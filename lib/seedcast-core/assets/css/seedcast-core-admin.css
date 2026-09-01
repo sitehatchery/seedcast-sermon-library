@@ -1,0 +1,589 @@
+/* Seedcast Core - shared admin styles.
+
+   GENERATED FILE. DO NOT EDIT.
+   Source of truth lives in the seedcast-core repository.
+   ------------------------------------------------------------------
+   Chrome for the surfaces core owns: the shared settings page, the
+   appearance picker, the suite grid, the moderation queue, and the
+   shared media field. Enqueued on core's own screens and on screens
+   belonging to a plugin registered through Seedcast\Core\Registry.
+   ------------------------------------------------------------------ */
+
+
+/* Moderation queue */
+.sc-queue { border-collapse: collapse; width: 100%; background: #fff; }
+.sc-queue th,
+.sc-queue td { text-align: left; padding: .75rem 1rem; border-bottom: 1px solid #e5e7eb; vertical-align: top; }
+.sc-queue th { font-size: .8rem; text-transform: uppercase; letter-spacing: .03em; color: #6b7280; }
+
+[data-submission-row] { transition: background .4s; }
+[data-submission-row][data-status="pending"]    { background: #fffbeb; }
+[data-submission-row][data-status="published"]   { background: #ecfdf5; }
+[data-submission-row][data-status="rejected"]    { background: #fef2f2; }
+[data-submission-row][data-status="needs_edit"]  { background: #eff6ff; }
+.sc-row-updated { background: #d1fae5 !important; }
+
+.sc-status-badge {
+  display: inline-block; padding: .1rem .55rem; border-radius: 999px;
+  font-size: .72rem; font-weight: 600; text-transform: capitalize;
+  background: #e5e7eb; color: #374151;
+}
+
+.sc-mod-actions { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .5rem; }
+.sc-mod-actions .button { font-size: .75rem; }
+
+[data-sc-notes] { width: 100%; min-height: 48px; margin-top: .4rem; font-size: .8rem; }
+
+/* ── Settings hub (tabbed, card-based) ─────── */
+.sc-settings-wrap h1 { margin-bottom: .25rem; font-size: 1.5rem; }
+.sc-settings-wrap > .description { margin: 0 0 1.5rem; color: #646970; max-width: 720px; }
+
+.sc-settings-nav { margin-bottom: 1.5rem; }
+
+
+.sc-settings-card {
+  background: #fff;
+  border: 1px solid #dcdcde;
+  border-radius: 6px;
+  padding: 1.5rem 1.75rem;
+  margin-bottom: 1.25rem;
+  max-width: 860px;
+  box-shadow: 0 1px 1px rgba(0,0,0,.03);
+}
+.sc-settings-card h2 {
+  margin: 0 0 .35rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1d2327;
+}
+.sc-settings-card > .description {
+  margin: 0 0 1.25rem;
+  color: #646970;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.sc-settings-card .form-table { margin-top: .5rem; }
+.sc-settings-card .form-table th { width: 200px; padding-left: 0; }
+
+/* Cross-plugin note (e.g. "Spam protection lives on the Seedcast tab"). */
+.sc-settings-wrap > .description:first-child {
+  padding: .75rem 1rem;
+  background: #f0f6fc;
+  border-left: 3px solid #2271b1;
+  border-radius: 0 4px 4px 0;
+  margin: 0 0 1.5rem;
+  font-size: 13px;
+  max-width: 860px;
+}
+
+/* ── Theme picker (Light / Dark / Warm / Minimal) ── */
+.sc-appearance-picker { display: flex; gap: 12px; flex-wrap: wrap; margin-top: .75rem; }
+.sc-appearance-option {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px; border: 2px solid #dcdcde; border-radius: 6px;
+  cursor: pointer; background: #fff; min-width: 240px; position: relative;
+  transition: border-color .15s, box-shadow .15s;
+}
+.sc-appearance-option:hover { border-color: #a8c8e8; }
+.sc-appearance-option.is-selected {
+  border-color: #2271b1;
+  box-shadow: 0 0 0 1px #2271b1;
+}
+.sc-appearance-radio { position: absolute; opacity: 0; width: 0; height: 0; }
+.sc-appearance-preview { display: flex; gap: 3px; flex-shrink: 0; }
+.sc-appearance-swatch {
+  display: block; width: 16px; height: 40px;
+  border-radius: 3px; border: 1px solid rgba(0,0,0,.1);
+}
+.sc-appearance-info { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+.sc-appearance-info strong { font-size: 13px; color: #1d2327; }
+.sc-appearance-info span { font-size: 11px; color: #646970; line-height: 1.4; }
+.sc-appearance-check {
+  display: none; color: #2271b1; font-weight: 700; font-size: 16px;
+  flex-shrink: 0;
+}
+.sc-appearance-option.is-selected .sc-appearance-check { display: block; }
+
+/* ── Seedcast Suite Grid (dashboard) ─────── */
+.sc-suite-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1rem;
+  max-width: 1200px;
+  margin-top: 1rem;
+}
+.sc-tile {
+  background: #fff;
+  border: 1px solid #dcdcde;
+  border-radius: 6px;
+  padding: 1.1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: .55rem;
+  transition: border-color .15s, box-shadow .15s;
+}
+.sc-tile.is-active { border-color: #2271b1; box-shadow: 0 0 0 1px #2271b1; }
+.sc-tile.is-uninstalled { background: #fafafa; }
+
+.sc-tile__head { display: flex; align-items: center; gap: .6rem; }
+.sc-tile__icon { color: #2271b1; font-size: 22px; width: 22px; height: 22px; flex-shrink: 0; }
+.sc-tile.is-inactive .sc-tile__icon,
+.sc-tile.is-uninstalled .sc-tile__icon { color: #a7aaad; }
+.sc-tile__name { margin: 0; font-size: 14px; font-weight: 600; color: #1d2327; flex: 1; }
+
+.sc-tile__toggle {
+  background: none; border: none; padding: 0; cursor: pointer;
+  flex-shrink: 0;
+}
+.sc-tile__toggle-track {
+  display: inline-block; width: 36px; height: 20px;
+  background: #c3c4c7; border-radius: 999px;
+  position: relative; transition: background .15s;
+}
+.sc-tile__toggle-thumb {
+  position: absolute; top: 2px; left: 2px;
+  width: 16px; height: 16px;
+  background: #fff; border-radius: 50%;
+  transition: transform .15s;
+  box-shadow: 0 1px 2px rgba(0,0,0,.2);
+}
+.sc-tile__toggle[aria-checked="true"] .sc-tile__toggle-track { background: #2271b1; }
+.sc-tile__toggle[aria-checked="true"] .sc-tile__toggle-thumb { transform: translateX(16px); }
+.sc-tile__toggle[disabled] { opacity: .5; cursor: not-allowed; }
+
+.sc-tile__tagline { margin: 0; color: #50575e; font-size: 13px; line-height: 1.45; flex: 1; }
+.sc-tile__foot { display: flex; align-items: center; justify-content: space-between; gap: .5rem; margin-top: .25rem; }
+.sc-tile__status { font-size: 11px; color: #646970; text-transform: uppercase; letter-spacing: .04em; }
+.sc-tile.is-active .sc-tile__status { color: #007017; }
+.sc-tile.is-uninstalled .sc-tile__status { color: #8a5100; }
+
+.sc-tile__download,
+.sc-tile__manage {
+  font-size: 13px; text-decoration: none; color: #2271b1;
+}
+.sc-tile__download:hover, .sc-tile__manage:hover { text-decoration: underline; }
+
+/* ── Shared media picker field (Seedcast\Admin\MediaField) ────────────────
+   URL input + Upload/Select + Clear, with an inline self-hosted preview.
+   Used by any suite plugin's meta boxes. */
+.sc-media-field {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.sc-media-field .large-text { flex: 1; min-width: 200px; }
+.sc-media-field .button { flex-shrink: 0; white-space: nowrap; }
+.sc-media-preview {
+  display: block;
+  margin-top: .5rem;
+  max-width: 100%;
+}
+audio.sc-media-preview { width: 100%; max-width: 480px; }
+.sc-media-preview--video { max-height: 160px; border-radius: 4px; }
+
+/* ── Suite grid states (install / activate / open) ── */
+.sc-tile.is-available { background: #fafafa; }
+.sc-tile__link { text-decoration: none; font-size: 12px; }
+.sc-tile__foot { display: flex; align-items: center; justify-content: space-between; gap: .5rem; margin-top: auto; }
+.sc-tile__status { font-size: 11px; color: #646970; }
+.sc-tile__tagline { font-size: 12px; color: #50575e; line-height: 1.5; margin: .5rem 0 .75rem; }
+
+/* ── Shared media field ── */
+.sc-media-field { display: flex; gap: .4rem; align-items: flex-start; flex-wrap: wrap; }
+.sc-media-field .sc-media-url { flex: 1 1 260px; }
+.sc-media-preview { display: block; margin-top: .5rem; max-width: 420px; width: 100%; }
+.sc-media-preview--video { max-height: 240px; }
+
+/* ── Contacts ── */
+.sc-contact-form { background: #fff; border: 1px solid #dcdcde; border-radius: 6px; padding: 1rem; max-width: 600px; margin: 1rem 0 1.5rem; }
+.sc-contact-table { margin-top: 1rem; }
+.sc-muted { color: #8c8f94; font-style: italic; }
+.sc-settings-foot { margin-top: 1rem; font-size: 12px; color: #646970; }
+
+/* The appearance radio is visually hidden, so the focus ring has to be drawn
+   on the label instead or keyboard users cannot see where they are. */
+.sc-appearance-radio:focus-visible + .sc-appearance-preview {
+  outline: 2px solid #2271b1;
+  outline-offset: 3px;
+}
+.sc-appearance-option:focus-within {
+  border-color: #2271b1;
+  box-shadow: 0 0 0 1px #2271b1;
+}
+
+/* ── Completeness report ───────────────────────
+   Two numbers with different jobs. The library score is the headline because
+   it is the one that can be acted on today; the weekly history sits under it
+   as a record. Buckets and per-item detail stay behind a disclosure so the top
+   of the screen answers at a glance. */
+.sc-completeness {
+  max-width: 900px;
+  margin: 1.5rem 0;
+}
+
+.sc-completeness__hero {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2rem;
+  padding: 1.5rem;
+  background: #fff;
+  border: 1px solid #dcdcde;
+  border-radius: 8px;
+}
+
+.sc-score {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 128px;
+  height: 128px;
+  border-radius: 50%;
+  border: 6px solid #dcdcde;
+  flex: 0 0 auto;
+}
+
+.sc-score--good { border-color: #00a32a; }
+.sc-score--fair { border-color: #dba617; }
+.sc-score--poor { border-color: #d63638; }
+
+.sc-score__value {
+  font-size: 2.75rem;
+  font-weight: 600;
+  line-height: 1;
+  color: #1d2327;
+}
+
+.sc-score__label {
+  margin-top: .35rem;
+  font-size: .75rem;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: #646970;
+}
+
+.sc-completeness__stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+
+.sc-stat { display: flex; flex-direction: column; }
+
+.sc-stat__value {
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: #1d2327;
+  line-height: 1.2;
+}
+
+.sc-stat__label {
+  font-size: .8rem;
+  color: #646970;
+}
+
+.sc-completeness__explain {
+  margin: 1rem 0;
+  color: #646970;
+  max-width: 70ch;
+}
+
+.sc-completeness__notice { margin: 1rem 0; }
+
+.sc-completeness__buckets {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.25rem 2rem;
+  margin-top: 1rem;
+}
+
+.sc-bar__head {
+  display: flex;
+  justify-content: space-between;
+  font-size: .85rem;
+  margin-bottom: .35rem;
+  color: #1d2327;
+}
+
+/* The track has to be visible, not just a container for the fill. Without it
+   the bar looks like a floating dash with a percentage stranded to the right,
+   and the eye has nothing carrying it from one to the other. */
+.sc-bar__track {
+  height: 8px;
+  background: #e4e4e6;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .05);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.sc-bar__fill { height: 100%; border-radius: 4px; }
+.sc-bar__fill--good { background: #00a32a; }
+.sc-bar__fill--fair { background: #dba617; }
+.sc-bar__fill--poor { background: #d63638; }
+
+.sc-weeks {
+  max-width: 900px;
+  border: 1px solid #dcdcde;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.sc-week + .sc-week { border-top: 1px solid #f0f0f1; }
+
+.sc-week__summary {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: .75rem 1rem;
+  cursor: pointer;
+  list-style: none;
+}
+
+.sc-week__summary::-webkit-details-marker { display: none; }
+.sc-week__summary:hover { background: #f6f7f7; }
+
+.sc-week__dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+}
+
+.sc-week__dot--good { background: #00a32a; }
+.sc-week__dot--fair { background: #dba617; }
+.sc-week__dot--poor { background: #d63638; }
+
+.sc-week__date { flex: 1 1 auto; color: #1d2327; }
+
+.sc-week__score { font-weight: 600; color: #1d2327; }
+
+.sc-week__flag {
+  font-size: .7rem;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  padding: .15rem .45rem;
+  border-radius: 3px;
+  background: #f0f0f1;
+  color: #646970;
+}
+
+.sc-week__flag--open { background: #e5f2fb; color: #135e96; }
+
+.sc-week__body { padding: 0 1rem 1rem; }
+
+.sc-week__buckets {
+  display: flex;
+  gap: 1.5rem;
+  font-size: .85rem;
+  color: #646970;
+}
+
+.sc-week__items { margin-top: .5rem; }
+
+.sc-week__version {
+  margin-top: .75rem;
+  font-size: .8rem;
+}
+
+/* Comprehensive comparison: two scores side by side, same visual weight, so
+   neither reads as the "real" one. */
+.sc-completeness__tabs { margin-bottom: 1.5rem; }
+
+.sc-completeness__compare {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  padding: 1.5rem;
+  background: #fff;
+  border: 1px solid #dcdcde;
+  border-radius: 8px;
+}
+
+.sc-completeness__excluded {
+  margin: .5rem 0 0 1.25rem;
+  list-style: disc;
+  color: #646970;
+}
+
+/* Item drill-down. The point is answering "what do I do next", so the field
+   most often missing comes before the list of individual items. */
+.sc-completeness__lead {
+  margin: 0 0 1rem;
+  max-width: 70ch;
+  color: #646970;
+}
+
+.sc-gaps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: .75rem;
+  margin: 0 0 1.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+.sc-gap {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: .75rem;
+  padding: .6rem .85rem;
+  background: #fff;
+  border: 1px solid #dcdcde;
+  border-radius: 6px;
+}
+
+.sc-gap__label { color: #1d2327; }
+
+.sc-gap__count {
+  font-weight: 600;
+  color: #d63638;
+  white-space: nowrap;
+}
+
+.sc-gap__count--none { color: #00a32a; }
+
+.sc-items__filters {
+  display: flex;
+  gap: .5rem;
+  margin: 0 0 1rem;
+  flex-wrap: wrap;
+}
+
+.sc-pill {
+  display: inline-block;
+  padding: .3rem .75rem;
+  border: 1px solid #dcdcde;
+  border-radius: 999px;
+  background: #fff;
+  color: #50575e;
+  text-decoration: none;
+  font-size: .85rem;
+}
+
+.sc-pill:hover { border-color: #2271b1; color: #2271b1; }
+
+.sc-pill--active {
+  background: #2271b1;
+  border-color: #2271b1;
+  color: #fff;
+}
+
+.sc-pill--active:hover { color: #fff; }
+
+.sc-item__score { font-weight: 600; white-space: nowrap; }
+.sc-item__score--good { color: #00a32a; }
+.sc-item__score--fair { color: #dba617; }
+.sc-item__score--poor { color: #d63638; }
+
+.sc-item__missing { color: #646970; }
+.sc-item__nodate { color: #d63638; font-weight: 600; }
+
+/* The completed count is the obvious thing to click when asking "which ones",
+   so it behaves like a link without looking bolted on. */
+.sc-stat__link {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+}
+
+.sc-stat__link:hover .sc-stat__value,
+.sc-stat__link:focus .sc-stat__value {
+  color: #2271b1;
+}
+
+.sc-stat__link:hover .sc-stat__label,
+.sc-stat__link:focus .sc-stat__label {
+  color: #2271b1;
+}
+
+/* Exclusions belong to the weekly scores only, never to the library score, so
+   the note sits with the weeks and reads as quiet context rather than as a
+   warning about the headline number. */
+.sc-completeness__excluded-note {
+  margin: 0 0 1rem;
+  max-width: 70ch;
+}
+
+.sc-completeness__excluded-note--warn {
+  padding: .6rem .8rem;
+  background: #fcf9e8;
+  border-left: 3px solid #dba617;
+  color: #646970;
+}
+
+/* Tier spread. A single count of everything short of perfect reads as a wall;
+   split into tiers the same library reads as a queue, and it visibly moves
+   when work happens. */
+.sc-tiers { margin-top: 1.25rem; }
+
+.sc-tiers__bar {
+  display: flex;
+  height: 10px;
+  border-radius: 5px;
+  overflow: hidden;
+  background: #e4e4e6;
+}
+
+.sc-tiers__seg { display: block; height: 100%; }
+.sc-tiers__seg--good { background: #00a32a; }
+.sc-tiers__seg--fair { background: #dba617; }
+.sc-tiers__seg--poor { background: #d63638; }
+
+.sc-tiers__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem 1.5rem;
+  margin: .75rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sc-tiers__legend a {
+  display: inline-flex;
+  align-items: baseline;
+  gap: .4rem;
+  text-decoration: none;
+  color: #50575e;
+}
+
+.sc-tiers__legend a:hover .sc-tiers__label,
+.sc-tiers__legend a:focus .sc-tiers__label { color: #2271b1; }
+
+.sc-tiers__dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+  align-self: center;
+}
+
+.sc-tiers__dot--good { background: #00a32a; }
+.sc-tiers__dot--fair { background: #dba617; }
+.sc-tiers__dot--poor { background: #d63638; }
+
+.sc-tiers__count { font-weight: 600; color: #1d2327; }
+
+.sc-item__tier {
+  font-size: .78rem;
+  color: #646970;
+}
+
+/* Service week cell. The week and its status are the reason to read this list
+   rather than the ordinary post list, so the status line sits under the range
+   rather than being crammed alongside it. */
+.sc-item__week {
+  color: #1d2327;
+  white-space: nowrap;
+}
+
+.sc-item__weeknote {
+  font-size: .78rem;
+  color: #646970;
+}
+
+.sc-item__weeknote--open { color: #135e96; }

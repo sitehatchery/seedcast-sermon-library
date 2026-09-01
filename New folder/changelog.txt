@@ -1,0 +1,371 @@
+=== Sermon Library Changelog ===
+
+Complete historical changelog moved out of readme.txt to keep the WordPress.org readme concise.
+
+= 2.70.1 =
+
+* Sermon section on Bulletin Library service pages now declares `'column' => 'full'`, so it renders above the two-column body area at full page width rather than being squeezed into the narrower main column.
+
+= 2.70.0 =
+
+**Bulletin Library integration**
+
+* Renamed `LivingBulletinBridge` to `BulletinLibraryBridge` to match the Bulletin Library plugin (formerly Living Bulletin, formerly Sunday). Bridge hooks into `scbl/service/sections`.
+* Section wrapper CSS classes updated from `sunday-section` to `scbl-section` so the sermon section inherits Bulletin Library's section styles.
+
+= 2.58.0 =
+* Sermons now tell the AI Engine where their video is, so a sermon with a YouTube link can be written from the captions YouTube already made. Nothing here changes without the engine installed.
+
+= 2.57.2 =
+* Documentation only. Describes the passage pages and the shortcode added in the versions above, and brings the changelog up to date. No code changed.
+
+= 2.57.1 =
+* The loading label on sermon lists is no longer written into the page while hidden. It was invisible on screen but still text, so anything reading the page as text rather than rendering it ended a complete list with a stray "Loading", which made the page look cut off.
+
+= 2.57.0 =
+* A sermon that walks through a paragraph now lists it as one span rather than a row per verse, in the order a Bible is in rather than the order they were typed.
+* Verses are only joined where they actually run together. A sermon on 6:10 and 6:12 stays as two, because saying 6:10-12 would claim verse 11 was preached when it was skipped.
+* A joined span still links to the right passage page, even though no sermon was filed under that exact wording.
+
+= 2.56.0 =
+* Addresses now keep chapter and verse apart. "Isaiah 59:16-17" used to become isaiah-5916-17, which names a chapter and verse that do not exist and matches nothing anybody searches for. New sermons and passages get readable addresses; existing ones are left alone, including any you have corrected by hand.
+
+= 2.55.1 =
+* Corrected the spacing around the sentence at the end of a sermon. There was too much space above it and none at all below, so the series that follows sat against it.
+
+= 2.55.0 =
+* Passage pages now find sermons on any passage covering the same words, not only the identical wording. A page for Ephesians 6:15 lists the sermon preached on Ephesians 6:10-20.
+* Fixed the missing gap between sermons on a passage page.
+
+= 2.54.2 =
+* A sermon with an empty excerpt now falls back to its description in lists. It was showing no text at all, because an excerpt that exists but is blank was being used in preference to a description that was not.
+
+= 2.54.1 =
+* Sermons are now filed under their passages however they were created. Generated and imported sermons recorded their passages but were never added to them, so a passage page could report having no sermons while the sermons listed it on their own pages.
+
+= 2.54.0 =
+* Passages on a sermon now link to that passage's page on your own site, with a separate link to read it in your chosen translation. Nothing linked to the passage pages before, so they existed and could not be reached by clicking anything.
+* New `[scsl_scripture_list]` shortcode: every passage your church has preached from, grouped by book in the order a Bible is in. Put it on a page under Sermons to make the whole set reachable.
+
+= 2.53.1 =
+* Passage pages now open with a link to read the passage in the translation your church has set.
+
+= 2.53.0 =
+* Every passage now has a page listing the sermons preached from it. These addresses existed and were being indexed, but had no page of their own and fell through to whatever the theme happened to show.
+* Sermons on a passage page use the same card as the rest of the suite, so two lists of the same sermons no longer look like different sites.
+* Fixed the sermon section never appearing on a Living Bulletin service page. It was listening for a name the plugin stopped using when Sunday was renamed, so the two never met.
+
+= 2.52.0 =
+* Sermon pages now end with a sentence saying who preached, at which church, in which town, and when you gather. It reads naturally for anyone who arrived from a search, and it is what search engines read to connect your church to a place.
+* Built from what you have already filled in. Any part you have not set is left out, and nothing appears at all if your church details are empty.
+* Your city, state and postcode are now their own fields under Settings, Seedcast, Church. Existing addresses are untouched.
+
+= 2.51.3 =
+* Updated the shared library to 1.20.0.
+
+= 2.51.2 =
+* Updated the shared library to 1.19.0, which adds a way to check your church address on the map.
+
+= 2.51.1 =
+* Updated the shared library to 1.18.0.
+
+= 2.51.0 =
+* Added a hook at the end of the sermon sidebar so other Seedcast plugins can place something there. Visitor Card uses it to put its card under the scripture references.
+* Corrected a few British spellings in the shared library.
+
+= 2.50.2 =
+* Shortened the upgrade notice, which exceeded the length WordPress.org allows.
+
+= 2.50.1 =
+* Plugin Check cleanup: the completeness queries now use WordPress's identifier placeholder for the table name, and the report screen reads its query arguments through a single sanitised helper.
+* Minimum WordPress version is now 6.2, which is where the identifier placeholder was added.
+
+= 2.50.0 =
+* The Sermons tab on the Completeness report now shows the service week each sermon counted toward, and whether that week is a closed record, still open, or from before you started measuring.
+* Made clear that the score on each row is where the sermon stands today, which for a closed week is not the same as the score that week was recorded at.
+
+= 2.49.2 =
+* Documentation only. The readme now describes the Completeness report and the shared church details, with answers on how the score is worked out, why a locked week does not change, and how to switch the scores off.
+
+= 2.49.1 =
+* Fixed completeness scores not updating after changing which content sections you use. The scores are cached, and changing the setting did not clear the cache, so the report kept showing figures from before the change for up to fifteen minutes.
+* Scores now also refresh when a sermon is added, deleted, trashed or restored.
+
+= 2.49.0 =
+* The comprehensive score now appears alongside the library score above the sermon list, when you have some content sections switched off.
+
+= 2.48.1 =
+* Fixed two settings checkboxes that could not be switched off. Completeness scores and Tidy transcripts would report as saved and then come back switched on.
+
+= 2.48.0 =
+* Added the library score above the sermon list, with the group counts, linking through to the Completeness report.
+* Added a setting to turn completeness scores off. If you only publish recordings, the scores and labels can be hidden from the sermon list, the sermon editor and the menu.
+* Weekly scores continue to be recorded even with the display turned off, so nothing is lost if you switch it back on later.
+
+= 2.47.0 =
+* Sermons are now grouped into Complete, Almost there, Needs work and Just started, on the report, in the sermon list and in the sermon editor.
+* The Completeness report shows how your library is spread across those groups, so progress is visible rather than being one large number.
+* Each group can be clicked to see just those sermons.
+
+= 2.46.0 =
+* Clearer Completeness report. The library score is an average across all your sermons and excludes nothing, which the page now says plainly.
+* Replaced the completed count with how many sermons need work, which links straight to them.
+* Moved the undated sermon warning next to the weekly scores, which are the only scores it affects.
+
+= 2.45.0 =
+* The completeness score on the sermon list and in the sermon editor now links straight to the Completeness report.
+* The sermon editor shows how long after the service that sermon was finished.
+* The Completeness report shows how long your sermons typically take to finish, counted only from sermons posted since you started using the report.
+
+= 2.44.0 =
+* The sermon list now shows a completeness score at the top of the Content column, with the sermon details that are missing listed underneath.
+* Added a Completeness box to the sermon editor showing the score and exactly what is present and what is not.
+* The More tab no longer counts against completeness. Nothing can generate it and most sermons never have one, so it was holding every sermon below 100.
+* Fixed the sermon list stylesheet, which was never loaded on that screen, leaving the Content column unstyled.
+
+= 2.43.0 =
+* Completeness now shows which sermons are missing what. A new tab lists every sermon worst first, filterable by needs work, complete, or no date.
+* Added a summary of how many sermons are missing each field, so you can see at a glance which one thing would move your score the most.
+* The completed count on the overview now links straight to the sermons that need attention.
+* Fixed the progress bars, which were hard to read against a white background.
+
+= 2.42.0 =
+* Completeness now respects the content sections you have chosen to use, so you are only scored on what you actually want.
+* Added a Comprehensive score view, shown only when you have some content switched off, so you can see what a fuller library would look like.
+* Generate Sermon is now visible on every site and explains what sermon generation does.
+* Fixed the plugin row link, which used an old product name and pointed at the wrong page.
+
+= 2.41.0 =
+* New: Completeness report. A single score for your sermon library, plus a week by week record of how each week actually went. Find it under Sermon Library, Completeness.
+* Weekly scores lock once the week has passed, so the record reflects whether the work happened that week. Your library score keeps rising as you fill things in.
+* Sermons without a recorded date are not counted toward any week, and are now flagged on the sermon list so they are easy to find.
+* Scores separate sermon details from written content, so you can see which is lagging.
+
+= 2.40.0 =
+* New: Church details, shared across every Seedcast plugin. Set your church name, address, service day, service times, phone, contact email, events page and a note to visitors once under Settings, Seedcast, Church.
+* New: [seedcast_church_details] shortcode and a matching Elementor widget, so the same details can appear in your footer, on your contact page, or anywhere else without being retyped.
+* Churches meeting on a day other than Sunday are now handled properly wherever the service day is referenced.
+* Fixed a fatal error in the shared library that affected sites running a Seedcast plugin which collects form submissions.
+
+= 2.39.0 =
+
+**Pagination for the content shortcode**
+
+* `[scsl_content]` can now page through the whole archive rather than showing only the newest few. Older articles and Bible studies stop being unreachable once enough newer ones exist.
+* The shortcode generator gained a Pagination option under Content, which appears for the list and grid layouts and hides itself for the slider, where pages have no meaning. With it on, the count below becomes how many appear per page.
+* Series grid pagination now uses the shared page control the rest of the suite uses, so it collapses long runs instead of printing one link for every page, and matches the styling of everything around it.
+* The shortcode generator now opens on Latest Sermon, which needs nothing configured, rather than on a display that does.
+
+= 2.38.4 =
+
+**Sermon card visual polish**
+
+* The View Sermon call to action now uses the site's shared button style rather than a card-specific pill, so it matches the rest of the site's design.
+* Card visual weight (background, radius, hover lift) now uses the same design tokens as other cards in the Seedcast family so it feels of a piece with the rest of the site.
+* Sermon poster is larger and has rounded corners.
+
+= 2.38.3 =
+
+**More context on the sermon card**
+
+* The sermon card on Living Bulletin service pages now includes a metadata column: speaker, series (linked to the series page), and article (linked to the sermon page's Article tab), plus direct links into the Bible Study and Transcript tabs when those exist on the sermon.
+* Each row appears only when the sermon has that content, so a bare sermon collapses cleanly.
+* Cards fill the section width rather than being capped, so a single sermon reads as substantive content rather than a small tile.
+
+= 2.38.2 =
+
+**Sermon card polish on Living Bulletin service pages**
+
+* Sermon poster art now shows in full instead of being cropped. Cards use a soft matte around the poster so different image proportions (portrait posters, landscape banners, square photos) all render cleanly.
+* Cards flow in a responsive grid rather than stretching full width. One sermon looks like a card, several sermons flow into columns based on available space.
+
+= 2.38.1 =
+
+**Bug fix**
+
+* Fixed a fatal error on plugin activation caused by the autoloader not knowing where to find the `LivingBulletinBridge` class. This class ships in `includes/Frontend/class-livingbulletinbridge.php` but the autoloader was deriving a different filename from its name, so the class was never loaded.
+
+= 2.38.0 =
+
+**Living Bulletin integration and suite plumbing tidy up**
+
+* Sermons for the day now appear on the Living Bulletin service page for the same date. Cards show the sermon's featured image, title, speaker, and short excerpt, with a link straight to the sermon. Multiple sermons on one day stack. No configuration is needed - the cards appear automatically whenever the dates line up. If Living Bulletin is not installed, nothing changes.
+* Upgraded the bundled Seedcast Core library to 1.9.0. The suite grid is now built from what each installed plugin registers about itself at runtime, so adding a new suite plugin no longer needs an update to every other plugin's copy of the library.
+* Sermon Library registers its own suite grid card metadata (name, tagline, icon, admin URL) rather than falling back to core's built-in catalog.
+
+= 2.36.0 =
+
+**Put your writing where people will find it**
+
+* New `[scsl_content]` shortcode lists recent articles or Bible studies anywhere on your site, as a list, a grid or a slider. Each one opens the sermon page straight to that tab, so nothing is published twice and your sermon page keeps its search authority.
+* Articles carry their own title in listings and as the heading on the sermon page, so a piece is named for what it is about rather than which Sunday it came from.
+* New `[scsl_topic_list]` display in the shortcode generator, for the topics your sermons are tagged with.
+* Order any listing by most recent or by what people are actually reading.
+
+**Choose what your church publishes**
+
+* New setting for which content sections you use. Anything switched off stops appearing on your sermon pages and stops being counted as missing.
+* Scripture references are now a section of their own, so a sermon can list every passage it covers, or just the one it is on.
+* The name you give the More tab is now kept in revision history along with the rest of your content.
+
+**Fixes**
+
+* The book filter now lists only books a sermon is actually about, taken from its focus passage, and finds them. Previously it listed every book mentioned in passing and returned nothing useful.
+* Filtering series by topic now works. It matches series through the sermons in them, which is where a series gets its subject from.
+* Grids now honor the number of columns you asked for. Series and speaker grids had been collapsing to a single column.
+* View counting no longer stops working on cached sites. The counter relied on a security token baked into the page, which expires long before a cached page does, so views were being silently discarded.
+* Speakers can be ordered by how many sermons they have preached, which usually puts your pastor first without arranging anything by hand, and individual speakers can be left out of a listing.
+* Series per page can now be set on the shortcode rather than only in settings.
+* The shortcode generator no longer carries a setting from one display type to the next, and no longer writes out values that are already the default.
+
+= 2.20.0 =
+
+* Sermon content now appears on your home page or anywhere else through a single shortcode, rather than only on the sermon page.
+* Visual shortcode generator gained Content and Topics displays alongside sermons, series and speakers.
+
+= 2.14.0 =
+
+* Article titles are derived from the article itself, so the field fills in as soon as the content arrives.
+* Scripture references found in a sermon are stored alongside the focus passage, with duplicates and the focus passage itself filtered out.
+
+= 2.10.0 =
+
+* New setting for which content sections your church uses, so the sermon page shows what you publish and nothing else.
+* The sermon list now shows what each sermon has and what is missing, so an archive can be filled in without opening every one.
+
+= 2.6.0 =
+
+* Sermon content is now kept in revision history. The summary, article, study guide, resources and transcript can be compared and restored from the Revisions screen like any other content, whether they were written by hand or generated. Previously none of these fields had any history at all.
+
+= 2.5.1 =
+
+* The podcast feature is now called the Sermon Audio Feed throughout the admin. Only the wording changed: your feed address, its contents and every setting are exactly as they were.
+
+= 2.5.0 =
+
+* Added a way to copy sermon audio hosted by Seedcast into your own media library, so your recordings are always yours to take back. Optional, and nothing needs doing if you are happy as you are.
+
+= 2.4.0 =
+
+* Added a Podcast screen showing everything in your feed, everything that is not, and why. Sermons can be added to or removed from the feed from one place instead of one sermon at a time.
+* Fixed the podcast include option on the Generate Sermon screen, which had no effect either way.
+
+= 2.3.3 =
+
+* Fixed a notice logged on every request under WordPress 6.7 and later, caused by the plugin registering itself with the shared library before translations were available.
+
+= 2.3.1 =
+
+* Fixed a PHP warning on series pages caused by an undefined variable in the filter bar.
+* Added a Generate Sermon screen under Sermon Library, explaining how the Seedcast AI Engine turns a recording into a summary, outline, study notes, study guide, article, scripture list, FAQs and a clean transcript.
+* Moved the mapping between generated content and sermon fields into one place, so the content zip importer and the Seedcast AI Engine fill in a sermon identically.
+
+= 2.3.0 =
+
+**Importing**
+
+* Added a one click importer for Sermon Manager, Sermon Works and Mattytap Sermons. It reads the sermons already on the site rather than asking for a file, and changes nothing in the original plugin. The old plugin does not need to be active, so a site that already removed it can still recover its sermons.
+* The importer scans first and reports what it found, including duplicate preachers and series, which you can merge before anything is written.
+* Choose whether to import everything as drafts or to match the publish state of the original.
+* Preachers and series become full speaker and series pages, carrying across whatever description the original term had.
+* Notes and bulletins come across as downloadable files on the sermon, labeled from the attachment title.
+* Scripture references that cannot be read as a book, chapter and verse are listed for you rather than guessed at, and are imported as written.
+* Re-running the import updates what came across the first time instead of duplicating it.
+* Fixed: the Series Engine importer was missing its upload step entirely, so there was no way to choose a CSV.
+* Fixed: the Series Engine series mapping screen showed internal label names such as "slImportI18n.importAs" instead of the labels themselves, and series titles containing an ampersand displayed as "&amp;".
+
+**Audio feed**
+
+* Added show level settings: cover art, title, subtitle, description, author, owner email, copyright, language, category, show website, and an explicit flag.
+* Fixed: the feed hardcoded its language, category and explicit flag, and carried no owner email at all. Apple requires one to verify ownership, so the feed could not be submitted before this.
+* Every field falls back to your site title, tagline, admin email and site icon, so a feed you never touch is still valid.
+* Cover art is stored as a media library reference rather than a URL, so the full size image is used in the feed. Apple rejects artwork below 1400x1400.
+* Added a limit on how many episodes the feed contains, defaulting to 50. It was previously fixed at 200, which is a large file for apps to fetch on every refresh.
+* Added a "moved to a new feed" field. If you ever relocate your show, this is what tells directories to follow, so your subscribers go with you.
+
+**Images**
+
+* A sermon with no image of its own now falls back to its series artwork, then to a site-wide default image you can set. Applies everywhere: sermon pages, archives, shortcodes, structured data and the feed.
+* Added an option to load none of the plugin's front-end CSS, for designers who would rather style everything from scratch. The markup and class names are unchanged.
+
+**Compliance**
+
+* File reads and deletes in the content importer now go through WP_Filesystem, so they work on hosts where WordPress writes over FTP or SSH rather than as the web user.
+* The bundled shared library now adopts the plugin's own text domain, so its strings are translated alongside the rest of the plugin.
+
+**Settings and admin**
+
+* Settings moved to Settings > Seedcast, in one permanent place alongside any other Seedcast plugin you run. The Settings link under the Sermon Library menu goes straight there.
+* Theme choice is now shared across Seedcast plugins, so they match without configuring each one. Your existing choice is carried over on update.
+* The Import Content box on the sermon editor moved to the sidebar, under Publish.
+* Removed the Date Range and Topics columns from the Series list. Neither is an attribute of a series and both were always empty.
+* Sermons now appear first in the menu, and Topics sits with the content screens rather than after the shortcode tool.
+* Fixed: deleting a topic emptied the page instead of returning to the list. The topic was deleted, but the redirect could not run because the page had already started rendering.
+* Fixed: the Series and Speaker pickers on a sermon listed only published records, so a sermon correctly linked to a draft appeared to have no series or speaker at all.
+
+**Appearance**
+
+* Front end output now inherits fonts and text colors from your theme instead of setting its own. Sermon pages, series pages and the shortcodes will look more like the rest of your site.
+* Shared components (buttons, lists, filters, pagination, breadcrumbs, the audio player, video embeds) now come from a shared library rather than being duplicated, so they behave consistently.
+* Removed the underline and fixed heading sizes that were being applied to section titles.
+* Fixed: series artwork was forced into a square container, leaving dead space beneath landscape images.
+* Fixed: the share divider on a sermon page drew even when there were no platform links above it.
+* The X share button is now labeled "Share on X".
+
+**Fixes**
+
+* Fixed: speaker pages referenced a variable that was never defined, producing a PHP warning on every view.
+* Fixed: speaker pages ran one database query per sermon to build the series list, then one per series after that. Both are now a single query, which makes a large difference for speakers with a long history.
+* Fixed: PDF download button labels were escaped twice.
+* Fixed: share and Bible passage links used urlencode(), which encodes spaces as plus signs. Now rawurlencode().
+* Fixed: the plugin declared PHP 7.4 as its minimum but used a PHP 8.0 function. Verified clean against 7.4.
+* Fixed: the breadcrumb shown on the page and the breadcrumb sent to search engines were built separately and could disagree. Both now come from one source.
+* Video embeds use YouTube's privacy mode and Vimeo's do-not-track flag everywhere, not just in some places.
+
+**Accessibility**
+
+* Settings sections are now real tabs with proper roles and keyboard support.
+* The copy link button announces itself to screen readers instead of only changing its label.
+* The theme picker shows a visible focus indicator for keyboard users.
+
+= 1.7.0 =
+* Changed: Custom post type slugs renamed from sl_ to scsl_ prefix for uniqueness
+* Added: Automatic database migration runs on activation and update
+* Added: JSON round-trip importer for migrating between sites
+* Added: Sermon archive template at /sermon/
+* Fixed: Scripture panel variable scope
+* Fixed: Series hero image aspect ratio
+
+= 1.5.0 =
+* Added: Speaker grid shortcode [scsl_speaker_grid] with slider support
+* Added: Speaker archive page at /speakers/
+* Added: Separate headshot field for episode card thumbnail vs featured image for profile/card
+* Added: Drag-to-reorder speakers in admin (same as series)
+* Added: Automatic Yoast SEO / RankMath / AIOSEO configuration on first activation
+* Added: Meta description, Open Graph, and Twitter Card tags when no SEO plugin installed
+* Added: Export to JSON (Import / Export page)
+* Added: Series Grid slider mode (slider="true" attribute)
+* Added: Series per page setting
+* Added: Automatic permalink flush on plugin update, so no manual Permalinks save is needed
+* Improved: Mobile layout across all shortcodes and templates
+* Improved: Elementor editor CSS loading for all shortcodes
+* Fixed: Series card click navigation
+* Fixed: Stale JS cache causing click issues
+* Removed: AI Integration settings (reserved for Pro)
+* Removed: Raw transcript field (reserved for Pro)
+
+= 1.4.0 =
+* Added: Warm theme
+* Added: Series Engine CSV importer with flexible series mapping
+* Added: Scripture passage picker (Book, Chapter, Verse)
+* Added: External platform links per sermon (Spotify, Apple Podcasts, YouTube, etc.)
+* Added: Social share buttons (Facebook, X, LinkedIn, Copy Link)
+* Added: Shortcode Generator admin page
+* Added: SEO-friendly pagination
+* Added: Drag-to-reorder series
+* Added: Admin filters for sermon list (Series, Speaker, Topic)
+* Added: Topics manager page
+* Added: Podcast RSS feed
+
+= 1.0.0 =
+* Initial release

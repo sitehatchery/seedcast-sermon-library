@@ -1,0 +1,681 @@
+/* Sermon Library: admin styles */
+
+/* ── Meta Tables ─────────────────────────── */
+.scsl-meta-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.scsl-meta-table th {
+  width: 160px;
+  text-align: left;
+  vertical-align: middle;
+  padding: .65rem .5rem .65rem 0;
+  font-weight: 600;
+  color: #1d2327;
+  white-space: nowrap;
+}
+.scsl-meta-table td {
+  padding: .5rem 0;
+  vertical-align: middle;
+}
+.scsl-meta-table input[type="text"],
+.scsl-meta-table input[type="url"],
+.scsl-meta-table input[type="email"],
+.scsl-meta-table input[type="date"],
+.scsl-meta-table input[type="number"],
+.scsl-meta-table select {
+  min-height: 36px;
+}
+
+/* ── Tab System (meta boxes) ─────────────── */
+.scsl-tab-wrap { margin-top: .5rem; }
+.scsl-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  border-bottom: 2px solid #dcdcde;
+  margin-bottom: 1rem;
+}
+.scsl-tab {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  padding: .55rem .85rem;
+  font-size: 13px;
+  font-weight: 600;
+  color: #646970;
+  cursor: pointer;
+  transition: color .12s, border-color .12s;
+  white-space: nowrap;
+}
+.scsl-tab:hover { color: #1d2327; }
+.scsl-tab.active {
+  color: #2271b1;
+  border-bottom-color: #2271b1;
+}
+.sc-tab-panel { display: none; }
+.sc-tab-panel.active { display: block; }
+
+.scsl-textarea {
+  font-family: monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  resize: vertical;
+}
+
+/* ── Asset Status Badge ──────────────────── */
+.scsl-status-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.scsl-status-table td {
+  padding: .35rem 0;
+  border-bottom: 1px solid #f0f0f1;
+}
+.scsl-status-table tr:last-child td { border-bottom: none; }
+
+.scsl-status-badge {
+  display: inline-block;
+  padding: .2rem .55rem;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.scsl-status--pending  { background: #f0f0f1; color: #646970; }
+.scsl-status--ready    { background: #d1e7dd; color: #0a3622; }
+.scsl-status--published{ background: #cfe2ff; color: #084298; }
+.scsl-status--error    { background: #f8d7da; color: #58151c; }
+
+/* ── Asset Dots (list column) ────────────── */
+.scsl-asset-dots { display: flex; gap: 3px; }
+.scsl-dot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 800;
+  cursor: default;
+}
+.scsl-dot--pending   { background: #f0f0f1; color: #9ca3af; }
+.scsl-dot--ready     { background: #d1e7dd; color: #0a3622; }
+.scsl-dot--published { background: #cfe2ff; color: #084298; }
+.scsl-dot--error     { background: #f8d7da; color: #58151c; }
+
+/* ── Input with prefix (@) ───────────────── */
+.scsl-input-prefix-wrap {
+  display: flex;
+  align-items: center;
+  border: 1px solid #8c8f94;
+  border-radius: 4px;
+  overflow: hidden;
+  width: fit-content;
+}
+.scsl-input-prefix {
+  padding: 0 .55rem;
+  background: #f6f7f7;
+  border-right: 1px solid #8c8f94;
+  color: #646970;
+  font-size: 14px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+}
+.scsl-input-prefix-wrap input {
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  height: 36px;
+}
+
+/* ── Settings Page ───────────────────────── */
+.scsl-settings-wrap h1 { margin-bottom: 1.5rem; }
+.scsl-settings-card {
+  background: #fff;
+  border: 1px solid #dcdcde;
+  border-radius: 4px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+  max-width: 800px;
+}
+.scsl-settings-card h2 {
+  margin: 0 0 .35rem;
+  font-size: 1rem;
+  font-weight: 700;
+}
+.scsl-settings-card > .description {
+  margin: 0 0 1rem;
+  color: #646970;
+  font-size: 13px;
+}
+
+/* ── Passage Repeater ────────────────────── */
+.scsl-passage-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.scsl-passage-row input { flex: 1; max-width: 300px; }
+
+/* ── PDF button (admin) ──────────────────── */
+.scsl-pdf-btn {
+  display: inline-block;
+  padding: .3rem .75rem;
+  border: 1px solid #c3c4c7;
+  border-radius: 3px;
+  font-size: 12px;
+  color: #646970;
+  text-decoration: none;
+  background: #f6f7f7;
+}
+.scsl-pdf-btn:hover { border-color: #2271b1; color: #2271b1; background: #fff; }
+
+
+/* ── CSS Editor ──────────────────────────── */
+.scsl-css-editor {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  background: #1e1e1e;
+  color: #d4d4d4;
+  border-color: #1e1e1e;
+  border-radius: 4px;
+  resize: vertical;
+}
+/* CodeMirror overrides to fill the area */
+.CodeMirror {
+  height: 320px !important;
+  font-size: 13px !important;
+  border-radius: 4px;
+  border: 1px solid #dcdcde;
+}
+
+/* ── External Link Rows ──────────────────── */
+.scsl-ext-link-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+.scsl-ext-link-row select { min-width: 150px; min-height: 32px; }
+.scsl-ext-link-row input  { flex: 1; min-width: 140px; }
+
+/* ── Passage Picker ──────────────────────── */
+.scsl-passage-picker {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+.scsl-passage-picker select { min-width: 160px; min-height: 32px; }
+.scsl-passage-picker input[type="number"] { min-height: 32px; text-align: center; }
+.scsl-pp-colon, .scsl-pp-dash { color: #646970; font-weight: 600; font-size: 14px; }
+.scsl-pp-preview {
+  font-weight: 600;
+  color: #2271b1;
+  font-size: 13px;
+  min-width: 120px;
+  padding: 0 6px;
+}
+.scsl-passage-row--extra {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+
+/* ── Media Upload Field ──────────────────── */
+.scsl-media-field {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.scsl-media-field .large-text {
+  flex: 1;
+  min-width: 200px;
+}
+.scsl-media-field .button {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------------------------
+ * Generate Sermon upsell
+ *
+ * The Generate Sermon screen without Seedcast Pro, or with Pro but no key
+ * covering sermon generation. Pro replaces this page entirely once both are
+ * in place, so nothing here is ever seen alongside the real form.
+ * --------------------------------------------------------------------- */
+
+.scsl-upsell-intro {
+	margin: .5rem 0 1rem;
+	max-width: 70ch;
+	font-size: 14px;
+	color: #50575e;
+}
+
+.scsl-upsell-box {
+	background: #fff;
+	border: 1px solid #dcdcde;
+	border-left: 4px solid var( --sc-admin-accent, #b8912f );
+	border-radius: 6px;
+	padding: 1.5rem 1.75rem;
+	max-width: 780px;
+	margin-top: 1rem;
+}
+
+.scsl-upsell-box h2 {
+	margin-top: 0;
+}
+
+.scsl-upsell-list {
+	margin: 0 0 1rem;
+	padding: 0;
+	list-style: none;
+	font-size: 14px;
+	color: #3c434a;
+	columns: 2;
+}
+
+@media screen and ( max-width: 600px ) {
+	.scsl-upsell-list {
+		columns: 1;
+	}
+}
+
+.scsl-upsell-list li {
+	padding: 2px 0 2px 1.1rem;
+	position: relative;
+	break-inside: avoid;
+}
+
+.scsl-upsell-list li::before {
+	content: "";
+	position: absolute;
+	left: 0;
+	top: .6em;
+	width: 5px;
+	height: 5px;
+	border-radius: 50%;
+	background: var( --sc-admin-accent, #b8912f );
+}
+
+.scsl-upsell-actions {
+	margin-top: 1.25rem;
+	display: flex;
+	gap: .75rem;
+	align-items: center;
+	flex-wrap: wrap;
+}
+
+.scsl-upsell-actions .description {
+	max-width: 40ch;
+}
+
+.button.scsl-generate-link .dashicons {
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+	line-height: 1.6;
+	margin-right: 2px;
+}
+
+.scsl-gen-passage {
+	display: flex;
+	align-items: center;
+	gap: .4rem;
+	flex-wrap: wrap;
+}
+
+.scsl-gen-passage input[type="text"] {
+	width: 4.5rem;
+	text-align: center;
+}
+
+/* ------------------------------------------------------------------------
+ * Audio feed screen
+ * --------------------------------------------------------------------- */
+
+.scsl-feed-intro {
+	margin: .4rem 0 1.25rem;
+	font-size: 14px;
+	color: #50575e;
+	max-width: 70ch;
+}
+
+.scsl-podcast-header {
+	max-width: 780px;
+	margin-bottom: 1.5rem;
+}
+
+.scsl-reclaim {
+	max-width: 780px;
+	padding: 1rem 1.25rem;
+	background: #f6f7f7;
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
+}
+
+.scsl-reclaim p:first-child {
+	margin-top: 0;
+	font-weight: 600;
+}
+
+.scsl-reclaim-status {
+	margin-left: .5rem;
+}
+
+.scsl-reclaim-log {
+	margin-top: .75rem;
+	font-size: 12px;
+}
+
+/* Sermon list: what is written and what is not. */
+
+.scsl-has {
+	color: #1d2327;
+}
+
+.scsl-none,
+.scsl-missing {
+	color: #646970;
+	font-size: 12px;
+}
+
+/*
+ * The source is missing, so nothing can be written for this sermon until
+ * somebody adds one. A tag rather than a sentence, because on a list of forty
+ * the eye is scanning for which rows need attention rather than reading.
+ */
+.scsl-tag {
+	display: inline-block;
+	margin-top: .35rem;
+	padding: 1px 8px;
+	border: 1px solid;
+	border-radius: 999px;
+	font-size: 11px;
+	font-weight: 600;
+	line-height: 1.7;
+	text-transform: uppercase;
+	letter-spacing: .02em;
+}
+
+.scsl-tag--missing {
+	background: #fcf0f1;
+	border-color: #d63638;
+	color: #b32d2e;
+}
+
+/*
+ * A content section this church has switched off. The tab and its fields stay
+ * where they are, because a tab that vanishes leaves somebody hunting for
+ * writing they thought they had. Greyed and explained is kinder than gone.
+ */
+
+.scsl-section-off {
+	margin: 0 0 1rem;
+	padding: .6rem .9rem;
+	background: #f6f7f7;
+	border-left: 4px solid #dba617;
+}
+
+.scsl-section-off p {
+	margin: 0;
+	color: #50575e;
+	font-size: 13px;
+}
+
+.scsl-section-off ~ * {
+	opacity: .5;
+}
+
+.scsl-section-off ~ * :is( input, textarea, select, button ) {
+	pointer-events: none;
+}
+
+/* Sermon list: the completeness score, above the content list it summarises.
+   Sized to read as a status chip rather than as body text, because it is the
+   thing being scanned down the column. */
+.scsl-score {
+	display: inline-block;
+	margin-bottom: .35rem;
+	padding: .1rem .45rem;
+	border-radius: 3px;
+	font-size: .78rem;
+	font-weight: 600;
+	line-height: 1.6;
+}
+
+.scsl-score--good {
+	background: #edfaef;
+	color: #00733f;
+	box-shadow: inset 0 0 0 1px #b8e6c4;
+}
+
+.scsl-score--fair {
+	background: #fcf6e4;
+	color: #8a6116;
+	box-shadow: inset 0 0 0 1px #f0d99a;
+}
+
+.scsl-score--poor {
+	background: #fcf0f1;
+	color: #b32d2e;
+	box-shadow: inset 0 0 0 1px #f2b8b9;
+}
+
+.scsl-score--nodate {
+	background: #f6f7f7;
+	color: #b32d2e;
+	box-shadow: inset 0 0 0 1px #dcdcde;
+}
+
+/* Sermon editor: the same answer, in the place the work happens. */
+.scsl-completeness-box__score {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 68px;
+	margin-bottom: .75rem;
+	border-radius: 6px;
+	border: 2px solid #dcdcde;
+}
+
+.scsl-completeness-box__score--good { border-color: #00a32a; background: #f4fbf6; }
+.scsl-completeness-box__score--fair { border-color: #dba617; background: #fdfaf1; }
+.scsl-completeness-box__score--poor { border-color: #d63638; background: #fdf5f5; }
+
+.scsl-completeness-box__value {
+	font-size: 1.75rem;
+	font-weight: 600;
+	color: #1d2327;
+	line-height: 1;
+}
+
+.scsl-completeness-box__heading {
+	margin: .75rem 0 .25rem;
+	font-size: .78rem;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: .04em;
+	color: #646970;
+}
+
+.scsl-completeness-box__list {
+	margin: 0 0 0 1.1rem;
+	list-style: disc;
+}
+
+.scsl-completeness-box__list--missing li { color: #b32d2e; }
+.scsl-completeness-box__list--present li { color: #646970; }
+
+.scsl-completeness-box__done { color: #00733f; margin: 0; }
+
+.scsl-completeness-box__warn {
+	margin: 0 0 .5rem;
+	padding: .5rem .6rem;
+	background: #fcf0f1;
+	border-left: 3px solid #d63638;
+	color: #b32d2e;
+}
+
+/* The badge is a link, but it should still read as a status chip rather than
+   as blue link text sitting in a table cell. */
+a.scsl-score,
+a.scsl-score:hover,
+a.scsl-score:focus {
+	text-decoration: none;
+}
+
+a.scsl-score:hover,
+a.scsl-score:focus {
+	filter: brightness(.96);
+}
+
+.scsl-completeness-box__link {
+	margin: .75rem 0 0;
+	padding-top: .6rem;
+	border-top: 1px solid #f0f0f1;
+}
+
+/* The tier name sits under the number in the editor box, so the score reads as
+   a state rather than as a mark out of a hundred. */
+.scsl-completeness-box__score {
+	flex-direction: column;
+	gap: .1rem;
+	height: auto;
+	padding: .75rem 0;
+}
+
+.scsl-completeness-box__tier {
+	font-size: .78rem;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: .04em;
+	color: #646970;
+}
+
+/* Sermon list: the library score above the table. The same number the report
+   leads with, in the place the work happens, so the per-row badges read as
+   parts of a whole rather than as scattered marks. */
+.scsl-list-summary {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	margin: 1rem 0 .5rem;
+	padding: .85rem 1rem;
+	background: #fff;
+	border: 1px solid #dcdcde;
+	border-left-width: 4px;
+	border-radius: 4px;
+}
+
+.scsl-list-summary__scores {
+	display: flex;
+	align-items: flex-start;
+	gap: 1rem;
+	flex: 0 0 auto;
+}
+
+/* Each ring is a link with its caption underneath, so the two scores are
+   distinguishable at a glance. Without captions a second ring is just an
+   unexplained number next to the first. */
+.scsl-list-summary__ring {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: .3rem;
+	text-decoration: none;
+}
+
+.scsl-list-summary__score {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 52px;
+	height: 52px;
+	flex: 0 0 auto;
+	border-radius: 50%;
+	border: 3px solid #dcdcde;
+	text-decoration: none;
+}
+
+.scsl-list-summary__caption {
+	font-size: .7rem;
+	text-transform: uppercase;
+	letter-spacing: .04em;
+	color: #646970;
+	white-space: nowrap;
+}
+
+.scsl-list-summary__ring:hover .scsl-list-summary__caption,
+.scsl-list-summary__ring:focus .scsl-list-summary__caption { color: #2271b1; }
+
+.scsl-list-summary__score--good { border-color: #00a32a; }
+.scsl-list-summary__score--fair { border-color: #dba617; }
+.scsl-list-summary__score--poor { border-color: #d63638; }
+
+.scsl-list-summary__value {
+	font-size: 1.25rem;
+	font-weight: 600;
+	color: #1d2327;
+	line-height: 1;
+}
+
+.scsl-list-summary__body { min-width: 0; }
+
+.scsl-list-summary__title {
+	margin: 0 0 .3rem;
+	font-weight: 600;
+}
+
+.scsl-list-summary__title a {
+	text-decoration: none;
+	color: #1d2327;
+}
+
+.scsl-list-summary__title a:hover,
+.scsl-list-summary__title a:focus { color: #2271b1; }
+
+.scsl-list-summary__tiers {
+	display: flex;
+	flex-wrap: wrap;
+	gap: .3rem 1.25rem;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	font-size: .85rem;
+}
+
+.scsl-list-summary__tiers a {
+	display: inline-flex;
+	align-items: center;
+	gap: .35rem;
+	text-decoration: none;
+	color: #50575e;
+}
+
+.scsl-list-summary__tiers a:hover,
+.scsl-list-summary__tiers a:focus { color: #2271b1; }
+
+.scsl-list-summary__dot {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	flex: 0 0 auto;
+}
+
+.scsl-list-summary__dot--good { background: #00a32a; }
+.scsl-list-summary__dot--fair { background: #dba617; }
+.scsl-list-summary__dot--poor { background: #d63638; }

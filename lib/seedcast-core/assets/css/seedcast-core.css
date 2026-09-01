@@ -1,0 +1,861 @@
+/* Seedcast Core - shared front-end styles.
+
+   GENERATED FILE. DO NOT EDIT.
+   Source of truth lives in the seedcast-core repository.
+   ------------------------------------------------------------------
+   The common design layer for every Seedcast plugin. Theme tokens plus
+   generic, plugin-agnostic components: layout wrap, grids, cards, list
+   items, sliders, pagination, filter bars, badges, buttons, share
+   buttons, and submission forms. Plugins style only what is genuinely
+   unique to them on top of this, and reference var(--sc-*) rather than
+   hardcoding a colour anywhere.
+
+   Whichever bundled copy of core wins version negotiation is the one
+   that emits the :root block below, so a plugin installed later picks
+   up the existing theme with no configuration.
+
+   Prefix: .sc-  Theme is switched via a body class, for example
+   <body class="sc-theme-warm">.
+   ------------------------------------------------------------------ */
+
+/* ── Screen-reader-only utility ─────────────── */
+.sc-screen-reader-text {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── Theme tokens ──────────────────────────── */
+:root {
+  --sc-color-primary:      #1a1a2e;
+  --sc-color-accent:       #4f46e5;
+  --sc-color-accent-light: #e0e7ff;
+  --sc-color-text:         #1f2937;
+  --sc-color-muted:        #6b7280;
+  --sc-color-link:         #1e40af; /* WCAG AA on white: contrast >= 4.5:1. Use for hyperlinks and interactive text, not the decorative --sc-color-accent. */
+  --sc-color-link-hover:   #1e3a8a;
+  --sc-color-border:       #e5e7eb;
+  --sc-color-bg:           #ffffff;
+  --sc-color-bg-subtle:    #f9fafb;
+  --sc-radius:             8px;
+  --sc-radius-lg:          12px;
+  --sc-shadow-sm:          0 1px 3px rgba(0,0,0,.08);
+  --sc-shadow-md:          0 4px 12px rgba(0,0,0,.1);
+  --sc-font-sans:          -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --sc-font-serif:         Georgia, 'Times New Roman', serif;
+  --sc-max-width:          1200px;
+  --sc-gutter:             clamp(1rem, 4vw, 2rem);
+}
+
+/* Light theme - clean white with a warm accent. Default. */
+.sc-theme-light {
+  --sc-color-accent:       #c9975a;
+  --sc-color-accent-light: #f6ead9;
+  --sc-color-link:         #7a4e1d; /* Darker warm brown for AA contrast on white. */
+  --sc-color-link-hover:   #5a3814;
+}
+
+/* Dark theme - deep charcoal with a soft gold accent. */
+.sc-theme-dark {
+  --sc-color-primary:      #e2e8f0;
+  --sc-color-text:         #e2e8f0;
+  --sc-color-muted:        #94a3b8;
+  --sc-color-accent:       #e0b872;
+  --sc-color-accent-light: #3f3421;
+  --sc-color-link:         #e0b872; /* Same as accent - passes AA on the dark background. */
+  --sc-color-link-hover:   #f0cc8a;
+  --sc-color-border:       #334155;
+  --sc-color-bg:           #1e293b;
+  --sc-color-bg-subtle:    #172033;
+  --sc-shadow-sm:          0 1px 3px rgba(0,0,0,.4);
+  --sc-shadow-md:          0 4px 12px rgba(0,0,0,.5);
+}
+
+/* Warm theme - the original Seedcast default (mirrors Sermon Library's "warm"). */
+.sc-theme-warm {
+  --sc-color-primary:      #0c0c0e;
+  --sc-color-accent:       #d3b673;
+  --sc-color-accent-light: #f5edd8;
+  --sc-color-text:         #1a1612;
+  --sc-color-muted:        #6b6259;
+  --sc-color-link:         #6b4a12; /* Darkened warm gold: passes AA on white. --sc-color-accent stays for backgrounds/borders. */
+  --sc-color-link-hover:   #4d3609;
+  --sc-color-bg-subtle:    #faf8f4;
+}
+
+/* Minimal theme - no shadows, pure typography. */
+.sc-theme-minimal {
+  --sc-color-accent:       #111827;
+  --sc-color-accent-light: #f3f4f6;
+  --sc-radius:             2px;
+  --sc-radius-lg:          2px;
+  --sc-shadow-sm:          none;
+  --sc-shadow-md:          none;
+}
+.sc-theme-minimal .sc-card,
+.sc-theme-minimal .pr-video-thumb,
+.sc-theme-minimal .sc-btn {
+  box-shadow: none;
+  border: 1px solid var(--sc-color-border);
+}
+
+/* ── Layout ────────────────────────────────── */
+.sc-wrap {
+  max-width: var(--sc-max-width);
+  margin: 3rem auto;
+  padding: 2rem var(--sc-gutter);
+  overflow-x: hidden;
+}
+
+/* ── Breadcrumb ────────────────────────────── */
+.sc-breadcrumb {
+  font-size: .85rem;
+  color: var(--sc-color-muted);
+  margin-bottom: 1.5rem;
+}
+.sc-breadcrumb a { color: var(--sc-color-accent); text-decoration: none; }
+.sc-breadcrumb a:hover { text-decoration: underline; }
+
+/* ── Section / archive header ──────────────── */
+.sc-header {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid var(--sc-color-border);
+}
+.sc-header__title {
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 700;
+  margin: 0;
+  color: var(--sc-color-primary);
+}
+.sc-header__desc {
+  margin: .75rem 0 0;
+  color: var(--sc-color-muted);
+  max-width: 60ch;
+  line-height: 1.6;
+}
+
+/* ── Filter bar ────────────────────────────── */
+.sc-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  margin-bottom: 2rem;
+}
+.sc-filter-btn {
+  display: inline-block;
+  padding: .4rem .9rem;
+  border-radius: 999px;
+  background: var(--sc-color-bg-subtle);
+  border: 1px solid var(--sc-color-border);
+  color: var(--sc-color-text);
+  font-size: .85rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s;
+}
+.sc-filter-btn:hover,
+.sc-filter-btn.is-active {
+  background: var(--sc-color-accent);
+  border-color: var(--sc-color-accent);
+  color: #fff;
+}
+
+/* ── Grid ──────────────────────────────────── */
+.sc-grid { display: grid; gap: 1.5rem; }
+.sc-grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+.sc-grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
+.sc-grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+@media (max-width: 900px) {
+  .sc-grid-cols-3,
+  .sc-grid-cols-4 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 560px) {
+  .sc-grid-cols-2,
+  .sc-grid-cols-3,
+  .sc-grid-cols-4 { grid-template-columns: 1fr; }
+}
+
+/* ── Card ──────────────────────────────────── */
+.sc-card {
+  position: relative; /* for stretched link */
+  background: var(--sc-color-bg);
+  border: 1px solid var(--sc-color-border);
+  border-radius: var(--sc-radius-lg);
+  overflow: hidden;
+  transition: box-shadow .18s, transform .18s;
+}
+.sc-card:hover { box-shadow: var(--sc-shadow-md); transform: translateY(-2px); }
+.sc-card__stretched-link {
+  position: absolute; inset: 0;
+  z-index: 1;
+  text-indent: -9999px;
+  overflow: hidden;
+}
+.sc-card__image { aspect-ratio: 16 / 9; background: var(--sc-color-bg-subtle); }
+.sc-card__image img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.sc-card__placeholder {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--sc-color-accent-light);
+}
+.sc-card__placeholder span { font-size: 2rem; opacity: .5; }
+.sc-card__body { padding: 1.1rem; }
+.sc-card__title {
+  font-size: 1.05rem; font-weight: 700; line-height: 1.3;
+  margin: 0 0 .35rem; color: var(--sc-color-primary);
+}
+.sc-card__meta {
+  font-size: .8rem; color: var(--sc-color-muted);
+  display: flex; flex-wrap: wrap; gap: .5rem;
+}
+.sc-card__excerpt {
+  font-size: .875rem; color: var(--sc-color-muted);
+  margin: .5rem 0 0; line-height: 1.55;
+}
+
+/* ── List item (horizontal row) ────────────── */
+.sc-list { display: flex; flex-direction: column; }
+.sc-list-item {
+  display: grid;
+  grid-template-columns: 120px 1fr auto;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--sc-color-border);
+  align-items: center;
+}
+.sc-list-item:last-child { border-bottom: none; }
+@media (max-width: 640px) {
+  .sc-list-item { grid-template-columns: 1fr; }
+  .sc-list-item__actions { padding: .5rem 0 0; }
+}
+.sc-list-item__thumb img {
+  width: 100%; height: 70px; object-fit: cover;
+  border-radius: var(--sc-radius);
+}
+.sc-list-item__body {
+  display: flex; flex-direction: column;
+  gap: .25rem; min-width: 0; align-items: flex-start;
+}
+.sc-list-item__meta {
+  display: flex; gap: .5rem; font-size: .78rem;
+  color: var(--sc-color-muted); flex-wrap: wrap;
+}
+.sc-list-item__title { font-size: 1rem; font-weight: 700; margin: 0; line-height: 1.3; }
+.sc-list-item__title a { color: var(--sc-color-primary); text-decoration: none; }
+.sc-list-item__title a:hover { color: var(--sc-color-accent); }
+.sc-list-item__desc { font-size: .85rem; color: var(--sc-color-muted); margin: 0; line-height: 1.5; }
+.sc-list-item__actions { display: flex; flex-direction: column; gap: .4rem; }
+.sc-list-item__actions .sc-btn { text-align: center; white-space: nowrap; }
+
+/* ── Slider / carousel ─────────────────────── */
+.sc-slider { position: relative; }
+.sc-slider__track {
+  display: flex;
+  gap: 1.5rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: .5rem;
+  scrollbar-width: thin;
+}
+
+/*
+ * Where there is a mouse there are also arrows either side, so the bar is
+ * duplication. Where the pointer is a finger it is the only sign that there is
+ * more to see, so it stays.
+ */
+@media ( pointer: fine ) {
+  .sc-slider__track {
+    scrollbar-width: none;
+  }
+  .sc-slider__track::-webkit-scrollbar { height: 0; }
+}
+.sc-slider__track::-webkit-scrollbar { height: 6px; }
+.sc-slider__track::-webkit-scrollbar-thumb {
+  background: var(--sc-color-border); border-radius: 999px;
+}
+.sc-slider__slide {
+  scroll-snap-align: start;
+  flex: 0 0 auto;
+  width: clamp(240px, 28vw, 320px);
+}
+.sc-slider__nav {
+  position: absolute; top: 40%;
+  width: 40px; height: 40px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--sc-color-bg);
+  border: 1px solid var(--sc-color-border);
+  border-radius: 50%;
+  box-shadow: var(--sc-shadow-sm);
+  cursor: pointer;
+  z-index: 2;
+  transition: background .15s;
+}
+.sc-slider__nav:hover { background: var(--sc-color-bg-subtle); }
+.sc-slider__nav--prev { left: -12px; }
+.sc-slider__nav--next { right: -12px; }
+.sc-slider__nav[disabled] { opacity: .35; cursor: default; }
+
+/* ── Badge / pill ──────────────────────────── */
+.sc-badge {
+  display: inline-block;
+  padding: .15rem .6rem;
+  border-radius: 999px;
+  font-size: .72rem;
+  font-weight: 600;
+  background: var(--sc-color-accent-light);
+  color: var(--sc-color-accent);
+}
+
+/* ── Buttons ───────────────────────────────── */
+/* !important on color/border/shadow only (never layout) - same host-bleed
+   fix applied to tabs, gallery, video, and lightbox controls elsewhere in
+   this file. Elementor's global Kit CSS is typically ID-scoped, which no
+   class-based selector can out-rank otherwise. */
+.sc-btn {
+  display: inline-block;
+  padding: .7rem 1.5rem;
+  border-radius: var(--sc-radius);
+  background: var(--sc-color-accent) !important;
+  color: #fff !important;
+  font-size: .95rem;
+  font-weight: 700;
+  text-decoration: none;
+  border: 1px solid transparent !important;
+  box-shadow: none !important;
+  cursor: pointer;
+  transition: filter .15s, transform .1s;
+}
+.sc-btn:hover { filter: brightness(1.08); color: #fff !important; }
+.sc-btn:active { transform: translateY(1px); }
+.sc-btn:focus-visible { outline: 2px solid var(--sc-color-accent); outline-offset: 2px; }
+
+/* Ghost variant. The base rules use !important to defeat theme overrides
+   (Elementor kit CSS in particular), so the modifier has to use it too
+   or its declarations lose to the base.
+   Border uses the accent color rather than the neutral border color so
+   the button reads as a real call to action across themes. */
+.sc-btn--ghost {
+  background: transparent !important;
+  color: var(--sc-color-accent) !important;
+  border-color: var(--sc-color-accent) !important;
+}
+.sc-btn--ghost:hover { background: var(--sc-color-accent) !important; color: #fff !important; filter: none; }
+
+/* Compact size variant. Same shape as .sc-btn, tighter padding and text.
+   For inline calls to action inside cards, list rows, and other places
+   where the full-size button would dominate. */
+.sc-btn--sm {
+  padding: .35rem .8rem;
+  font-size: .85rem;
+  font-weight: 600;
+}
+
+/* ── Pagination ────────────────────────────── */
+.sc-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .35rem;
+  justify-content: center;
+}
+.sc-pagination a,
+.sc-pagination span {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 2.25rem; height: 2.25rem;
+  padding: 0 .5rem;
+  border-radius: var(--sc-radius);
+  border: 1px solid var(--sc-color-border);
+  background: var(--sc-color-bg);
+  color: var(--sc-color-text);
+  text-decoration: none;
+  font-size: .875rem;
+}
+.sc-pagination a:hover { border-color: var(--sc-color-accent); color: var(--sc-color-accent); }
+.sc-pagination .current {
+  background: var(--sc-color-accent);
+  border-color: var(--sc-color-accent);
+  color: #fff;
+}
+
+/* ── Forms (shared submission styling) ─────── */
+.sc-form {
+  max-width: 640px;
+  background: var(--sc-color-bg);
+  border: 1px solid var(--sc-color-border);
+  border-radius: var(--sc-radius-lg);
+  box-shadow: var(--sc-shadow-sm);
+  padding: 1.75rem 2rem 2rem;
+}
+@media (max-width: 600px) {
+  .sc-form { padding: 1.25rem 1.25rem 1.5rem; border-radius: var(--sc-radius); }
+}
+.sc-form__row { margin-bottom: 1.5rem; }
+.sc-form__label {
+  display: block;
+  font-size: .9rem;
+  font-weight: 700;
+  margin-bottom: .4rem;
+  color: var(--sc-color-primary);
+}
+.sc-form__req { color: var(--sc-color-accent); }
+.sc-form input[type="text"],
+.sc-form input[type="email"],
+.sc-form input[type="url"],
+.sc-form select,
+.sc-form textarea {
+  width: 100%;
+  padding: .7rem .85rem;
+  border: 1.5px solid var(--sc-color-border);
+  border-radius: var(--sc-radius);
+  font-size: .95rem;
+  font-family: inherit;
+  background: var(--sc-color-bg);
+  color: var(--sc-color-text);
+  transition: border-color .15s, box-shadow .15s;
+}
+.sc-form textarea { min-height: 150px; resize: vertical; line-height: 1.6; }
+.sc-form input:focus,
+.sc-form select:focus,
+.sc-form textarea:focus {
+  outline: none;
+  border-color: var(--sc-color-accent);
+  box-shadow: 0 0 0 3px var(--sc-color-accent-light);
+}
+.sc-form__help { font-size: .8rem; color: var(--sc-color-muted); margin: .4rem 0 0; line-height: 1.5; }
+
+/* Sharing-permission style radio options: each choice reads as its own
+   selectable row rather than a cramped inline list. */
+.sc-form__consent {
+  display: flex;
+  align-items: flex-start;
+  gap: .65rem;
+  padding: .75rem .9rem;
+  margin-bottom: .5rem;
+  border: 1.5px solid var(--sc-color-border);
+  border-radius: var(--sc-radius);
+  font-size: .875rem;
+  line-height: 1.45;
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+}
+.sc-form__consent:hover { border-color: var(--sc-color-accent); background: var(--sc-color-bg-subtle); }
+.sc-form__consent:has(input:checked) {
+  border-color: var(--sc-color-accent);
+  background: var(--sc-color-accent-light);
+}
+.sc-form__consent input { margin-top: .2rem; accent-color: var(--sc-color-accent); flex-shrink: 0; }
+
+/* Honeypot - visually hidden, off-screen, not display:none (bots skip those). */
+.sc-form__hp {
+  position: absolute !important;
+  left: -9999px !important;
+  width: 1px; height: 1px;
+  overflow: hidden;
+}
+
+/* Submit button: full width and a touch larger so it reads as the clear
+   final step of the form, with breathing room above it. */
+.sc-form > .sc-btn {
+  display: block;
+  width: 100%;
+  text-align: center;
+  padding: .85rem 1.5rem;
+  font-size: 1rem;
+  margin-top: .5rem;
+}
+
+/* ── Notices (form success / error) ────────── */
+.sc-notice {
+  padding: .85rem 1rem;
+  border-radius: var(--sc-radius);
+  margin-bottom: 1.5rem;
+  font-size: .9rem;
+  border: 1px solid transparent;
+}
+.sc-notice--success {
+  background: #ecfdf5; border-color: #a7f3d0; color: #065f46;
+}
+.sc-notice--error {
+  background: #fef2f2; border-color: #fecaca; color: #991b1b;
+}
+
+/* ── Empty state ───────────────────────────── */
+.sc-empty {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--sc-color-muted);
+}
+
+/* ── Section titles (archive sub-sections) ─── */
+.sc-section-title {
+  margin: 2rem 0 1rem;
+}
+.pr-section { margin-bottom: 2.5rem; }
+
+/* ── Front-end tabs (pill style) ───────────── */
+.sc-tab-wrap { margin: 1.5rem 0; }
+.sc-tabs {
+  display: flex; flex-wrap: wrap; gap: .35rem;
+  margin-bottom: 1.5rem;
+}
+/* Pill tab buttons. Scoped under .sc-tabs (specificity 0,2,0) plus a
+   native-chrome reset. Color/border/shadow use !important: repeated reports
+   show the host theme's button styling (Elementor's global Kit CSS is
+   typically ID-scoped, specificity 1,0,0 - no class-based selector can beat
+   that) still bleeding through at higher specificity alone. This is a narrow,
+   deliberate exception limited to color chrome on our own named components. */
+.sc-tabs .sc-tab {
+  -webkit-appearance: none; appearance: none;
+  background: var(--sc-color-bg-subtle) !important;
+  border: 1.5px solid var(--sc-color-border) !important;
+  border-radius: var(--sc-radius);
+  box-shadow: none !important;
+  padding: .5rem 1rem;
+  font-size: .875rem;
+  font-weight: 600;
+  color: var(--sc-color-muted) !important;
+  cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s;
+}
+.sc-tabs .sc-tab:hover,
+.sc-tabs .sc-tab.active {
+  background: var(--sc-color-accent) !important;
+  border-color: var(--sc-color-accent) !important;
+  color: #fff !important;
+}
+.sc-tabs .sc-tab:focus-visible {
+  outline: 2px solid var(--sc-color-accent);
+  outline-offset: 2px;
+}
+.sc-tab-panel {
+  /* Off-screen rather than display:none, so search engines still index the
+     inactive panels. */
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.sc-tab-panel.active,
+.sc-tab-panel.is-active {
+  position: static;
+  width: auto;
+  height: auto;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+  line-height: 1.7;
+}
+
+/* Warm theme: the accent is a light gold, so tab text stays dark (matching
+   Sermon Library) rather than the white used on darker accents. */
+.sc-theme-warm .sc-tabs .sc-tab {
+  border-color: var(--sc-color-accent) !important;
+  color: var(--sc-color-primary) !important;
+}
+.sc-theme-warm .sc-tabs .sc-tab:hover,
+.sc-theme-warm .sc-tabs .sc-tab.active {
+  background: var(--sc-color-accent) !important;
+  border-color: var(--sc-color-accent) !important;
+  color: var(--sc-color-primary) !important;
+}
+
+/* Same reasoning for the primary button - light gold background needs dark
+   text, not white. */
+.sc-theme-warm .sc-btn {
+  color: var(--sc-color-primary) !important;
+}
+.sc-theme-warm .sc-btn:hover { color: var(--sc-color-primary) !important; }
+
+/* Section heading - a titled section without a tab row (e.g. a single tab). */
+.sc-content-section-heading {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--sc-color-primary);
+  margin: 0 0 1.25rem;
+  padding-bottom: .6rem;
+  border-bottom: 2px solid var(--sc-color-border);
+  letter-spacing: -.01em;
+}
+
+/* ── Two-column layout (main + right sidebar) ─ */
+.sc-layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 2.5rem;
+  align-items: start;
+  margin-top: 1.5rem;
+}
+.sc-layout--full { grid-template-columns: 1fr; }
+@media (max-width: 860px) {
+  .sc-layout { grid-template-columns: 1fr; }
+  .sc-layout__sidebar { order: 2; }
+}
+
+/* ── Sidebar panel / card ──────────────────── */
+.sc-panel {
+  background: var(--sc-color-bg-subtle);
+  border: 1px solid var(--sc-color-border);
+  border-radius: var(--sc-radius-lg);
+  padding: 1.25rem 1.25rem 1.4rem;
+}
+.sc-panel + .sc-panel { margin-top: 1.5rem; }
+.sc-panel__title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--sc-color-primary);
+  margin: 0 0 1rem;
+  padding-bottom: .5rem;
+  border-bottom: 2px solid var(--sc-color-border);
+}
+
+/* ── Responsive 16:9 video embed wrapper ───── */
+.sc-video-wrap {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  border-radius: var(--sc-radius-lg);
+  overflow: hidden;
+  background: #000;
+}
+.sc-video-wrap iframe,
+.sc-video-wrap video,
+.sc-video-wrap object,
+.sc-video-wrap embed {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  border: 0;
+}
+
+/* Per-form inline notice: invisible until populated by AJAX. */
+.sc-form__notice:empty { display: none; }
+.sc-form__notice { margin-bottom: 1rem; }
+
+/* ── Shared audio player (Seedcast\Core\Frontend\AudioPlayer) ─────────────────
+   A labeled card wrapping a native <audio controls> element. Used by any
+   suite plugin's single templates for self-hosted audio. */
+.sc-audio-player {
+  margin-bottom: 1.5rem;
+  background: var(--sc-color-bg-subtle);
+  border: 1px solid var(--sc-color-border);
+  border-radius: var(--sc-radius);
+  padding: .75rem 1rem;
+}
+.sc-audio-player__label {
+  font-size: .85rem;
+  font-weight: 600;
+  color: var(--sc-color-muted);
+  margin: 0 0 .5rem;
+}
+
+/* ── Share buttons ─────────────────────────── */
+.sc-share {
+	margin: 2rem 0;
+}
+.sc-share__heading {
+	font-size: .8rem;
+	font-weight: 700;
+	letter-spacing: .08em;
+	text-transform: uppercase;
+	color: var(--sc-color-muted, #6b7280);
+	margin: 0 0 .75rem;
+}
+.sc-share__list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	gap: .5rem;
+}
+.sc-share__btn {
+	display: inline-flex;
+	align-items: center;
+	gap: .5rem;
+	padding: .5rem 1rem;
+	background: var(--sc-color-bg, #fff);
+	border: 1px solid var(--sc-color-accent, #4f46e5);
+	border-radius: 999px;
+	color: var(--sc-color-primary, #111827);
+	font: inherit;
+	font-size: .9rem;
+	text-decoration: none;
+	cursor: pointer;
+	transition: background .15s, border-color .15s, color .15s;
+}
+.sc-share__btn:hover,
+.sc-share__btn:focus-visible {
+	background: var(--sc-color-accent-light, #eef);
+	border-color: var(--sc-color-accent, #4f46e5);
+	color: var(--sc-color-primary, #111827);
+	text-decoration: none;
+	outline: none;
+}
+.sc-share__btn:focus-visible {
+	box-shadow: 0 0 0 2px var(--sc-color-accent, #4f46e5);
+}
+.sc-share__icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 1.25rem;
+	color: currentColor;
+	vertical-align: middle;
+}
+.sc-share__label {
+	line-height: 1;
+}
+.sc-share__label--copy {
+	font-size: .9rem;
+}
+.sc-share__btn.is-copied {
+	color: var(--sc-color-accent, #4f46e5);
+}
+/* Copy Link is a <button> element while the other share buttons are <a>
+   elements. Many themes apply default <button> styling (background color,
+   thicker border, box-shadow, text-transform) that overrides the shared
+   .sc-share__btn class and makes Copy Link look different. Reset those
+   defaults so the button matches its siblings. */
+.sc-share__btn--copy {
+	-webkit-appearance: none;
+	appearance: none;
+	background: var(--sc-color-bg, #fff) !important;
+	border: 1px solid var(--sc-color-accent, #4f46e5) !important;
+	border-radius: 999px !important;
+	color: var(--sc-color-primary, #111827) !important;
+	box-shadow: none !important;
+	padding: .4rem .9rem !important;
+	font-family: inherit;
+	font-size: inherit;
+	line-height: 1;
+	text-transform: none;
+	letter-spacing: normal;
+	cursor: pointer;
+}
+.sc-share__btn--copy:hover,
+.sc-share__btn--copy:focus-visible {
+	background: var(--sc-color-accent-light, #eef) !important;
+	border-color: var(--sc-color-accent, #4f46e5) !important;
+	color: var(--sc-color-primary, #111827) !important;
+}
+
+/* ── Breadcrumb trail (Seedcast\Core\Frontend\Breadcrumb) ─── */
+.sc-breadcrumb__list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .4rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.sc-breadcrumb__item { display: inline; }
+.sc-breadcrumb__sep { color: var(--sc-color-border); }
+.sc-breadcrumb [aria-current="page"] { color: var(--sc-color-text); }
+
+/* ── Video embed (Seedcast\Core\Frontend\VideoEmbed) ─────── */
+.sc-video-wrap {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  border-radius: var(--sc-radius-lg);
+  overflow: hidden;
+  background: #000;
+}
+.sc-video-wrap iframe,
+.sc-video-wrap video,
+.sc-video-wrap .sc-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* ── Church details ────────────────────────────
+   The church's own identity block: name, address, service times, contact,
+   directions. Rendered by the [seedcast_church_details] shortcode, the
+   Elementor Church Details widget, or a direct ChurchDetails::render() call.
+   Deliberately unopinionated, because this most often lands in a footer or a
+   contact page column that the theme already styles. */
+.sc-church {
+  font-family: var(--sc-font-sans);
+  color: var(--sc-color-text);
+}
+
+.sc-church__heading {
+  margin: 0 0 .5rem;
+  color: var(--sc-color-primary);
+}
+
+.sc-church p {
+  margin: 0 0 .4rem;
+}
+
+.sc-church__name {
+  font-weight: 600;
+  color: var(--sc-color-primary);
+}
+
+.sc-church__address,
+.sc-church__note {
+  color: var(--sc-color-muted);
+}
+
+.sc-church__note {
+  font-style: italic;
+}
+
+.sc-church__times {
+  margin: 0 0 .4rem;
+}
+
+.sc-church__time {
+  margin: 0;
+}
+
+.sc-church a {
+  color: var(--sc-color-link);
+}
+
+.sc-church a:hover,
+.sc-church a:focus {
+  color: var(--sc-color-link-hover);
+}
+
+.sc-church__directions {
+  margin-top: .75rem;
+}
+
+/* Inline layout: one row on wide screens, wrapping to stacked on narrow ones
+   rather than compressing. Footers are the common home for this. */
+.sc-church--inline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: .35rem 1.25rem;
+}
+
+.sc-church--inline > * {
+  margin: 0;
+}
+
+.sc-church--inline .sc-church__heading {
+  flex-basis: 100%;
+}
+
+.sc-church__placeholder {
+  padding: 1rem;
+  border: 1px dashed var(--sc-color-border);
+  border-radius: var(--sc-radius);
+  color: var(--sc-color-muted);
+}
