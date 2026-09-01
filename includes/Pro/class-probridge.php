@@ -109,6 +109,17 @@ class ProBridge {
 		if ( false === strpos( $hook, self::PAGE ) ) return;
 
 		wp_enqueue_style( 'scsl-admin', SCSL_PLUGIN_URL . 'assets/css/admin.css', [], SCSL_VERSION );
+
+		/*
+		 * The passage picker's own behaviour.
+		 *
+		 * It is the sermon screen's control, and what makes it more than four
+		 * boxes -- the end chapter appearing when a passage needs one, the
+		 * reference building itself, the preview -- lives in this script. The
+		 * handlers are bound to the document, so they work wherever the markup
+		 * is; the script simply has to be on the page.
+		 */
+		wp_enqueue_script( 'scsl-admin', SCSL_PLUGIN_URL . 'assets/js/admin.js', [ 'jquery' ], SCSL_VERSION, true );
 	}
 
 	/**
@@ -143,6 +154,20 @@ class ProBridge {
 			'purchase_url' => 'https://seedcast.ai/sermon-library/',
 			'intro'       => __( 'Turn a sermon recording into a summary, study guide, article, and a clean transcript. Everything lands on a draft sermon for you to review.', 'seedcast-sermon-library' ),
 			'field_map'   => FieldMap::api_to_meta(),
+
+			/*
+			 * Fields that belong to another field rather than standing alone.
+			 *
+			 * The article's title is its first heading, worked out from the
+			 * body and rewritten from it on every save. So it is not offered
+			 * as something to generate, and it is not named as something that
+			 * was written -- but it does have to travel with the article. Put
+			 * the old article back on its own and the title left behind is a
+			 * heading for a version that is no longer there.
+			 */
+			'derived'     => [
+				'_scsl_article_title' => '_scsl_article_body',
+			],
 			'plain_text'  => FieldMap::plain_text_meta(),
 			'append'      => [
 				'meta'   => '_scsl_resources',
@@ -328,7 +353,7 @@ class ProBridge {
 			<h1><?php esc_html_e( 'Generate Sermon', 'seedcast-sermon-library' ); ?></h1>
 
 			<p class="scsl-upsell-intro">
-				<?php esc_html_e( 'Seedcast AI Engine turns a sermon recording into written content and puts it straight onto a draft sermon here. Upload the audio or video, choose one already in your media library, paste a Google Drive link, or hand it a transcript you already have.', 'seedcast-sermon-library' ); ?>
+				<?php esc_html_e( 'Seedcast AI Engine turns a sermon recording into written content and puts it straight onto a draft sermon here. Paste a YouTube link, upload the audio or video, choose one already in your media library, or hand it a transcript you already have.', 'seedcast-sermon-library' ); ?>
 			</p>
 
 			<div class="scsl-upsell-box">
@@ -401,21 +426,30 @@ class ProBridge {
 		</tr>
 
 		<tr>
-			<th scope="row"><label for="scsl-gen-book"><?php esc_html_e( 'Primary scripture', 'seedcast-sermon-library' ); ?></label></th>
+			<th scope="row"><?php esc_html_e( 'Focus Passage', 'seedcast-sermon-library' ); ?></th>
 			<td>
-				<div class="scsl-gen-passage">
-					<select id="scsl-gen-book" data-scpro="book">
-						<option value=""><?php esc_html_e( 'Book...', 'seedcast-sermon-library' ); ?></option>
-						<?php foreach ( ScriptureParser::all_books() as $book ) : ?>
-							<option value="<?php echo esc_attr( $book ); ?>"><?php echo esc_html( $book ); ?></option>
-						<?php endforeach; ?>
-					</select>
-					<input type="text" id="scsl-gen-chapter" inputmode="numeric" data-scpro="chapter" placeholder="<?php esc_attr_e( 'Ch.', 'seedcast-sermon-library' ); ?>" aria-label="<?php esc_attr_e( 'Chapter', 'seedcast-sermon-library' ); ?>" />
-					<span aria-hidden="true">:</span>
-					<input type="text" id="scsl-gen-verse-start" inputmode="numeric" data-scpro="verse_start" placeholder="<?php esc_attr_e( 'v.', 'seedcast-sermon-library' ); ?>" aria-label="<?php esc_attr_e( 'Starting verse', 'seedcast-sermon-library' ); ?>" />
-					<span><?php esc_html_e( 'to', 'seedcast-sermon-library' ); ?></span>
-					<input type="text" id="scsl-gen-verse-end" inputmode="numeric" data-scpro="verse_end" placeholder="<?php esc_attr_e( 'v.', 'seedcast-sermon-library' ); ?>" aria-label="<?php esc_attr_e( 'Ending verse', 'seedcast-sermon-library' ); ?>" />
-				</div>
+				<?php
+				/*
+				 * The same control the sermon screen uses, called the same
+				 * thing.
+				 *
+				 * This screen had a simpler one of its own: it could not
+				 * express a passage that crosses a chapter, and it called the
+				 * field "Primary scripture" while the sermon screen called the
+				 * very same field "Focus Passage". Two names and two behaviours
+				 * for one thing is a difference somebody has to learn for no
+				 * reason.
+				 *
+				 * The hidden field carries the assembled reference, and
+				 * data-scpro is what the engine reads off this form.
+				 */
+				SermonMeta::passage_picker(
+					'scsl_focus_passage',
+					'',
+					ScriptureParser::all_books(),
+					[ 'data-scpro' => 'primary_scripture' ]
+				);
+				?>
 				<p class="description"><?php esc_html_e( 'The verse range is optional.', 'seedcast-sermon-library' ); ?></p>
 			</td>
 		</tr>
@@ -546,29 +580,51 @@ class ProBridge {
 	 * @return string Empty when no book was chosen.
 	 */
 	private function passage_from_request(): string {
-		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Pro verifies its own nonce before this runs.
-		$book    = isset( $_POST['book'] ) ? sanitize_text_field( wp_unslash( $_POST['book'] ) ) : '';
-		$chapter = isset( $_POST['chapter'] ) ? preg_replace( '/\D/', '', sanitize_text_field( wp_unslash( $_POST['chapter'] ) ) ) : '';
-		$from    = isset( $_POST['verse_start'] ) ? preg_replace( '/\D/', '', sanitize_text_field( wp_unslash( $_POST['verse_start'] ) ) ) : '';
-		$to      = isset( $_POST['verse_end'] ) ? preg_replace( '/\D/', '', sanitize_text_field( wp_unslash( $_POST['verse_end'] ) ) ) : '';
-		// phpcs:enable WordPress.Security.NonceVerification.Missing
+		/*
+		 * One assembled reference, not four loose parts.
+		 *
+		 * The picker on this screen is now the same one the sermon screen
+		 * uses, and it hands over a finished reference such as "Ruth 3:3" or
+		 * "Luke 6:37-7:2" in a single field. Rebuilding it here from a book, a
+		 * chapter and two verses could not express a passage that crosses a
+		 * chapter, which is exactly what the shared picker exists to allow.
+		 */
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Pro verifies its own nonce before this runs.
+		$reference = isset( $_POST['primary_scripture'] )
+			? sanitize_text_field( wp_unslash( $_POST['primary_scripture'] ) )
+			: '';
 
-		// Only a real book name, so a hand-edited request cannot put arbitrary
-		// text into the generation prompt.
+		$reference = trim( $reference );
+
+		if ( '' === $reference ) {
+			return '';
+		}
+
+		/*
+		 * Only a real book name, so a hand-edited request cannot put arbitrary
+		 * text into the generation prompt. The rest of the reference is
+		 * checked by shape rather than by meaning: this plugin does not know
+		 * how many verses a chapter has, and refusing what it cannot verify
+		 * would refuse correct passages.
+		 */
+		$book = ScriptureParser::extract_book( $reference );
+
 		if ( '' === $book || ! in_array( $book, ScriptureParser::all_books(), true ) ) {
 			return '';
 		}
 
-		if ( '' === $chapter ) return $book;
+		$rest = trim( substr( $reference, strlen( $book ) ) );
 
-		$reference = $book . ' ' . $chapter;
-
-		if ( '' !== $from ) {
-			$reference .= ':' . $from;
-			if ( '' !== $to ) $reference .= '-' . $to;
+		if ( '' === $rest ) {
+			return $book;
 		}
 
-		return $reference;
+		// Chapter, optional verse, optional end chapter and verse.
+		if ( ! preg_match( '/^\d{1,3}(:\d{1,3})?(-\d{1,3}(:\d{1,3})?)?$/', $rest ) ) {
+			return $book;
+		}
+
+		return $book . ' ' . $rest;
 	}
 
 	/**

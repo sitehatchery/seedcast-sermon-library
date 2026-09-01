@@ -316,8 +316,25 @@ class SermonMeta {
 	/**
 	 * Render a structured passage picker (Book + Chapter + optional verse range).
 	 * Outputs a hidden field with the formatted reference, e.g. "Luke 6:37-45"
+	 *
+	 * Public and static because the Generate screen needs the same control.
+	 * It had a simpler one of its own, which could not express a passage
+	 * crossing a chapter and called the same field by a different name, so the
+	 * two screens disagreed about what a sermon's passage even was. One
+	 * control, used in both places, cannot drift.
+	 *
+	 * @param string $field_name Name for the hidden field carrying the result.
+	 * @param string $value      Existing reference, e.g. "Luke 6:37-45".
+	 * @param array  $books      Book names for the select.
+	 * @param array  $attrs      Extra attributes for the hidden field, such as
+	 *                           the data-scpro name the generate screen reads.
+	 * @return void
 	 */
-	private function render_passage_picker( string $field_name, string $value, array $books ): void {
+	public static function passage_picker( string $field_name, string $value, array $books, array $attrs = [] ): void {
+		( new self() )->render_passage_picker( $field_name, $value, $books, $attrs );
+	}
+
+	private function render_passage_picker( string $field_name, string $value, array $books, array $attrs = [] ): void {
 		// Parse existing value into parts
 		$book    = '';
 		$chapter = '';
@@ -413,7 +430,12 @@ class SermonMeta {
 				   style="width:55px;" />
 			<span class="scsl-pp-preview"><?php echo esc_html( $value ?: '-' ); ?></span>
 			<input type="hidden" class="scsl-pp-value" name="<?php echo esc_attr( $field_name ); ?>"
-				   value="<?php echo esc_attr( $value ); ?>" />
+				   value="<?php echo esc_attr( $value ); ?>"
+				   <?php
+					foreach ( $attrs as $attr_name => $attr_value ) {
+						printf( ' %s="%s"', esc_attr( $attr_name ), esc_attr( $attr_value ) );
+					}
+					?> />
 		</div>
 		<?php
 	}
@@ -534,6 +556,10 @@ class SermonMeta {
 					'textarea_name' => 'scsl_article_body',
 					'media_buttons' => true,
 					'textarea_rows' => 16,
+					// Tall enough to read a few paragraphs without scrolling. TinyMCE
+					// sizes itself from editor_height; textarea_rows only reaches the
+					// Code view underneath it.
+					'editor_height' => 400,
 					'teeny'         => false,
 				] );
 				?>
@@ -578,6 +604,10 @@ class SermonMeta {
 					'textarea_name' => 'scsl_bible_study',
 					'media_buttons' => true,
 					'textarea_rows' => 16,
+					// Tall enough to read a few paragraphs without scrolling. TinyMCE
+					// sizes itself from editor_height; textarea_rows only reaches the
+					// Code view underneath it.
+					'editor_height' => 400,
 					'teeny'         => false,
 				] );
 				?>

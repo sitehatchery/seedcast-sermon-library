@@ -3,7 +3,7 @@ Contributors: seedcast
 Tags: sermons, church, preaching, bible, audio
 Requires at least: 6.2
 Tested up to: 7.1
-Stable tag: 2.70.1
+Stable tag: 2.70.6
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -186,6 +186,10 @@ No. Sermons, series and speakers remain in the database.
 
 == Changelog ==
 
+= 2.70.2 =
+
+* Unlisted sermons are now kept out of lists that name the sermon type as a list rather than a single value, and a repeated error-log warning is gone.
+
 = 2.70.1 =
 
 * Bulletin Library sermon sections now render at full page width above the two-column body area.
@@ -198,6 +202,6 @@ Complete historical changelog: see `changelog.txt`.
 
 == Upgrade Notice ==
 
-= 2.70.1 =
+= 2.70.2 =
 
-Improves Sermon Library's Bulletin Library integration so sermon sections render at the intended full width.
+Fixes unlisted sermons still showing in some lists, and stops a repeated warning being written to the error log.

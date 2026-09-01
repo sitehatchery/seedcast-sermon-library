@@ -64,6 +64,42 @@
   resize: vertical;
 }
 
+/*
+ * Room to actually read what is in these.
+ *
+ * Every one of them holds prose written to be read over -- a description, a
+ * transcript, a study -- and a five row box shows two sentences of it, so
+ * checking a generated draft meant scrolling a porthole. Set here rather than
+ * on the rows attribute so it holds whichever box it is and stays put when the
+ * markup changes; still resizable, so anyone who wants it smaller can drag it.
+ */
+.sc-tab-panel textarea {
+  min-height: 400px;
+}
+
+/*
+ * The rich editors are sized by editor_height when they are built, but the
+ * Code view underneath is a plain textarea and would otherwise snap back to
+ * its row count the moment somebody switched to it.
+ */
+.sc-tab-panel .wp-editor-area {
+  min-height: 400px;
+}
+
+/*
+ * What an import would do to a field that already has something in it. Said
+ * beside the item it applies to, which is where the decision is made.
+ */
+.scsl-manifest-replaces,
+.scsl-manifest-adds {
+  display: block;
+  font-size: 11px;
+  font-style: normal;
+}
+
+.scsl-manifest-replaces { color: #b32d2e; }
+.scsl-manifest-adds     { color: #8a6d1f; }
+
 /* ── Asset Status Badge ──────────────────── */
 .scsl-status-table {
   width: 100%;

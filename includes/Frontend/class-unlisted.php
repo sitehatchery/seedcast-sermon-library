@@ -58,7 +58,23 @@ class Unlisted {
 		 */
 		if ( is_admin() && ! wp_doing_ajax() ) return;
 
-		if ( 'scsl_sermon' !== (string) $query->get( 'post_type' ) ) return;
+		/*
+		 * post_type is a string or an array, depending on who built the query.
+		 *
+		 * Casting it to a string to compare turned every array into the word
+		 * "Array", which never matched, so the filter quietly did nothing on
+		 * those queries and PHP logged a conversion warning for each one. On a
+		 * busy site that was several warnings a second.
+		 *
+		 * A query for sermons alone is filtered however it was spelled. A
+		 * query for sermons alongside other post types is left alone: the
+		 * condition below is a meta_query, and meta conditions apply to every
+		 * row a query returns, so filtering a mixed query would also drop
+		 * pages and posts that simply have no such meta.
+		 */
+		$types = array_values( array_filter( (array) $query->get( 'post_type' ) ) );
+
+		if ( [ 'scsl_sermon' ] !== $types ) return;
 
 		/*
 		 * Never a single sermon.

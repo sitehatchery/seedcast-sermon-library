@@ -71,11 +71,18 @@ class ManifestImporter {
 					<span id="scsl-manifest-speaker" class="scsl-manifest-badge scsl-manifest-badge--speaker"></span>
 				</div>
 				<ul id="scsl-manifest-items" class="scsl-manifest-item-list"></ul>
+				<?php
+				/*
+				 * No blanket overwrite switch.
+				 *
+				 * Ticking a thing to import it and then having to tick a second
+				 * thing before it actually goes in is two answers to one
+				 * question. What was ticked is imported; anything that would
+				 * replace what is already there says so beside its own name,
+				 * which is the part somebody needed the switch to tell them.
+				 */
+				?>
 				<div class="scsl-manifest-actions">
-					<label>
-						<input type="checkbox" id="scsl-manifest-overwrite" />
-						<?php esc_html_e( 'Overwrite fields that already have content', 'seedcast-sermon-library' ); ?>
-					</label>
 					<button type="button" class="button button-primary" id="scsl-manifest-import-btn">
 						<?php esc_html_e( 'Import Content', 'seedcast-sermon-library' ); ?>
 					</button>
@@ -202,10 +209,26 @@ class ManifestImporter {
 
 				var $list = $( '#scsl-manifest-items' ).empty();
 				$.each( data.items, function( key, item ) {
+					var $label = $( '<span>' ).text( item.label );
+
+					if ( item.replaces ) {
+						$label.append(
+							$( '<em class="scsl-manifest-replaces">' ).text(
+								<?php echo wp_json_encode( __( 'replaces what is there', 'seedcast-sermon-library' ) ); ?>
+							)
+						);
+					} else if ( item.adds_to ) {
+						$label.append(
+							$( '<em class="scsl-manifest-adds">' ).text(
+								<?php echo wp_json_encode( __( 'adds to what is there', 'seedcast-sermon-library' ) ); ?>
+							)
+						);
+					}
+
 					$list.append(
 						$( '<li>' ).append(
 							$( '<input type="checkbox" checked />' ).attr( 'data-key', key ),
-							$( '<span>' ).text( item.label )
+							$label
 						)
 					);
 				} );
@@ -231,7 +254,9 @@ class ManifestImporter {
 				fd.append( 'phase', 'import' );
 				fd.append( 'zip', zipFile );
 				fd.append( 'selected', JSON.stringify( selected ) );
-				fd.append( 'overwrite', $( '#scsl-manifest-overwrite' ).is( ':checked' ) ? '1' : '0' );
+				// What was ticked is what gets imported. Untick anything that
+				// should be left alone.
+				fd.append( 'overwrite', '1' );
 
 				$( this ).prop( 'disabled', true ).text( <?php echo wp_json_encode( __( 'Importing…', 'seedcast-sermon-library' ) ); ?> );
 
@@ -247,8 +272,26 @@ class ManifestImporter {
 							showResult( 'success', res.data.message );
 							$preview.hide();
 							$area.hide();
-							// Reload to show populated fields
-							setTimeout( function() { location.reload(); }, 1200 );
+
+							/*
+							 * Show the sermon the content actually landed on.
+							 *
+							 * Reloading is wrong on a sermon started from Add
+							 * New: the page is post-new.php until something is
+							 * saved, so reloading it asks for another blank
+							 * sermon and the import looks like it did nothing.
+							 * The server says where the sermon is; a reload is
+							 * the fallback for screens that already have a
+							 * real address.
+							 */
+							setTimeout( function() {
+								if ( res.data.edit_url ) {
+									window.onbeforeunload = null;
+									window.location.href = res.data.edit_url;
+								} else {
+									location.reload();
+								}
+							}, 1200 );
 						} else {
 							showResult( 'error', res.data );
 						}
@@ -331,7 +374,7 @@ class ManifestImporter {
 
 		if ( $phase === 'preview' ) {
 			$this->cleanup( $extract_dir );
-			wp_send_json_success( $manifest );
+			wp_send_json_success( $this->for_preview( $post_id, $manifest ) );
 		}
 
 		// Import phase
@@ -341,6 +384,23 @@ class ManifestImporter {
 		if ( ! is_array( $selected ) ) {
 			$this->cleanup( $extract_dir );
 			wp_send_json_error( __( 'Invalid selection.', 'seedcast-sermon-library' ) );
+		}
+
+		/*
+		 * A sermon that has only been started becomes a real one first.
+		 *
+		 * An auto-draft is WordPress's scratch row for a screen somebody
+		 * opened, and it is thrown away if they wander off. Importing content
+		 * onto one risks losing all of it to a cleanup that has no idea
+		 * anything of value arrived.
+		 */
+		$post = get_post( $post_id );
+
+		if ( $post && 'auto-draft' === (string) $post->post_status ) {
+			wp_update_post( [
+				'ID'          => $post_id,
+				'post_status' => 'draft',
+			] );
 		}
 
 		$result = $this->import( $post_id, $manifest, $selected, $overwrite );
@@ -356,7 +416,127 @@ class ManifestImporter {
 				__( 'Imported %d fields successfully.', 'seedcast-sermon-library' ),
 				$result
 			),
+
+			/*
+			 * Where this sermon actually is, so the browser can go there.
+			 *
+			 * Imported from Add New, the page is still post-new.php: the row
+			 * has been promoted and filled in, but nothing told the browser its
+			 * address. Reloading post-new.php asks WordPress for another blank
+			 * sermon, so the content landed on one post and the person was
+			 * shown a different, empty one -- which reads exactly like an
+			 * import that did nothing.
+			 */
+			'edit_url' => get_edit_post_link( $post_id, 'raw' ),
 		] );
+	}
+
+	/**
+	 * Copy the zip's recording into the media library.
+	 *
+	 * Copied rather than moved, because the folder it is in is wiped as soon
+	 * as the import finishes and WordPress takes charge of the file it is
+	 * given. Named after the sermon rather than left as audio.mp3, so a media
+	 * library with a dozen imports in it is still navigable.
+	 *
+	 * @param int    $post_id Sermon ID.
+	 * @param string $path    Extracted audio file.
+	 * @param array  $meta    Manifest metadata, for the name.
+	 * @return string|\WP_Error URL of the attached file.
+	 */
+	private function sideload_audio( int $post_id, string $path, array $meta ) {
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+		require_once ABSPATH . 'wp-admin/includes/media.php';
+		require_once ABSPATH . 'wp-admin/includes/image.php';
+
+		$title = sanitize_title( (string) ( $meta['title'] ?? '' ) );
+		$name  = ( $title ?: 'sermon' ) . '.' . pathinfo( $path, PATHINFO_EXTENSION );
+
+		// A copy in a temp file, because media_handle_sideload moves what it
+		// is handed and the original is still needed until cleanup.
+		$tmp = wp_tempnam( $name );
+
+		if ( ! $tmp || ! copy( $path, $tmp ) ) {
+			if ( $tmp ) @unlink( $tmp ); // phpcs:ignore WordPress.PHP.NoSilencedErrors
+			return new \WP_Error( 'copy_failed', __( 'Could not read the recording from the zip.', 'seedcast-sermon-library' ) );
+		}
+
+		$id = media_handle_sideload(
+			[
+				'name'     => $name,
+				'tmp_name' => $tmp,
+			],
+			$post_id
+		);
+
+		if ( is_wp_error( $id ) ) {
+			@unlink( $tmp ); // phpcs:ignore WordPress.PHP.NoSilencedErrors
+			return $id;
+		}
+
+		return (string) wp_get_attachment_url( $id );
+	}
+
+	/**
+	 * The sermon field each kind of content lands in.
+	 *
+	 * The list a zip offers is whatever the service put in it, and this plugin
+	 * has somewhere to put only some of it. Anything else was being offered,
+	 * ticked, and then quietly dropped on import -- a choice that did nothing
+	 * and reported nothing.
+	 *
+	 * Read from the shared map rather than a local copy, so this and the
+	 * import below cannot disagree about what is supported.
+	 *
+	 * @return array<string, string> Item key to the meta key it writes.
+	 */
+	private function item_targets(): array {
+		$targets = FieldMap::api_to_meta();
+
+		// Several stack into the one resources body, under their own headings.
+		foreach ( FieldMap::appended_fields() as $key ) {
+			$targets[ $key ] = '_scsl_resources';
+		}
+
+		$targets['scripture'] = '_scsl_other_passages';
+
+		return $targets;
+	}
+
+	/**
+	 * The manifest as the panel should show it.
+	 *
+	 * Trimmed to what can actually be imported, and each item told whether it
+	 * would replace something already on this sermon -- which is the thing
+	 * somebody needs to know before ticking it, and which a single "overwrite
+	 * everything" switch could never say.
+	 *
+	 * @param int   $post_id  Sermon ID.
+	 * @param array $manifest Parsed manifest.
+	 * @return array
+	 */
+	private function for_preview( int $post_id, array $manifest ): array {
+		$targets = $this->item_targets();
+		$items   = [];
+
+		foreach ( (array) $manifest['items'] as $key => $item ) {
+			if ( ! isset( $targets[ $key ] ) ) continue;
+
+			$existing = get_post_meta( $post_id, $targets[ $key ], true );
+
+			$items[ $key ] = [
+				'label'    => $item['label'],
+				// Named for what somebody would see happen, not for how it is
+				// stored: appended content adds to a field that may already
+				// hold other sections, which is not the same as replacing it.
+				'replaces' => '_scsl_resources' !== $targets[ $key ] && ! empty( $existing ),
+				'adds_to'  => '_scsl_resources' === $targets[ $key ] && ! empty( $existing ),
+			];
+		}
+
+		$manifest['items'] = $items;
+
+		return $manifest;
 	}
 
 	/**
@@ -392,9 +572,27 @@ class ManifestImporter {
 			}
 		}
 
+		/*
+		 * The recording, if the zip carried one.
+		 *
+		 * Kept as a path rather than read in: it is the one part of a zip that
+		 * is measured in megabytes, and it is going to be copied into the media
+		 * library rather than into a field.
+		 */
+		$audio = '';
+
+		if ( isset( $xml->audio['file'] ) ) {
+			$candidate = $extract_dir . basename( (string) $xml->audio['file'] );
+
+			if ( file_exists( $candidate ) ) {
+				$audio = $candidate;
+			}
+		}
+
 		return [
 			'meta'  => $meta,
 			'items' => $items,
+			'audio' => $audio,
 		];
 	}
 
@@ -417,6 +615,31 @@ class ManifestImporter {
 			update_post_meta( $post_id, $key, $value );
 			$count++;
 		};
+
+		/*
+		 * The first title suggestion, when there is one.
+		 *
+		 * The zip carries both a title in its metadata and a list of suggested
+		 * titles, and they are not always the same. The suggestions are what
+		 * the service actually proposes for this sermon, so the first of them
+		 * wins and the metadata title is the fallback. The list itself is not
+		 * offered as something to tick: there is nowhere to put a list of
+		 * titles, and a sermon has one.
+		 */
+		if ( ! empty( $items['title_suggestions']['content'] ) ) {
+			$suggested = wp_strip_all_tags( (string) $items['title_suggestions']['content'] );
+			$suggested = trim( (string) preg_split( '/
+|
+|
+/', trim( $suggested ) )[0] );
+
+			// Lists come back marked up; the marker is not part of the title.
+			$suggested = trim( preg_replace( '/^[\-\*\d\.\)\s]+/', '', $suggested ) );
+
+			if ( '' !== $suggested ) {
+				$meta['title'] = $suggested;
+			}
+		}
 
 		// Post title from meta
 		if ( ! empty( $meta['title'] ) ) {
@@ -446,6 +669,33 @@ class ManifestImporter {
 			] );
 			if ( ! empty( $speaker ) ) {
 				$write( '_scsl_speaker_id', absint( $speaker[0] ) );
+			}
+		}
+
+		/*
+		 * The recording goes into the media library, and the sermon points at
+		 * it.
+		 *
+		 * The zip carries the audio it was generated from, and it was being
+		 * thrown away with the temporary folder: a sermon imported this way had
+		 * every word of its content and no way to listen to it, and no way to
+		 * add one without going and finding the file again.
+		 *
+		 * The media library, not the storage the AI Engine transcribes from.
+		 * That storage is reached through the engine's signed uploads, which a
+		 * site importing a zip may well not have, and this has to work on its
+		 * own. The media library is also where every other route puts a
+		 * recording, so the field means the same thing however it was filled.
+		 */
+		if ( ! empty( $manifest['audio'] ) && file_exists( $manifest['audio'] ) ) {
+			$existing_audio = (string) get_post_meta( $post_id, '_scsl_audio_url', true );
+
+			if ( $overwrite || '' === $existing_audio ) {
+				$attached = $this->sideload_audio( $post_id, (string) $manifest['audio'], $meta );
+
+				if ( ! is_wp_error( $attached ) && $attached ) {
+					$write( '_scsl_audio_url', $attached );
+				}
 			}
 		}
 

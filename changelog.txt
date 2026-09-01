@@ -2,6 +2,11 @@
 
 Complete historical changelog moved out of readme.txt to keep the WordPress.org readme concise.
 
+= 2.70.2 =
+
+* Fixed unlisted sermons still appearing in lists that name the sermon type as a list rather than as a single value. Both spellings mean the same thing, but the check compared it as text, so a list never matched and those lists were left unfiltered. PHP also logged a warning each time it happened, several a second on a busy site.
+* Lists that mix sermons with other kinds of content are still left alone, on purpose. The condition that hides an unlisted sermon applies to every row a list returns, so using it there would also hide pages and posts that simply never had the setting.
+
 = 2.70.1 =
 
 * Sermon section on Bulletin Library service pages now declares `'column' => 'full'`, so it renders above the two-column body area at full page width rather than being squeezed into the narrower main column.
