@@ -457,7 +457,7 @@ class ManifestImporter {
 		$tmp = wp_tempnam( $name );
 
 		if ( ! $tmp || ! copy( $path, $tmp ) ) {
-			if ( $tmp ) @unlink( $tmp ); // phpcs:ignore WordPress.PHP.NoSilencedErrors
+			if ( $tmp ) wp_delete_file( $tmp );
 			return new \WP_Error( 'copy_failed', __( 'Could not read the recording from the zip.', 'seedcast-sermon-library' ) );
 		}
 
@@ -470,7 +470,7 @@ class ManifestImporter {
 		);
 
 		if ( is_wp_error( $id ) ) {
-			@unlink( $tmp ); // phpcs:ignore WordPress.PHP.NoSilencedErrors
+			wp_delete_file( $tmp );
 			return $id;
 		}
 

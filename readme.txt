@@ -3,7 +3,7 @@ Contributors: seedcast
 Tags: sermons, church, preaching, bible, audio
 Requires at least: 6.2
 Tested up to: 7.1
-Stable tag: 2.70.6
+Stable tag: 2.71.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -186,6 +186,13 @@ No. Sermons, series and speakers remain in the database.
 
 == Changelog ==
 
+= 2.71.0 =
+* Every setting the shared Seedcast library stores was renamed to a longer, more distinctive prefix, so it cannot collide with another plugin that happened to choose the same short one. Your church details, service times, theme and spam settings are carried across automatically the first time the plugin loads; nothing needs re-entering.
+* Submitted form values are cleaned once, in a single place, before any plugin sees them. A value containing a backslash is no longer damaged on its way into the database.
+* The church details published for search engines can no longer be broken by a stray tag in a setting.
+* The unlisted choice saved from Quick Edit is sanitized before it is read, and temporary files left by a manifest import are now removed through WordPress rather than by a direct file call.
+* The completeness report's own links use the new prefix. A bookmarked report URL from an earlier version opens the default view rather than the filtered one.
+
 = 2.70.2 =
 
 * Unlisted sermons are now kept out of lists that name the sermon type as a list rather than a single value, and a repeated error-log warning is gone.
@@ -201,6 +208,10 @@ No. Sermons, series and speakers remain in the database.
 Complete historical changelog: see `changelog.txt`.
 
 == Upgrade Notice ==
+
+= 2.71.0 =
+
+Settings stored by the shared Seedcast library move to a new, longer prefix. They are carried across for you on the first page load after upgrading, so nothing needs re-entering. Includes input handling improvements.
 
 = 2.70.2 =
 

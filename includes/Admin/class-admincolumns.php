@@ -419,7 +419,7 @@ class AdminColumns {
 		if ( ! current_user_can( 'edit_post', $post_id ) ) return;
 		if ( ! isset( $_POST['scsl_quick_unlisted'] ) ) return;
 
-		$unlisted = '1' === (string) wp_unslash( $_POST['scsl_quick_unlisted'] );
+		$unlisted = '1' === sanitize_text_field( wp_unslash( $_POST['scsl_quick_unlisted'] ) );
 
 		if ( $unlisted ) {
 			update_post_meta( $post_id, '_scsl_unlisted', '1' );

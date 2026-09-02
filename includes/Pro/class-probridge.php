@@ -590,9 +590,7 @@ class ProBridge {
 		 * chapter, which is exactly what the shared picker exists to allow.
 		 */
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Pro verifies its own nonce before this runs.
-		$reference = isset( $_POST['primary_scripture'] )
-			? sanitize_text_field( wp_unslash( $_POST['primary_scripture'] ) )
-			: '';
+		$reference = isset( $_POST['primary_scripture'] ) ? sanitize_text_field( wp_unslash( $_POST['primary_scripture'] ) ) : '';
 
 		$reference = trim( $reference );
 

@@ -30,6 +30,19 @@ if ( ! defined( 'ABSPATH' ) ) {
  * content, plus the form controls and inline SVG the suite actually emits, and
  * nothing else. Script tags, event handlers and javascript: URLs are still
  * removed, which is the part that matters.
+ *
+ * Call it like this, at the point of output:
+ *
+ *     echo wp_kses( $html, Kses::tags() );
+ *
+ * Not through a helper of your own that wraps both. This class used to offer a
+ * section() method that did exactly that, and it had to go: WordPress.org's
+ * Plugin Check runs WordPress.Security.EscapeOutput, which recognises escaping
+ * by function name against a fixed list. wp_kses() is on that list; anything
+ * wrapping it is not, so a wrapper reads as unescaped output and fails the
+ * check - four errors in one template, on code that was already safe. Keeping
+ * the allowlist shared and the wp_kses() call at the call site satisfies both
+ * the sniff and the reason the sniff exists.
  */
 final class Kses {
 
@@ -39,16 +52,6 @@ final class Kses {
 	 * @var array|null
 	 */
 	private static $tags = null;
-
-	/**
-	 * Escape a block of section or sidebar HTML for output.
-	 *
-	 * @param string $html Rendered section markup.
-	 * @return string
-	 */
-	public static function section( string $html ): string {
-		return wp_kses( $html, self::tags() );
-	}
 
 	/**
 	 * Post content, plus form controls and inline SVG.
