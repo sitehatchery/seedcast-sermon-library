@@ -34,14 +34,14 @@ final class Church {
 	 * @var array<string, string>
 	 */
 	public const DEFAULTS = array(
-		'sc_church_name'          => '',
-		'sc_church_address'       => '',
-		'sc_church_phone'         => '',
-		'sc_church_email'         => '',
-		'sc_church_service_day'   => '0',
-		'sc_church_service_times' => '',
-		'sc_church_events_url'    => '',
-		'sc_church_visitor_note'  => '',
+		'seedcast_church_name'          => '',
+		'seedcast_church_address'       => '',
+		'seedcast_church_phone'         => '',
+		'seedcast_church_email'         => '',
+		'seedcast_church_service_day'   => '0',
+		'seedcast_church_service_times' => '',
+		'seedcast_church_events_url'    => '',
+		'seedcast_church_visitor_note'  => '',
 	);
 
 	/**
@@ -53,7 +53,7 @@ final class Church {
 	 * @return string
 	 */
 	public static function name(): string {
-		$name = trim( (string) get_option( 'sc_church_name', '' ) );
+		$name = trim( (string) get_option( 'seedcast_church_name', '' ) );
 		if ( '' === $name ) {
 			$name = (string) get_bloginfo( 'name' );
 		}
@@ -66,7 +66,7 @@ final class Church {
 	 * @return string
 	 */
 	public static function address(): string {
-		return trim( (string) get_option( 'sc_church_address', '' ) );
+		return trim( (string) get_option( 'seedcast_church_address', '' ) );
 	}
 
 	/**
@@ -150,7 +150,7 @@ final class Church {
 	 * @return string
 	 */
 	public static function city(): string {
-		return trim( (string) get_option( 'sc_church_city', '' ) );
+		return trim( (string) get_option( 'seedcast_church_city', '' ) );
 	}
 
 	/**
@@ -159,7 +159,7 @@ final class Church {
 	 * @return string
 	 */
 	public static function state(): string {
-		return trim( (string) get_option( 'sc_church_state', '' ) );
+		return trim( (string) get_option( 'seedcast_church_state', '' ) );
 	}
 
 	/**
@@ -168,7 +168,7 @@ final class Church {
 	 * @return string
 	 */
 	public static function postcode(): string {
-		return trim( (string) get_option( 'sc_church_postcode', '' ) );
+		return trim( (string) get_option( 'seedcast_church_postcode', '' ) );
 	}
 
 	/**
@@ -217,7 +217,7 @@ final class Church {
 	 * @return string
 	 */
 	public static function country(): string {
-		$code = strtoupper( trim( (string) get_option( 'sc_church_country', 'US' ) ) );
+		$code = strtoupper( trim( (string) get_option( 'seedcast_church_country', 'US' ) ) );
 
 		return preg_match( '/^[A-Z]{2}$/', $code ) ? $code : '';
 	}
@@ -228,7 +228,7 @@ final class Church {
 	 * @return string
 	 */
 	public static function description(): string {
-		return trim( (string) get_option( 'sc_church_description', '' ) );
+		return trim( (string) get_option( 'seedcast_church_description', '' ) );
 	}
 
 	/**
@@ -242,7 +242,7 @@ final class Church {
 	public static function profiles(): array {
 		$out = array();
 
-		foreach ( array( 'sc_church_facebook', 'sc_church_instagram', 'sc_church_youtube' ) as $key ) {
+		foreach ( array( 'seedcast_church_facebook', 'seedcast_church_instagram', 'seedcast_church_youtube' ) as $key ) {
 			$url = trim( (string) get_option( $key, '' ) );
 
 			if ( '' !== $url && filter_var( $url, FILTER_VALIDATE_URL ) ) {
@@ -254,7 +254,7 @@ final class Church {
 	}
 
 	public static function phone(): string {
-		return trim( (string) get_option( 'sc_church_phone', '' ) );
+		return trim( (string) get_option( 'seedcast_church_phone', '' ) );
 	}
 
 	/**
@@ -266,7 +266,7 @@ final class Church {
 	 * @return string
 	 */
 	public static function email(): string {
-		$email = trim( (string) get_option( 'sc_church_email', '' ) );
+		$email = trim( (string) get_option( 'seedcast_church_email', '' ) );
 		if ( '' === $email ) {
 			$email = (string) get_option( 'admin_email', '' );
 		}
@@ -279,7 +279,7 @@ final class Church {
 	 * @return int
 	 */
 	public static function service_day(): int {
-		$day = (int) get_option( 'sc_church_service_day', 0 );
+		$day = (int) get_option( 'seedcast_church_service_day', 0 );
 		return ( $day >= 0 && $day <= 6 ) ? $day : 0;
 	}
 
@@ -316,7 +316,7 @@ final class Church {
 	 * @return string
 	 */
 	public static function service_times(): string {
-		return trim( (string) get_option( 'sc_church_service_times', '' ) );
+		return trim( (string) get_option( 'seedcast_church_service_times', '' ) );
 	}
 
 	/**
@@ -342,7 +342,7 @@ final class Church {
 	 * @return string
 	 */
 	public static function events_url(): string {
-		return trim( (string) get_option( 'sc_church_events_url', '' ) );
+		return trim( (string) get_option( 'seedcast_church_events_url', '' ) );
 	}
 
 	/**
@@ -352,7 +352,7 @@ final class Church {
 	 * @return string
 	 */
 	public static function visitor_note(): string {
-		return trim( (string) get_option( 'sc_church_visitor_note', '' ) );
+		return trim( (string) get_option( 'seedcast_church_visitor_note', '' ) );
 	}
 
 	/**
@@ -385,7 +385,7 @@ final class Church {
 		$fields = array(
 			self::address(),
 			self::phone(),
-			trim( (string) get_option( 'sc_church_email', '' ) ),
+			trim( (string) get_option( 'seedcast_church_email', '' ) ),
 			self::service_times(),
 			self::events_url(),
 			self::visitor_note(),

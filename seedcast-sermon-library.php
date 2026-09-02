@@ -31,7 +31,7 @@ define( 'SCSL_PLUGIN_BASENAME',  plugin_basename( __FILE__ ) );
  * features. They match today; they diverge as soon as another Seedcast plugin
  * ships a newer core and this one has not caught up.
  */
-define( 'SCSL_CORE_VERSION',     '1.24.4' );
+define( 'SCSL_CORE_VERSION',     '1.26.1' );
 define( 'SCSL_CORE_MIN_VERSION', '1.17.1' );
 
 /*

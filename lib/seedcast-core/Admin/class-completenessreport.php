@@ -53,7 +53,7 @@ final class CompletenessReport {
 		 */
 		$show_comprehensive = Completeness::has_excluded_fields( $source );
 
-		$requested = self::query_arg( 'sc_view', 'library' );
+		$requested = self::query_arg( 'seedcast_view', 'library' );
 
 		$allowed = array( 'library', 'items' );
 		if ( $show_comprehensive ) {
@@ -107,7 +107,7 @@ final class CompletenessReport {
 		 * line of directness.
 		 *
 		 * sanitize_key() returns an empty string for an array, so a crafted
-		 * sc_filter[]= falls through to the fallback rather than reaching the
+		 * seedcast_filter[]= falls through to the fallback rather than reaching the
 		 * comparison as an array.
 		 */
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -151,7 +151,7 @@ final class CompletenessReport {
 
 		$allowed_filters = array_merge( array( 'all', 'incomplete', 'undated' ), $tier_keys );
 
-		$filter = self::query_arg( 'sc_filter', 'all' );
+		$filter = self::query_arg( 'seedcast_filter', 'all' );
 		$filter = in_array( $filter, $allowed_filters, true ) ? $filter : 'all';
 
 		$filtered = array_values(
@@ -173,7 +173,7 @@ final class CompletenessReport {
 		);
 
 		$per_page = 50;
-		$paged    = max( 1, (int) self::query_arg( 'sc_paged', '1' ) );
+		$paged    = max( 1, (int) self::query_arg( 'seedcast_paged', '1' ) );
 		$pages    = max( 1, (int) ceil( count( $filtered ) / $per_page ) );
 		$paged    = min( $paged, $pages );
 		$page_of  = array_slice( $filtered, ( $paged - 1 ) * $per_page, $per_page );
@@ -247,8 +247,8 @@ final class CompletenessReport {
 				foreach ( $labels as $key => $label ) :
 					$url = add_query_arg(
 						array(
-							'sc_view'   => 'items',
-							'sc_filter' => $key,
+							'seedcast_view'   => 'items',
+							'seedcast_filter' => $key,
 						),
 						self::base_url()
 					);
@@ -311,9 +311,9 @@ final class CompletenessReport {
 								array(
 									'base'      => add_query_arg(
 										array(
-											'sc_view'   => 'items',
-											'sc_filter' => $filter,
-											'sc_paged'  => '%#%',
+											'seedcast_view'   => 'items',
+											'seedcast_filter' => $filter,
+											'seedcast_paged'  => '%#%',
 										),
 										self::base_url()
 									),
@@ -347,12 +347,12 @@ final class CompletenessReport {
 				class="nav-tab <?php echo 'library' === $current ? 'nav-tab-active' : ''; ?>">
 				<?php esc_html_e( 'Overview', 'seedcast-sermon-library' ); ?>
 			</a>
-			<a href="<?php echo esc_url( add_query_arg( 'sc_view', 'items', $base ) ); ?>"
+			<a href="<?php echo esc_url( add_query_arg( 'seedcast_view', 'items', $base ) ); ?>"
 				class="nav-tab <?php echo 'items' === $current ? 'nav-tab-active' : ''; ?>">
 				<?php echo esc_html( (string) $definition['label'] ); ?>
 			</a>
 			<?php if ( $show_comprehensive ) : ?>
-				<a href="<?php echo esc_url( add_query_arg( 'sc_view', 'comprehensive', $base ) ); ?>"
+				<a href="<?php echo esc_url( add_query_arg( 'seedcast_view', 'comprehensive', $base ) ); ?>"
 					class="nav-tab <?php echo 'comprehensive' === $current ? 'nav-tab-active' : ''; ?>">
 					<?php esc_html_e( 'Comprehensive score', 'seedcast-sermon-library' ); ?>
 				</a>
@@ -467,7 +467,7 @@ final class CompletenessReport {
 					<?php endif; ?>
 
 					<div class="sc-stat">
-						<a class="sc-stat__link" href="<?php echo esc_url( add_query_arg( array( 'sc_view' => 'items', 'sc_filter' => 'complete' ), self::base_url() ) ); ?>">
+						<a class="sc-stat__link" href="<?php echo esc_url( add_query_arg( array( 'seedcast_view' => 'items', 'seedcast_filter' => 'complete' ), self::base_url() ) ); ?>">
 							<span class="sc-stat__value"><?php echo esc_html( (string) (int) $archive['complete'] ); ?></span>
 							<span class="sc-stat__label"><?php esc_html_e( 'Complete', 'seedcast-sermon-library' ); ?></span>
 						</a>
@@ -562,7 +562,7 @@ final class CompletenessReport {
 			<ul class="sc-tiers__legend">
 				<?php foreach ( Completeness::tiers() as $tier ) : ?>
 					<li>
-						<a href="<?php echo esc_url( add_query_arg( array( 'sc_view' => 'items', 'sc_filter' => $tier['key'] ), self::base_url() ) ); ?>">
+						<a href="<?php echo esc_url( add_query_arg( array( 'seedcast_view' => 'items', 'seedcast_filter' => $tier['key'] ), self::base_url() ) ); ?>">
 							<span class="sc-tiers__dot sc-tiers__dot--<?php echo esc_attr( $tier['band'] ); ?>"></span>
 							<span class="sc-tiers__count"><?php echo esc_html( (string) (int) $counts[ $tier['key'] ] ); ?></span>
 							<span class="sc-tiers__label"><?php echo esc_html( $tier['label'] ); ?></span>
@@ -634,7 +634,7 @@ final class CompletenessReport {
 					esc_html( implode( ', ', $excluded ) )
 				);
 				?>
-				<a href="<?php echo esc_url( add_query_arg( array( 'sc_view' => 'items', 'sc_filter' => 'undated' ), self::base_url() ) ); ?>">
+				<a href="<?php echo esc_url( add_query_arg( array( 'seedcast_view' => 'items', 'seedcast_filter' => 'undated' ), self::base_url() ) ); ?>">
 					<?php esc_html_e( 'Show them', 'seedcast-sermon-library' ); ?>
 				</a>
 			</p>

@@ -45,14 +45,14 @@ final class Settings {
 	/**
 	 * Core's own settings group.
 	 */
-	private const GROUP = 'sc_settings';
+	private const GROUP = 'seedcast_settings';
 
 	/**
 	 * Church identity settings group. Separate from GROUP because each
 	 * section on this page is its own form and the Settings API only
 	 * processes one group per submit.
 	 */
-	private const CHURCH_GROUP = 'sc_church_settings';
+	private const CHURCH_GROUP = 'seedcast_church_settings';
 
 	/**
 	 * Registered sections.
@@ -177,11 +177,11 @@ final class Settings {
 	 */
 	public function register_settings(): void {
 		$fields = array(
-			'sc_theme',
-			'sc_captcha_provider',
-			'sc_captcha_site_key',
-			'sc_captcha_secret',
-			'sc_honeypot_enabled',
+			'seedcast_theme',
+			'seedcast_captcha_provider',
+			'seedcast_captcha_site_key',
+			'seedcast_captcha_secret',
+			'seedcast_honeypot_enabled',
 		);
 		foreach ( $fields as $field ) {
 			register_setting( self::GROUP, $field, array( 'sanitize_callback' => 'sanitize_text_field' ) );
@@ -194,50 +194,50 @@ final class Settings {
 		 * forms on the page.
 		 */
 		$church_fields = array(
-			'sc_church_name'          => 'sanitize_text_field',
-			'sc_church_address'       => 'sanitize_textarea_field',
-			'sc_church_city'          => 'sanitize_text_field',
-			'sc_church_state'         => 'sanitize_text_field',
-			'sc_church_postcode'      => 'sanitize_text_field',
-			'sc_church_phone'         => 'sanitize_text_field',
-			'sc_church_email'         => 'sanitize_email',
-			'sc_church_service_day'   => array( Church::class, 'sanitize_service_day' ),
-			'sc_church_service_times' => 'sanitize_textarea_field',
-			'sc_church_events_url'    => 'esc_url_raw',
-			'sc_church_visitor_note'  => 'sanitize_textarea_field',
-			'sc_church_country'       => 'sanitize_text_field',
-			'sc_church_description'   => 'sanitize_textarea_field',
-			'sc_church_facebook'      => 'esc_url_raw',
-			'sc_church_instagram'     => 'esc_url_raw',
-			'sc_church_youtube'       => 'esc_url_raw',
+			'seedcast_church_name'          => 'sanitize_text_field',
+			'seedcast_church_address'       => 'sanitize_textarea_field',
+			'seedcast_church_city'          => 'sanitize_text_field',
+			'seedcast_church_state'         => 'sanitize_text_field',
+			'seedcast_church_postcode'      => 'sanitize_text_field',
+			'seedcast_church_phone'         => 'sanitize_text_field',
+			'seedcast_church_email'         => 'sanitize_email',
+			'seedcast_church_service_day'   => array( Church::class, 'sanitize_service_day' ),
+			'seedcast_church_service_times' => 'sanitize_textarea_field',
+			'seedcast_church_events_url'    => 'esc_url_raw',
+			'seedcast_church_visitor_note'  => 'sanitize_textarea_field',
+			'seedcast_church_country'       => 'sanitize_text_field',
+			'seedcast_church_description'   => 'sanitize_textarea_field',
+			'seedcast_church_facebook'      => 'esc_url_raw',
+			'seedcast_church_instagram'     => 'esc_url_raw',
+			'seedcast_church_youtube'       => 'esc_url_raw',
 		);
 		foreach ( $church_fields as $field => $sanitize ) {
 			register_setting( self::CHURCH_GROUP, $field, array( 'sanitize_callback' => $sanitize ) );
 		}
 
 		$this->add_section(
-			'sc_suite',
+			'seedcast_suite',
 			__( 'Suite', 'seedcast-sermon-library' ),
 			array( $this, 'render_suite_section' ),
 			'',
 			0
 		);
 		$this->add_section(
-			'sc_church',
+			'seedcast_church',
 			__( 'Church', 'seedcast-sermon-library' ),
 			array( $this, 'render_church_section' ),
 			self::CHURCH_GROUP,
 			1
 		);
 		$this->add_section(
-			'sc_appearance',
+			'seedcast_appearance',
 			__( 'Appearance', 'seedcast-sermon-library' ),
 			array( $this, 'render_appearance_section' ),
 			self::GROUP,
 			2
 		);
 		$this->add_section(
-			'sc_spam',
+			'seedcast_spam',
 			__( 'Spam protection', 'seedcast-sermon-library' ),
 			array( $this, 'render_spam_section' ),
 			self::GROUP,
@@ -358,10 +358,10 @@ final class Settings {
 			</p>
 			<table class="form-table" role="presentation">
 				<tr>
-					<th scope="row"><label for="sc_church_name"><?php esc_html_e( 'Church name', 'seedcast-sermon-library' ); ?></label></th>
+					<th scope="row"><label for="seedcast_church_name"><?php esc_html_e( 'Church name', 'seedcast-sermon-library' ); ?></label></th>
 					<td>
-						<input type="text" class="regular-text" name="sc_church_name" id="sc_church_name"
-							value="<?php echo esc_attr( (string) get_option( 'sc_church_name', '' ) ); ?>" />
+						<input type="text" class="regular-text" name="seedcast_church_name" id="seedcast_church_name"
+							value="<?php echo esc_attr( (string) get_option( 'seedcast_church_name', '' ) ); ?>" />
 						<p class="description">
 							<?php
 							printf(
@@ -374,9 +374,9 @@ final class Settings {
 					</td>
 				</tr>
 				<tr>
-					<th scope="row"><label for="sc_church_address"><?php esc_html_e( 'Street address', 'seedcast-sermon-library' ); ?></label></th>
+					<th scope="row"><label for="seedcast_church_address"><?php esc_html_e( 'Street address', 'seedcast-sermon-library' ); ?></label></th>
 					<td>
-						<textarea class="large-text" rows="3" name="sc_church_address" id="sc_church_address"><?php echo esc_textarea( (string) get_option( 'sc_church_address', '' ) ); ?></textarea>
+						<textarea class="large-text" rows="3" name="seedcast_church_address" id="seedcast_church_address"><?php echo esc_textarea( (string) get_option( 'seedcast_church_address', '' ) ); ?></textarea>
 						<p class="description">
 							<?php esc_html_e( 'The street and building only. City, state and postcode go in the fields below.', 'seedcast-sermon-library' ); ?>
 						</p>
@@ -389,12 +389,12 @@ final class Settings {
 						 * where a church is, and leaving them in both places
 						 * would print the city twice.
 						 */
-						$sc_address_lines = array_filter(
-							array_map( 'trim', (array) preg_split( '/\r\n|\r|\n/', (string) get_option( 'sc_church_address', '' ) ) ),
+						$seedcast_address_lines = array_filter(
+							array_map( 'trim', (array) preg_split( '/\r\n|\r|\n/', (string) get_option( 'seedcast_church_address', '' ) ) ),
 							'strlen'
 						);
 						?>
-						<?php if ( count( $sc_address_lines ) > 1 && '' === \Seedcast\Core\Church::city() ) : ?>
+						<?php if ( count( $seedcast_address_lines ) > 1 && '' === \Seedcast\Core\Church::city() ) : ?>
 							<div class="notice notice-warning inline">
 								<p>
 									<?php esc_html_e( 'This looks like it still holds the city and state. Move them into the fields below and leave only the street here, or they will appear twice.', 'seedcast-sermon-library' ); ?>
@@ -410,11 +410,11 @@ final class Settings {
 						 * visitor in a car. This is the same link, so pressing
 						 * it is the check.
 						 */
-						$sc_directions = \Seedcast\Core\Church::directions_url();
+						$seedcast_directions = \Seedcast\Core\Church::directions_url();
 						?>
-						<?php if ( '' !== $sc_directions ) : ?>
+						<?php if ( '' !== $seedcast_directions ) : ?>
 							<p>
-								<a href="<?php echo esc_url( $sc_directions ); ?>" target="_blank" rel="noopener noreferrer">
+								<a href="<?php echo esc_url( $seedcast_directions ); ?>" target="_blank" rel="noopener noreferrer">
 									<?php esc_html_e( 'Check this address on the map', 'seedcast-sermon-library' ); ?>
 								</a>
 								<span class="description">
@@ -425,30 +425,30 @@ final class Settings {
 					</td>
 				</tr>
 				<tr>
-					<th scope="row"><label for="sc_church_city"><?php esc_html_e( 'City', 'seedcast-sermon-library' ); ?></label></th>
+					<th scope="row"><label for="seedcast_church_city"><?php esc_html_e( 'City', 'seedcast-sermon-library' ); ?></label></th>
 					<td>
-						<input type="text" class="regular-text" name="sc_church_city" id="sc_church_city"
-							value="<?php echo esc_attr( (string) get_option( 'sc_church_city', '' ) ); ?>" />
+						<input type="text" class="regular-text" name="seedcast_church_city" id="seedcast_church_city"
+							value="<?php echo esc_attr( (string) get_option( 'seedcast_church_city', '' ) ); ?>" />
 						<p class="description">
 							<?php esc_html_e( 'Used in sentences that say where you are, which is also what search engines read to connect you to a place.', 'seedcast-sermon-library' ); ?>
 						</p>
 					</td>
 				</tr>
 				<tr>
-					<th scope="row"><label for="sc_church_state"><?php esc_html_e( 'State or county', 'seedcast-sermon-library' ); ?></label></th>
+					<th scope="row"><label for="seedcast_church_state"><?php esc_html_e( 'State or county', 'seedcast-sermon-library' ); ?></label></th>
 					<td>
-						<input type="text" class="regular-text" name="sc_church_state" id="sc_church_state"
-							value="<?php echo esc_attr( (string) get_option( 'sc_church_state', '' ) ); ?>" />
+						<input type="text" class="regular-text" name="seedcast_church_state" id="seedcast_church_state"
+							value="<?php echo esc_attr( (string) get_option( 'seedcast_church_state', '' ) ); ?>" />
 						<p class="description">
 							<?php esc_html_e( 'Written out rather than abbreviated reads better in a sentence: California, not CA.', 'seedcast-sermon-library' ); ?>
 						</p>
 					</td>
 				</tr>
 				<tr>
-					<th scope="row"><label for="sc_church_country"><?php esc_html_e( 'Country', 'seedcast-sermon-library' ); ?></label></th>
+					<th scope="row"><label for="seedcast_church_country"><?php esc_html_e( 'Country', 'seedcast-sermon-library' ); ?></label></th>
 					<td>
-						<input type="text" class="small-text" name="sc_church_country" id="sc_church_country" maxlength="2"
-							value="<?php echo esc_attr( (string) get_option( 'sc_church_country', 'US' ) ); ?>" />
+						<input type="text" class="small-text" name="seedcast_church_country" id="seedcast_church_country" maxlength="2"
+							value="<?php echo esc_attr( (string) get_option( 'seedcast_church_country', 'US' ) ); ?>" />
 						<p class="description">
 							<?php
 							/*
@@ -463,16 +463,16 @@ final class Settings {
 					</td>
 				</tr>
 				<tr>
-					<th scope="row"><label for="sc_church_postcode"><?php esc_html_e( 'Postcode or zip', 'seedcast-sermon-library' ); ?></label></th>
+					<th scope="row"><label for="seedcast_church_postcode"><?php esc_html_e( 'Postcode or zip', 'seedcast-sermon-library' ); ?></label></th>
 					<td>
-						<input type="text" class="regular-text" name="sc_church_postcode" id="sc_church_postcode"
-							value="<?php echo esc_attr( (string) get_option( 'sc_church_postcode', '' ) ); ?>" />
+						<input type="text" class="regular-text" name="seedcast_church_postcode" id="seedcast_church_postcode"
+							value="<?php echo esc_attr( (string) get_option( 'seedcast_church_postcode', '' ) ); ?>" />
 					</td>
 				</tr>
 				<tr>
-					<th scope="row"><label for="sc_church_service_day"><?php esc_html_e( 'Service day', 'seedcast-sermon-library' ); ?></label></th>
+					<th scope="row"><label for="seedcast_church_service_day"><?php esc_html_e( 'Service day', 'seedcast-sermon-library' ); ?></label></th>
 					<td>
-						<select name="sc_church_service_day" id="sc_church_service_day">
+						<select name="seedcast_church_service_day" id="seedcast_church_service_day">
 							<?php
 							for ( $day = 0; $day <= 6; $day++ ) :
 								$label = ( $wp_locale instanceof \WP_Locale ) ? $wp_locale->get_weekday( $day ) : (string) $day;
@@ -488,24 +488,24 @@ final class Settings {
 					</td>
 				</tr>
 				<tr>
-					<th scope="row"><label for="sc_church_service_times"><?php esc_html_e( 'Service times', 'seedcast-sermon-library' ); ?></label></th>
+					<th scope="row"><label for="seedcast_church_service_times"><?php esc_html_e( 'Service times', 'seedcast-sermon-library' ); ?></label></th>
 					<td>
-						<textarea class="large-text" rows="3" name="sc_church_service_times" id="sc_church_service_times"><?php echo esc_textarea( (string) get_option( 'sc_church_service_times', '' ) ); ?></textarea>
+						<textarea class="large-text" rows="3" name="seedcast_church_service_times" id="seedcast_church_service_times"><?php echo esc_textarea( (string) get_option( 'seedcast_church_service_times', '' ) ); ?></textarea>
 						<p class="description">
 							<?php esc_html_e( 'One per line, in your own words. For example: 9:00 AM Traditional, 11:00 AM Contemporary.', 'seedcast-sermon-library' ); ?>
 						</p>
 					</td>
 				</tr>
 				<tr>
-					<th scope="row"><label for="sc_church_phone"><?php esc_html_e( 'Phone', 'seedcast-sermon-library' ); ?></label></th>
-					<td><input type="text" class="regular-text" name="sc_church_phone" id="sc_church_phone"
-						value="<?php echo esc_attr( (string) get_option( 'sc_church_phone', '' ) ); ?>" /></td>
+					<th scope="row"><label for="seedcast_church_phone"><?php esc_html_e( 'Phone', 'seedcast-sermon-library' ); ?></label></th>
+					<td><input type="text" class="regular-text" name="seedcast_church_phone" id="seedcast_church_phone"
+						value="<?php echo esc_attr( (string) get_option( 'seedcast_church_phone', '' ) ); ?>" /></td>
 				</tr>
 				<tr>
-					<th scope="row"><label for="sc_church_email"><?php esc_html_e( 'Contact email', 'seedcast-sermon-library' ); ?></label></th>
+					<th scope="row"><label for="seedcast_church_email"><?php esc_html_e( 'Contact email', 'seedcast-sermon-library' ); ?></label></th>
 					<td>
-						<input type="email" class="regular-text" name="sc_church_email" id="sc_church_email"
-							value="<?php echo esc_attr( (string) get_option( 'sc_church_email', '' ) ); ?>" />
+						<input type="email" class="regular-text" name="seedcast_church_email" id="seedcast_church_email"
+							value="<?php echo esc_attr( (string) get_option( 'seedcast_church_email', '' ) ); ?>" />
 						<p class="description">
 							<?php
 							printf(
@@ -518,19 +518,19 @@ final class Settings {
 					</td>
 				</tr>
 				<tr>
-					<th scope="row"><label for="sc_church_events_url"><?php esc_html_e( 'Events page', 'seedcast-sermon-library' ); ?></label></th>
+					<th scope="row"><label for="seedcast_church_events_url"><?php esc_html_e( 'Events page', 'seedcast-sermon-library' ); ?></label></th>
 					<td>
-						<input type="url" class="regular-text" name="sc_church_events_url" id="sc_church_events_url"
-							value="<?php echo esc_attr( (string) get_option( 'sc_church_events_url', '' ) ); ?>" />
+						<input type="url" class="regular-text" name="seedcast_church_events_url" id="seedcast_church_events_url"
+							value="<?php echo esc_attr( (string) get_option( 'seedcast_church_events_url', '' ) ); ?>" />
 						<p class="description">
 							<?php esc_html_e( 'Optional. Where someone can see what is coming up.', 'seedcast-sermon-library' ); ?>
 						</p>
 					</td>
 				</tr>
 				<tr>
-					<th scope="row"><label for="sc_church_description"><?php esc_html_e( 'About this church', 'seedcast-sermon-library' ); ?></label></th>
+					<th scope="row"><label for="seedcast_church_description"><?php esc_html_e( 'About this church', 'seedcast-sermon-library' ); ?></label></th>
 					<td>
-						<textarea class="large-text" rows="3" name="sc_church_description" id="sc_church_description"><?php echo esc_textarea( (string) get_option( 'sc_church_description', '' ) ); ?></textarea>
+						<textarea class="large-text" rows="3" name="seedcast_church_description" id="seedcast_church_description"><?php echo esc_textarea( (string) get_option( 'seedcast_church_description', '' ) ); ?></textarea>
 						<p class="description">
 							<?php
 							/*
@@ -560,18 +560,18 @@ final class Settings {
 						 * chose.
 						 */
 						foreach ( array(
-							'sc_church_facebook'  => __( 'Facebook page', 'seedcast-sermon-library' ),
-							'sc_church_instagram' => __( 'Instagram profile', 'seedcast-sermon-library' ),
-							'sc_church_youtube'   => __( 'YouTube channel', 'seedcast-sermon-library' ),
-						) as $sc_key => $sc_label ) :
+							'seedcast_church_facebook'  => __( 'Facebook page', 'seedcast-sermon-library' ),
+							'seedcast_church_instagram' => __( 'Instagram profile', 'seedcast-sermon-library' ),
+							'seedcast_church_youtube'   => __( 'YouTube channel', 'seedcast-sermon-library' ),
+						) as $seedcast_key => $seedcast_label ) :
 							?>
 							<p>
-								<label for="<?php echo esc_attr( $sc_key ); ?>" style="display:inline-block;min-width:9em;">
-									<?php echo esc_html( $sc_label ); ?>
+								<label for="<?php echo esc_attr( $seedcast_key ); ?>" style="display:inline-block;min-width:9em;">
+									<?php echo esc_html( $seedcast_label ); ?>
 								</label>
-								<input type="url" class="regular-text" name="<?php echo esc_attr( $sc_key ); ?>" id="<?php echo esc_attr( $sc_key ); ?>"
+								<input type="url" class="regular-text" name="<?php echo esc_attr( $seedcast_key ); ?>" id="<?php echo esc_attr( $seedcast_key ); ?>"
 									placeholder="https://"
-									value="<?php echo esc_attr( (string) get_option( $sc_key, '' ) ); ?>" />
+									value="<?php echo esc_attr( (string) get_option( $seedcast_key, '' ) ); ?>" />
 							</p>
 						<?php endforeach; ?>
 						<p class="description">
@@ -580,9 +580,9 @@ final class Settings {
 					</td>
 				</tr>
 				<tr>
-					<th scope="row"><label for="sc_church_visitor_note"><?php esc_html_e( 'Note to visitors', 'seedcast-sermon-library' ); ?></label></th>
+					<th scope="row"><label for="seedcast_church_visitor_note"><?php esc_html_e( 'Note to visitors', 'seedcast-sermon-library' ); ?></label></th>
 					<td>
-						<textarea class="large-text" rows="4" name="sc_church_visitor_note" id="sc_church_visitor_note"><?php echo esc_textarea( (string) get_option( 'sc_church_visitor_note', '' ) ); ?></textarea>
+						<textarea class="large-text" rows="4" name="seedcast_church_visitor_note" id="seedcast_church_visitor_note"><?php echo esc_textarea( (string) get_option( 'seedcast_church_visitor_note', '' ) ); ?></textarea>
 						<p class="description">
 							<?php esc_html_e( 'A short word to someone thinking about coming for the first time. Where to park, what people wear, what happens with their kids.', 'seedcast-sermon-library' ); ?>
 						</p>
@@ -619,7 +619,7 @@ final class Settings {
 	 * @return void
 	 */
 	public function render_appearance_section(): void {
-		$theme = get_option( 'sc_theme', 'light' );
+		$theme = get_option( 'seedcast_theme', 'light' );
 
 		$themes = array(
 			'light'   => array(
@@ -652,7 +652,7 @@ final class Settings {
 			<div class="sc-appearance-picker">
 				<?php foreach ( $themes as $key => $option ) : ?>
 					<label class="sc-appearance-option<?php echo esc_attr( $theme === $key ? ' is-selected' : '' ); ?>">
-						<input type="radio" name="sc_theme" value="<?php echo esc_attr( $key ); ?>"
+						<input type="radio" name="seedcast_theme" value="<?php echo esc_attr( $key ); ?>"
 							<?php checked( $theme, $key ); ?> class="sc-appearance-radio" />
 						<span class="sc-appearance-preview">
 							<?php foreach ( $option['preview'] as $color ) : ?>
@@ -678,8 +678,8 @@ final class Settings {
 	 * @return void
 	 */
 	public function render_spam_section(): void {
-		$provider = get_option( 'sc_captcha_provider', 'none' );
-		$honeypot = get_option( 'sc_honeypot_enabled', '1' );
+		$provider = get_option( 'seedcast_captcha_provider', 'none' );
+		$honeypot = get_option( 'seedcast_honeypot_enabled', '1' );
 		?>
 		<div class="sc-settings-card">
 			<h2><?php esc_html_e( 'Spam protection', 'seedcast-sermon-library' ); ?></h2>
@@ -688,9 +688,9 @@ final class Settings {
 			</p>
 			<table class="form-table" role="presentation">
 				<tr>
-					<th scope="row"><label for="sc_captcha_provider"><?php esc_html_e( 'Captcha provider', 'seedcast-sermon-library' ); ?></label></th>
+					<th scope="row"><label for="seedcast_captcha_provider"><?php esc_html_e( 'Captcha provider', 'seedcast-sermon-library' ); ?></label></th>
 					<td>
-						<select name="sc_captcha_provider" id="sc_captcha_provider">
+						<select name="seedcast_captcha_provider" id="seedcast_captcha_provider">
 							<option value="none" <?php selected( $provider, 'none' ); ?>><?php esc_html_e( 'None', 'seedcast-sermon-library' ); ?></option>
 							<option value="recaptcha" <?php selected( $provider, 'recaptcha' ); ?>><?php esc_html_e( 'Google reCAPTCHA v2 (checkbox)', 'seedcast-sermon-library' ); ?></option>
 							<option value="hcaptcha" <?php selected( $provider, 'hcaptcha' ); ?>><?php esc_html_e( 'hCaptcha', 'seedcast-sermon-library' ); ?></option>
@@ -702,18 +702,18 @@ final class Settings {
 					</td>
 				</tr>
 				<tr>
-					<th scope="row"><label for="sc_captcha_site_key"><?php esc_html_e( 'Captcha site key', 'seedcast-sermon-library' ); ?></label></th>
-					<td><input type="text" class="regular-text" name="sc_captcha_site_key" id="sc_captcha_site_key" value="<?php echo esc_attr( get_option( 'sc_captcha_site_key', '' ) ); ?>" /></td>
+					<th scope="row"><label for="seedcast_captcha_site_key"><?php esc_html_e( 'Captcha site key', 'seedcast-sermon-library' ); ?></label></th>
+					<td><input type="text" class="regular-text" name="seedcast_captcha_site_key" id="seedcast_captcha_site_key" value="<?php echo esc_attr( get_option( 'seedcast_captcha_site_key', '' ) ); ?>" /></td>
 				</tr>
 				<tr>
-					<th scope="row"><label for="sc_captcha_secret"><?php esc_html_e( 'Captcha secret key', 'seedcast-sermon-library' ); ?></label></th>
-					<td><input type="text" class="regular-text" name="sc_captcha_secret" id="sc_captcha_secret" value="<?php echo esc_attr( get_option( 'sc_captcha_secret', '' ) ); ?>" /></td>
+					<th scope="row"><label for="seedcast_captcha_secret"><?php esc_html_e( 'Captcha secret key', 'seedcast-sermon-library' ); ?></label></th>
+					<td><input type="text" class="regular-text" name="seedcast_captcha_secret" id="seedcast_captcha_secret" value="<?php echo esc_attr( get_option( 'seedcast_captcha_secret', '' ) ); ?>" /></td>
 				</tr>
 				<tr>
 					<th scope="row"><?php esc_html_e( 'Honeypot', 'seedcast-sermon-library' ); ?></th>
 					<td>
 						<label>
-							<input type="checkbox" name="sc_honeypot_enabled" value="1" <?php checked( $honeypot, '1' ); ?> />
+							<input type="checkbox" name="seedcast_honeypot_enabled" value="1" <?php checked( $honeypot, '1' ); ?> />
 							<?php esc_html_e( 'Enable the hidden honeypot spam trap on all forms', 'seedcast-sermon-library' ); ?>
 						</label>
 					</td>

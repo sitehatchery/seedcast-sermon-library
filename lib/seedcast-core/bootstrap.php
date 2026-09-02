@@ -27,6 +27,7 @@ define( 'SEEDCAST_CORE_URL', plugin_dir_url( __FILE__ ) );
 require_once SEEDCAST_CORE_DIR . 'class-log.php';
 require_once SEEDCAST_CORE_DIR . 'class-registry.php';
 require_once SEEDCAST_CORE_DIR . 'class-install.php';
+require_once SEEDCAST_CORE_DIR . 'class-prefixmigration.php';
 require_once SEEDCAST_CORE_DIR . 'class-assets.php';
 require_once SEEDCAST_CORE_DIR . 'class-church.php';
 require_once SEEDCAST_CORE_DIR . 'class-blurb.php';
@@ -40,6 +41,7 @@ require_once SEEDCAST_CORE_DIR . 'Submissions/class-moderation.php';
 
 require_once SEEDCAST_CORE_DIR . 'Frontend/class-meta.php';
 require_once SEEDCAST_CORE_DIR . 'Frontend/class-schema.php';
+require_once SEEDCAST_CORE_DIR . 'Frontend/class-kses.php';
 require_once SEEDCAST_CORE_DIR . 'Frontend/class-breadcrumb.php';
 require_once SEEDCAST_CORE_DIR . 'Frontend/class-videoembed.php';
 require_once SEEDCAST_CORE_DIR . 'Frontend/class-formrenderer.php';

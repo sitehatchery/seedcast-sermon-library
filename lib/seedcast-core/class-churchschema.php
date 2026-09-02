@@ -246,15 +246,19 @@ class ChurchSchema {
 		// added to above. A second one here would contradict it.
 		if ( self::seo_plugin_active() ) return;
 
-		printf(
-			'<script type="application/ld+json">%s</script>' . "\n",
-			wp_json_encode(
-				[
-					'@context' => 'https://schema.org',
-					'@graph'   => [ self::node() ],
-				],
-				JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
-			)
+		/*
+		 * Schema::emit() rather than a printf() of our own: it encodes with
+		 * JSON_HEX_TAG, so a church name or description containing '</script>'
+		 * is escaped to '</script>' and cannot close the block early.
+		 * These values come from a settings screen, but "only an admin can set
+		 * it" is not the same as safe, and the other JSON-LD in the library
+		 * already goes out through there.
+		 */
+		Frontend\Schema::emit(
+			[
+				'@context' => 'https://schema.org',
+				'@graph'   => [ self::node() ],
+			]
 		);
 	}
 

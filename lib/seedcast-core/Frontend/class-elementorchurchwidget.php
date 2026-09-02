@@ -76,7 +76,7 @@ class ElementorChurchWidget extends \Elementor\Widget_Base {
 	 */
 	protected function register_controls() {
 		$this->start_controls_section(
-			'sc_church_content',
+			'seedcast_church_content',
 			array(
 				'label' => __( 'Church Details', 'seedcast-sermon-library' ),
 				'tab'   => \Elementor\Controls_Manager::TAB_CONTENT,
@@ -84,7 +84,7 @@ class ElementorChurchWidget extends \Elementor\Widget_Base {
 		);
 
 		$this->add_control(
-			'sc_church_intro',
+			'seedcast_church_intro',
 			array(
 				'type'            => \Elementor\Controls_Manager::RAW_HTML,
 				'raw'             => esc_html__( 'These details are edited once under Settings, Seedcast, Church. Every place they appear updates together.', 'seedcast-sermon-library' ),
@@ -173,8 +173,13 @@ class ElementorChurchWidget extends \Elementor\Widget_Base {
 				. '</p>';
 		}
 
-		// ChurchDetails::render() escapes every value it emits.
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		echo $html;
+		/*
+		 * ChurchDetails::render() escapes every value it emits, so this is
+		 * escaping the same thing twice. That is deliberate: it costs nothing
+		 * here, and it means a future change to render() cannot turn this line
+		 * into an XSS hole without anyone noticing. ChurchDetails emits no form
+		 * controls, so wp_kses_post() has nothing of its to strip.
+		 */
+		echo wp_kses_post( $html );
 	}
 }

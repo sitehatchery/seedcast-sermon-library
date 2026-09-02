@@ -23,10 +23,10 @@ class Captcha {
 	 * The field name is fixed so FormRenderer and this checker agree.
 	 */
 	public static function passes_honeypot(): bool {
-		if ( get_option( 'sc_honeypot_enabled', '1' ) !== '1' ) return true;
+		if ( get_option( 'seedcast_honeypot_enabled', '1' ) !== '1' ) return true;
 		// Nonce is verified in SubmissionEngine::process() before this runs; this
 		// check only compares the honeypot field against an empty string.
-		$val = isset( $_POST['sc_hp_note'] ) ? sanitize_text_field( wp_unslash( $_POST['sc_hp_note'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$val = isset( $_POST['seedcast_hp_note'] ) ? sanitize_text_field( wp_unslash( $_POST['seedcast_hp_note'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 		return $val === '';
 	}
 
@@ -35,10 +35,10 @@ class Captcha {
 	 * Returns true when no provider is set (feature simply off).
 	 */
 	public static function verify(): bool {
-		$provider = get_option( 'sc_captcha_provider', 'none' );
+		$provider = get_option( 'seedcast_captcha_provider', 'none' );
 		if ( $provider === 'none' || $provider === '' ) return true;
 
-		$secret = get_option( 'sc_captcha_secret', '' );
+		$secret = get_option( 'seedcast_captcha_secret', '' );
 		if ( ! $secret ) return true; // Misconfigured - don't lock users out.
 
 		$token = self::posted_token( $provider );
@@ -119,8 +119,8 @@ class Captcha {
 	 * one in the form that failed. Called by FormRenderer.
 	 */
 	public static function render_widget(): void {
-		$provider = get_option( 'sc_captcha_provider', 'none' );
-		$site_key = get_option( 'sc_captcha_site_key', '' );
+		$provider = get_option( 'seedcast_captcha_provider', 'none' );
+		$site_key = get_option( 'seedcast_captcha_site_key', '' );
 		if ( $provider === 'none' || ! $site_key ) return;
 
 		printf(

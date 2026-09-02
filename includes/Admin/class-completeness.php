@@ -478,7 +478,7 @@ class Completeness {
 
 				<?php if ( $show_comprehensive ) : ?>
 					<a class="scsl-list-summary__ring"
-						href="<?php echo esc_url( add_query_arg( 'sc_view', 'comprehensive', $report ) ); ?>">
+						href="<?php echo esc_url( add_query_arg( 'seedcast_view', 'comprehensive', $report ) ); ?>">
 						<span class="scsl-list-summary__score scsl-list-summary__score--<?php echo esc_attr( $comp_tier['band'] ); ?>">
 							<span class="scsl-list-summary__value"><?php echo esc_html( (string) $comprehensive ); ?></span>
 						</span>
@@ -494,7 +494,7 @@ class Completeness {
 				<ul class="scsl-list-summary__tiers">
 					<?php foreach ( \Seedcast\Core\Completeness::tiers() as $t ) : ?>
 						<li>
-							<a href="<?php echo esc_url( add_query_arg( [ 'sc_view' => 'items', 'sc_filter' => $t['key'] ], $report ) ); ?>">
+							<a href="<?php echo esc_url( add_query_arg( [ 'seedcast_view' => 'items', 'seedcast_filter' => $t['key'] ], $report ) ); ?>">
 								<span class="scsl-list-summary__dot scsl-list-summary__dot--<?php echo esc_attr( $t['band'] ); ?>"></span>
 								<strong><?php echo esc_html( (string) (int) $counts[ $t['key'] ] ); ?></strong>
 								<?php echo esc_html( $t['label'] ); ?>
@@ -591,7 +591,7 @@ class Completeness {
 			esc_attr( $tier['band'] ),
 			esc_url(
 				admin_url(
-					'admin.php?page=seedcast-sermon-library-completeness&sc_view=items&sc_filter='
+					'admin.php?page=seedcast-sermon-library-completeness&seedcast_view=items&seedcast_filter='
 					. rawurlencode( $tier['key'] )
 				)
 			),

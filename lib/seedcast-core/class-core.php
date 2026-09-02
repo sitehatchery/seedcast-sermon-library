@@ -24,6 +24,11 @@ final class Core {
 	 * @return void
 	 */
 	public static function boot(): void {
+		// Before anything reads an option: the library's own option names moved
+		// from the sc_ prefix to seedcast_, and existing sites still hold their
+		// values under the old names until this has run.
+		PrefixMigration::maybe_run();
+
 		( new Assets() )->init();
 		( new Admin\Settings() )->init();
 		( new Admin\SuiteGrid() )->init();

@@ -30,7 +30,7 @@ final class Install {
 	/**
 	 * Option recording the installed schema version.
 	 */
-	public const SCHEMA_OPTION = 'sc_submissions_schema';
+	public const SCHEMA_OPTION = 'seedcast_submissions_schema';
 
 	/**
 	 * The shared submissions table name.
@@ -153,7 +153,7 @@ final class Install {
 	/**
 	 * Option recording the installed completeness schema version.
 	 */
-	public const COMPLETENESS_SCHEMA_OPTION = 'sc_completeness_schema';
+	public const COMPLETENESS_SCHEMA_OPTION = 'seedcast_completeness_schema';
 
 	/**
 	 * The weekly completeness table name.
@@ -216,11 +216,11 @@ final class Install {
 	public static function set_defaults(): void {
 		$defaults = array_merge(
 			array(
-				'sc_theme'             => 'light',
-				'sc_captcha_provider'  => 'none',
-				'sc_captcha_site_key'  => '',
-				'sc_captcha_secret'    => '',
-				'sc_honeypot_enabled'  => '1',
+				'seedcast_theme'             => 'light',
+				'seedcast_captcha_provider'  => 'none',
+				'seedcast_captcha_site_key'  => '',
+				'seedcast_captcha_secret'    => '',
+				'seedcast_honeypot_enabled'  => '1',
 			),
 			Church::DEFAULTS
 		);

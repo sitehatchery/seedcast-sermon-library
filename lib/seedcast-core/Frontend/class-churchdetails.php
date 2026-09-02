@@ -205,11 +205,11 @@ class ChurchDetails {
 		 * those two, and the resolved value for everything else.
 		 */
 		if ( 'name' === $field ) {
-			return '' !== trim( (string) get_option( 'sc_church_name', '' ) );
+			return '' !== trim( (string) get_option( 'seedcast_church_name', '' ) );
 		}
 
 		if ( 'email' === $field ) {
-			return '' !== trim( (string) get_option( 'sc_church_email', '' ) );
+			return '' !== trim( (string) get_option( 'seedcast_church_email', '' ) );
 		}
 
 		$map = array(
@@ -270,7 +270,7 @@ class ChurchDetails {
 					. esc_html( $church['phone'] ) . '</a></p>';
 
 			case 'email':
-				if ( '' === trim( (string) get_option( 'sc_church_email', '' ) ) ) {
+				if ( '' === trim( (string) get_option( 'seedcast_church_email', '' ) ) ) {
 					return '';
 				}
 				return '<p class="sc-church__email"><a href="' . esc_url( 'mailto:' . $church['email'] ) . '">'

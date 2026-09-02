@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  *
  * Child plugins do not talk to the database directly. They:
  *   1. Render a form via Seedcast\Core\Frontend\FormRenderer (or their own markup
- *      that posts to the `sc_submit` action).
+ *      that posts to the `seedcast_submit` action).
  *   2. Receive a validated, spam-checked, stored submission.
  *   3. Hook `seedcast/submission/stored` to react (e.g. notify admins).
  *
@@ -29,25 +29,61 @@ class SubmissionEngine {
 
 	public function init(): void {
 		// Public (logged-out) and private (logged-in) form posts.
-		add_action( 'admin_post_nopriv_sc_submit', [ $this, 'handle_post' ] );
-		add_action( 'admin_post_sc_submit',        [ $this, 'handle_post' ] );
+		add_action( 'admin_post_nopriv_seedcast_submit', [ $this, 'handle_post' ] );
+		add_action( 'admin_post_seedcast_submit',        [ $this, 'handle_post' ] );
 		// AJAX path (no page reload; notice shown inline in the posting form).
-		add_action( 'wp_ajax_nopriv_sc_ajax_submit', [ $this, 'ajax_submit' ] );
-		add_action( 'wp_ajax_sc_ajax_submit',        [ $this, 'ajax_submit' ] );
+		add_action( 'wp_ajax_nopriv_seedcast_ajax_submit', [ $this, 'ajax_submit' ] );
+		add_action( 'wp_ajax_seedcast_ajax_submit',        [ $this, 'ajax_submit' ] );
+	}
+
+	/**
+	 * The posted values, unslashed and sanitized once, at the boundary.
+	 *
+	 * Everything downstream - this class, and every parse_payload listener -
+	 * receives the result of this rather than $_POST, so no raw superglobal is
+	 * ever handed to a filter callback.
+	 *
+	 * Unslashing happens here and only here. stripslashes() is not idempotent
+	 * on every input: an apostrophe or a quote survives a second pass unharmed,
+	 * but a value that legitimately contains a backslash does not. WordPress
+	 * stores "a\b" in $_POST as "a\\b"; one unslash gives "a\b" back, and a
+	 * second silently gives "ab". So a listener that unslashes what it is
+	 * handed here is a bug - narrow, but real, and silent when it bites.
+	 *
+	 * sanitize_textarea_field(), not sanitize_text_field(), because the latter
+	 * flattens newlines and one of these fields is a message box. Per-field
+	 * sanitizers still run on top of this: this pass makes the array safe to
+	 * pass around, and absint()/sanitize_email()/sanitize_key() below make each
+	 * value right for its own context.
+	 *
+	 * @return array
+	 */
+	private static function clean_post(): array {
+		// Nonce verification happens in process(), which is the first thing to
+		// look at any of this. Nothing is trusted before then.
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$raw = isset( $_POST ) ? (array) $_POST : [];
+		if ( ! $raw ) {
+			return [];
+		}
+
+		return map_deep( wp_unslash( $raw ), 'sanitize_textarea_field' );
 	}
 
 	/**
 	 * Shared validation + insert used by both the classic POST handler and the
 	 * AJAX handler. Returns [ true, '' ] on success or [ false, message ].
 	 *
+	 * @param array $post Values from clean_post(): already unslashed and
+	 *                    sanitized, so nothing here unslashes again.
 	 * @return array{0:bool,1:string}
 	 */
 	private function process( array $post ): array {
-		$source = isset( $post['sc_source'] ) ? sanitize_key( wp_unslash( $post['sc_source'] ) ) : '';
-		$type   = isset( $post['sc_type'] )   ? sanitize_key( wp_unslash( $post['sc_type'] ) )   : '';
+		$source = isset( $post['seedcast_source'] ) ? sanitize_key( $post['seedcast_source'] ) : '';
+		$type   = isset( $post['seedcast_type'] )   ? sanitize_key( $post['seedcast_type'] )   : '';
 
-		$nonce_action = "sc_submit_{$source}_{$type}";
-		if ( ! isset( $post['sc_nonce'] ) || ! wp_verify_nonce( wp_unslash( $post['sc_nonce'] ), $nonce_action ) ) {
+		$nonce_action = "seedcast_submit_{$source}_{$type}";
+		if ( ! isset( $post['seedcast_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( $post['seedcast_nonce'] ), $nonce_action ) ) {
 			return [ false, __( 'Security check failed. Please try again.', 'seedcast-sermon-library' ) ];
 		}
 
@@ -68,17 +104,17 @@ class SubmissionEngine {
 			'source'       => $source,
 			'type'         => $type,
 			'payload'      => $payload,
-			'author_name'  => isset( $post['sc_author_name'] )  ? sanitize_text_field( wp_unslash( $post['sc_author_name'] ) ) : '',
-			'author_email' => isset( $post['sc_author_email'] ) ? sanitize_email( wp_unslash( $post['sc_author_email'] ) )     : '',
-			'service_id'   => isset( $post['sc_service_id'] )   ? absint( $post['sc_service_id'] ) : 0,
-			'source_url'   => isset( $post['sc_source_url'] )   ? esc_url_raw( wp_unslash( $post['sc_source_url'] ) ) : '',
+			'author_name'  => isset( $post['seedcast_author_name'] )  ? sanitize_text_field( $post['seedcast_author_name'] ) : '',
+			'author_email' => isset( $post['seedcast_author_email'] ) ? sanitize_email( $post['seedcast_author_email'] )     : '',
+			'service_id'   => isset( $post['seedcast_service_id'] )   ? absint( $post['seedcast_service_id'] ) : 0,
+			'source_url'   => isset( $post['seedcast_source_url'] )   ? esc_url_raw( $post['seedcast_source_url'] ) : '',
 			/*
 			 * Which post the form was on, as an id rather than only a URL.
 			 * The URL alone breaks as a grouping key the moment a permalink
 			 * changes or a query string is appended, so counting submissions
 			 * per piece of content needs the id.
 			 */
-			'linked_post'  => isset( $post['sc_linked_post'] )  ? absint( $post['sc_linked_post'] ) : 0,
+			'linked_post'  => isset( $post['seedcast_linked_post'] )  ? absint( $post['seedcast_linked_post'] ) : 0,
 		] );
 
 		if ( is_wp_error( $result ) ) {
@@ -113,10 +149,10 @@ class SubmissionEngine {
 		}
 
 		ob_start();
-		// Nonce is verified inside process() before any posted value is used;
-		// process() unslashes and sanitizes each field individually.
-		list( $ok, $message ) = $this->process( $_POST ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$stray = trim( (string) ob_get_clean() );
+		// Nonce is verified inside process() before any posted value is used.
+		$post                 = self::clean_post();
+		list( $ok, $message ) = $this->process( $post );
+		$stray                = trim( (string) ob_get_clean() );
 		if ( $stray ) {
 			// Log::debug() only writes to the server's PHP error log - never
 			// shown to the visitor - so this is safe to log unconditionally
@@ -126,8 +162,8 @@ class SubmissionEngine {
 		}
 
 		if ( $ok ) {
-			$source = isset( $_POST['sc_source'] ) ? sanitize_key( wp_unslash( $_POST['sc_source'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- verified inside process() above.
-			$type   = isset( $_POST['sc_type'] ) ? sanitize_key( wp_unslash( $_POST['sc_type'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			$source = isset( $post['seedcast_source'] ) ? sanitize_key( $post['seedcast_source'] ) : '';
+			$type   = isset( $post['seedcast_type'] ) ? sanitize_key( $post['seedcast_type'] ) : '';
 
 			/**
 			 * The JSON sent back after a successful submission.
@@ -149,7 +185,7 @@ class SubmissionEngine {
 			$payload = apply_filters(
 				"seedcast/submission/response/{$source}/{$type}",
 				[ 'message' => __( 'Thank you - your submission has been received and will be reviewed.', 'seedcast-sermon-library' ) ],
-				$_POST // phpcs:ignore WordPress.Security.NonceVerification.Missing -- verified inside process() above.
+				$post
 			);
 
 			wp_send_json_success( $payload );
@@ -159,9 +195,10 @@ class SubmissionEngine {
 
 	public function handle_post(): void {
 		// Nonce is verified inside process() before any posted value is used.
-		list( $ok, $message ) = $this->process( $_POST ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$source = isset( $_POST['sc_source'] ) ? sanitize_key( wp_unslash( $_POST['sc_source'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$type   = isset( $_POST['sc_type'] )   ? sanitize_key( wp_unslash( $_POST['sc_type'] ) )   : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$post                 = self::clean_post();
+		list( $ok, $message ) = $this->process( $post );
+		$source               = isset( $post['seedcast_source'] ) ? sanitize_key( $post['seedcast_source'] ) : '';
+		$type                 = isset( $post['seedcast_type'] ) ? sanitize_key( $post['seedcast_type'] ) : '';
 		$this->redirect_back( $ok, $ok ? '' : $message, $source, $type );
 	}
 
@@ -184,7 +221,7 @@ class SubmissionEngine {
 		global $wpdb;
 
 		if ( empty( $data['source'] ) || empty( $data['type'] ) ) {
-			return new \WP_Error( 'sc_missing_source', __( 'Submission source and type are required.', 'seedcast-sermon-library' ) );
+			return new \WP_Error( 'seedcast_missing_source', __( 'Submission source and type are required.', 'seedcast-sermon-library' ) );
 		}
 
 		$row = [
@@ -224,7 +261,7 @@ class SubmissionEngine {
 				// cause instead of just "Could not save submission."
 				Log::debug( 'submission insert failed: ' . $wpdb->last_error );
 			}
-			return new \WP_Error( 'sc_db_error', __( 'Could not save submission.', 'seedcast-sermon-library' ) );
+			return new \WP_Error( 'seedcast_db_error', __( 'Could not save submission.', 'seedcast-sermon-library' ) );
 		}
 
 		$id = (int) $wpdb->insert_id;
@@ -251,10 +288,10 @@ class SubmissionEngine {
 		$referer = wp_get_referer() ?: home_url( '/' );
 		$url = add_query_arg(
 			[
-				'sc_submitted' => $success ? '1' : '0',
-				'sc_msg'       => $message ? rawurlencode( $message ) : false,
-				'sc_src'       => $source ?: false,
-				'sc_stype'     => $type ?: false,
+				'seedcast_submitted' => $success ? '1' : '0',
+				'seedcast_msg'       => $message ? rawurlencode( $message ) : false,
+				'seedcast_src'       => $source ?: false,
+				'seedcast_stype'     => $type ?: false,
 			],
 			$referer
 		);

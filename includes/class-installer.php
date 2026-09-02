@@ -80,8 +80,8 @@ class Installer {
 		if ( get_option( 'scsl_core_migration_done' ) === '1' ) return;
 
 		$theme = get_option( 'scsl_theme', false );
-		if ( false !== $theme && false === get_option( 'sc_theme', false ) ) {
-			update_option( 'sc_theme', $theme );
+		if ( false !== $theme && false === get_option( 'seedcast_theme', false ) ) {
+			update_option( 'seedcast_theme', $theme );
 		}
 		delete_option( 'scsl_theme' );
 

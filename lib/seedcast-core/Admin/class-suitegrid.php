@@ -45,8 +45,8 @@ final class SuiteGrid {
 	 * @return void
 	 */
 	public function init(): void {
-		add_action( 'wp_ajax_sc_suite_activate', array( $this, 'ajax_activate' ) );
-		add_action( 'wp_ajax_sc_suite_install', array( $this, 'ajax_install' ) );
+		add_action( 'wp_ajax_seedcast_suite_activate', array( $this, 'ajax_activate' ) );
+		add_action( 'wp_ajax_seedcast_suite_install', array( $this, 'ajax_install' ) );
 	}
 
 	/**
@@ -150,7 +150,7 @@ final class SuiteGrid {
 	 * @return void
 	 */
 	public static function render(): void {
-		$nonce = wp_create_nonce( 'sc_suite' );
+		$nonce = wp_create_nonce( 'seedcast_suite' );
 		?>
 		<p class="description">
 			<?php esc_html_e( 'Seedcast plugins share one set of settings and one look. Anything you install later inherits both automatically.', 'seedcast-sermon-library' ); ?>
@@ -234,7 +234,7 @@ final class SuiteGrid {
 	 * @return void
 	 */
 	public function ajax_activate(): void {
-		check_ajax_referer( 'sc_suite', 'nonce' );
+		check_ajax_referer( 'seedcast_suite', 'nonce' );
 		if ( ! current_user_can( 'activate_plugins' ) ) {
 			wp_send_json_error( array( 'message' => __( 'Permission denied.', 'seedcast-sermon-library' ) ), 403 );
 		}
@@ -268,7 +268,7 @@ final class SuiteGrid {
 	 * @return void
 	 */
 	public function ajax_install(): void {
-		check_ajax_referer( 'sc_suite', 'nonce' );
+		check_ajax_referer( 'seedcast_suite', 'nonce' );
 		if ( ! current_user_can( 'install_plugins' ) ) {
 			wp_send_json_error( array( 'message' => __( 'Permission denied.', 'seedcast-sermon-library' ) ), 403 );
 		}

@@ -43,23 +43,23 @@ final class Completeness {
 	 * standard that was not being applied yet, and inventing history would
 	 * poison any before and after comparison.
 	 */
-	private const START_OPTION = 'sc_completeness_start_';
+	private const START_OPTION = 'seedcast_completeness_start_';
 
 	/**
 	 * Transient prefix for the archive score, which is expensive enough to be
 	 * worth caching and current enough that a short life is fine.
 	 */
-	private const ARCHIVE_CACHE = 'sc_completeness_archive_';
+	private const ARCHIVE_CACHE = 'seedcast_completeness_archive_';
 
 	/**
 	 * Transient prefix for the per-item breakdown.
 	 */
-	private const BREAKDOWN_CACHE = 'sc_completeness_items_';
+	private const BREAKDOWN_CACHE = 'seedcast_completeness_items_';
 
 	/**
 	 * Transient prefix for the completion gap.
 	 */
-	private const GAP_CACHE = 'sc_completeness_gap_';
+	private const GAP_CACHE = 'seedcast_completeness_gap_';
 
 	/**
 	 * How long the archive score stays cached.

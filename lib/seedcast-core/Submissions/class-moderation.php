@@ -27,7 +27,7 @@ class Moderation {
 	public const STATUSES = [ 'pending', 'approved', 'published', 'rejected', 'needs_edit', 'archived' ];
 
 	public function init(): void {
-		add_action( 'wp_ajax_sc_moderate', [ $this, 'ajax_moderate' ] );
+		add_action( 'wp_ajax_seedcast_moderate', [ $this, 'ajax_moderate' ] );
 	}
 
 	private static function table(): string {
@@ -147,7 +147,7 @@ class Moderation {
 	}
 
 	public function ajax_moderate(): void {
-		check_ajax_referer( 'sc_admin_nonce', 'nonce' );
+		check_ajax_referer( 'seedcast_admin_nonce', 'nonce' );
 		if ( ! current_user_can( 'edit_posts' ) ) {
 			wp_send_json_error( [ 'message' => __( 'Permission denied.', 'seedcast-sermon-library' ) ], 403 );
 		}

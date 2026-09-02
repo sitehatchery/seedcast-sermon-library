@@ -108,7 +108,7 @@ final class Assets {
 			'seedcastAdmin',
 			array(
 				'ajaxUrl' => admin_url( 'admin-ajax.php' ),
-				'nonce'   => wp_create_nonce( 'sc_admin_nonce' ),
+				'nonce'   => wp_create_nonce( 'seedcast_admin_nonce' ),
 				'labels'  => array(
 					'active'   => __( 'Active', 'seedcast-sermon-library' ),
 					'inactive' => __( 'Inactive', 'seedcast-sermon-library' ),
@@ -144,7 +144,7 @@ final class Assets {
 	 * @return array
 	 */
 	public function theme_body_class( array $classes ): array {
-		$theme     = (string) get_option( 'sc_theme', 'light' );
+		$theme     = (string) get_option( 'seedcast_theme', 'light' );
 		$classes[] = 'sc-theme-' . sanitize_html_class( $theme );
 		return $classes;
 	}
