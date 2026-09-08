@@ -82,6 +82,23 @@ class ScriptureParser {
 	];
 
 	/**
+	 * Book map keys, longest first. Built on first use.
+	 *
+	 * @var string[]|null
+	 */
+	private static $sorted_keys = null;
+
+	/**
+	 * Parsed spans, keyed by the reference they came from.
+	 *
+	 * The same passage is parsed repeatedly within a single request, most of
+	 * all by overlaps() comparing one term against the whole taxonomy.
+	 *
+	 * @var array<string, array|null>
+	 */
+	private static $span_cache = [];
+
+	/**
 	 * Extract canonical book name from a free-text reference like "John 3:16-17"
 	 */
 	public static function extract_book( string $reference ): ?string {
@@ -96,11 +113,21 @@ class ScriptureParser {
 		// "John 3:16-17" -> try progressively shorter prefixes
 		$lower = strtolower( $ref );
 
-		// Try longest match first (handles "Song of Solomon")
-		$keys = array_keys( self::$book_map );
-		usort( $keys, function( $a, $b ) { return strlen( $b ) - strlen( $a ); } );
+		/*
+		 * Longest match first, so "Song of Solomon" is not cut short by "song".
+		 *
+		 * Sorted once per request rather than once per call. A scripture page
+		 * compares its passage against every other term in the taxonomy, twice
+		 * each, so on a site with a couple of thousand references this ran a
+		 * two-hundred element sort several thousand times and cost seconds.
+		 */
+		if ( null === self::$sorted_keys ) {
+			$keys = array_keys( self::$book_map );
+			usort( $keys, function( $a, $b ) { return strlen( $b ) - strlen( $a ); } );
+			self::$sorted_keys = $keys;
+		}
 
-		foreach ( $keys as $key ) {
+		foreach ( self::$sorted_keys as $key ) {
 			if ( strpos( $lower, $key ) === 0 ) {
 				return self::$book_map[ $key ];
 			}
@@ -162,6 +189,25 @@ class ScriptureParser {
 	 * @return array{book: string, start: int, end: int}|null
 	 */
 	public static function to_span( string $reference ): ?array {
+		// Memoised: overlaps() parses the queried passage once per term in the
+		// taxonomy, and the answer for a given string never changes.
+		if ( array_key_exists( $reference, self::$span_cache ) ) {
+			return self::$span_cache[ $reference ];
+		}
+
+		$span = self::compute_span( $reference );
+
+		self::$span_cache[ $reference ] = $span;
+
+		return $span;
+	}
+
+	/**
+	 * Work out a span without consulting the cache.
+	 *
+	 * @return array{book: string, start: int, end: int}|null
+	 */
+	private static function compute_span( string $reference ): ?array {
 		$book = self::extract_book( $reference );
 
 		if ( ! $book ) return null;

@@ -3,7 +3,7 @@
  * Plugin Name: Seedcast Sermon Library
  * Plugin URI:  https://seedcast.ai/sermon-library
  * Description: A complete sermon series and content management system for churches. Manage sermons, series, speakers, transcripts, Bible studies, and more.
- * Version:     2.71.0
+ * Version:     2.72.0
  * Author:      Seedcast
  * Author URI:  https://seedcast.ai
  * License:     GPL-2.0-or-later
@@ -20,7 +20,7 @@ namespace SeedcastSermonLibrary;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define( 'SCSL_VERSION',          '2.71.0' );
+define( 'SCSL_VERSION',          '2.72.0' );
 define( 'SCSL_PLUGIN_FILE',      __FILE__ );
 define( 'SCSL_PLUGIN_DIR',       plugin_dir_path( __FILE__ ) );
 define( 'SCSL_PLUGIN_URL',       plugin_dir_url( __FILE__ ) );
@@ -91,6 +91,9 @@ final class SermonLibrary {
 		( new Frontend\Shortcodes() )->init();
 		( new Frontend\ContentList() )->init();
 		( new Frontend\Schema() )->init();
+		Scripture\Summary::init();
+		Scripture\ListLoader::init();
+		Scripture\Indexing::init();
 		( new Frontend\ViewCounter() )->init();
 		( new Frontend\ImageFallback() )->init();
 		( new Frontend\PodcastFeed() )->init();
@@ -223,10 +226,10 @@ final class SermonLibrary {
 		if ( get_option( 'scsl_disable_css' ) !== '1' ) {
 			// Declaring the core stylesheet as a dependency guarantees the token
 			// block loads first, so every var(--sc-*) below it resolves.
-			wp_enqueue_style( 'scsl-frontend', SCSL_PLUGIN_URL . 'assets/css/frontend.css', [ 'seedcast-core' ], SCSL_VERSION );
+			wp_enqueue_style( 'scsl-frontend', SCSL_PLUGIN_URL . 'assets/css/frontend.css', [ 'seedcast-core' ], scsl_asset_version( 'assets/css/frontend.css' ) );
 		}
 
-		wp_enqueue_script( 'scsl-frontend', SCSL_PLUGIN_URL . 'assets/js/frontend.js', [ 'jquery' ], SCSL_VERSION, true );
+		wp_enqueue_script( 'scsl-frontend', SCSL_PLUGIN_URL . 'assets/js/frontend.js', [ 'jquery' ], scsl_asset_version( 'assets/js/frontend.js' ), true );
 	}
 
 	/**
@@ -235,7 +238,7 @@ final class SermonLibrary {
 	 */
 	public function elementor_assets(): void {
 		if ( get_option( 'scsl_disable_css' ) === '1' ) return;
-		wp_enqueue_style( 'scsl-frontend', SCSL_PLUGIN_URL . 'assets/css/frontend.css', [ 'seedcast-core' ], SCSL_VERSION );
+		wp_enqueue_style( 'scsl-frontend', SCSL_PLUGIN_URL . 'assets/css/frontend.css', [ 'seedcast-core' ], scsl_asset_version( 'assets/css/frontend.css' ) );
 	}
 }
 

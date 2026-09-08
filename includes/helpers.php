@@ -62,3 +62,29 @@ if ( ! function_exists( 'scsl_demote_headings' ) ) {
 		return $html;
 	}
 }
+
+/**
+ * A cache-busting version for a bundled asset.
+ *
+ * The plugin version alone is not enough: it changes on release, but a
+ * stylesheet edited between releases keeps the same URL, so browsers and page
+ * caches keep serving the old file and the change appears not to have worked.
+ * The file's own timestamp changes exactly when its contents do, which is the
+ * question being asked.
+ *
+ * @param string $relative Path under the plugin directory, e.g. assets/css/frontend.css.
+ * @return string
+ */
+function scsl_asset_version( string $relative ): string {
+	$path = SCSL_PLUGIN_DIR . ltrim( $relative, '/' );
+
+	if ( is_readable( $path ) ) {
+		$mtime = filemtime( $path );
+
+		if ( $mtime ) {
+			return SCSL_VERSION . '.' . $mtime;
+		}
+	}
+
+	return SCSL_VERSION;
+}

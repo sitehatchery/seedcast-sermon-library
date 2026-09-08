@@ -39,6 +39,8 @@ class Autoloader {
 		'PodcastFeed'           => 'class-podcastfeed.php',
 		'BulletinLibraryBridge' => 'class-bulletinlibrarybridge.php',
 		'ScriptureParser'       => 'class-scriptureparser.php',
+		'CardPassages'          => 'class-cardpassages.php',
+		'ListLoader'            => 'class-listloader.php',
 	];
 
 	public function load( string $class ): void {

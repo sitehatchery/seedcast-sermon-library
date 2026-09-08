@@ -20,7 +20,7 @@ class Scripture {
 
 		register_taxonomy( 'scsl_scripture', [ 'scsl_sermon' ], [
 			'labels'            => $labels,
-			'hierarchical'      => false,
+			'hierarchical'      => true,
 			'public'            => true,
 			'show_ui'           => true,
 			'show_in_menu'      => true,

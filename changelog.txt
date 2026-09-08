@@ -2,6 +2,27 @@
 
 Complete historical changelog moved out of readme.txt to keep the WordPress.org readme concise.
 
+= 2.72.0 =
+
+**Passage pages rebuilt**
+
+* Scripture references now form a hierarchy. Every verse term sits under its chapter, and every chapter under its book, so `/scripture/romans/` and `/scripture/romans-8/` are real pages listing everything beneath them. Verse terms keep their names, their slugs and their URLs; nothing that was linkable before has moved.
+* A passage page now leads with the sermons on that passage, unpaginated, then the articles written out of those sermons, then a section offering the rest of the book. That last section is what makes the long tail worth visiting: most passages have a single sermon, and before this a page for one of them was a page with one card on it.
+* Sermon cards on a passage page say which passages in that book the sermon actually touches, and which one it was built on. Passages from other books are left out, because on a page about Acts a sermon's aside about Romans is noise.
+* Book and chapter pages can carry a written summary of what their sermons cover as a body of teaching. Nothing here writes one: generation happens through the `scsl_scripture_summary_generate` filter, so a church with no service connected simply never sees the section. Summaries are cached in term meta, keyed by a hash of the sermon set they were written from, and served while a stale one is refreshed in the background rather than making a visitor wait on a network call.
+* Long lists load further batches on request instead of paginating. The first batch is in the HTML, which is the part that matters for search and for anything reading the page without scripts, and every button is a real link to the book page so it still leads somewhere with scripts unavailable.
+* Passages in books the church has barely preached are left out of the index and the sitemap. This is a rule rather than a list: a page becomes indexable on its own once its book crosses the threshold, which `scsl_min_book_sermons_for_index` sets.
+
+**Performance**
+
+* `ScriptureParser::extract_book()` sorted its two hundred entry book map on every call, and comparing one passage against a whole taxonomy calls it twice per term. On a site with a couple of thousand references that ran several thousand sorts per page load and cost around six seconds. The sorted list and the parsed spans are now worked out once per request. Passage pages went from roughly eight seconds to one.
+
+**For other code**
+
+* `scsl_sermon_card_meta_rows` adds rows to a sermon card's detail column, so a page can put context on a card without the card knowing anything about that page.
+* `[scsl_content]` gained `include`, `offset` and `wrapper`, so a caller that has already worked out which sermons belong in a list can ask for exactly those, continue a list it has already drawn, and receive bare cards to append rather than a second section nested inside the first.
+* Bundled CSS and JavaScript are versioned by the file's own timestamp as well as the plugin version. A stylesheet edited between releases kept the same URL before, so browsers and page caches went on serving the old file and the change looked as though it had not worked.
+
 = 2.70.2 =
 
 * Fixed unlisted sermons still appearing in lists that name the sermon type as a list rather than as a single value. Both spellings mean the same thing, but the check compared it as text, so a list never matched and those lists were left unfiltered. PHP also logged a warning each time it happened, several a second on a busy site.

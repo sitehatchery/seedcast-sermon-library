@@ -2420,3 +2420,64 @@ button.scsl-btn--platform:hover {
 
 /* The end chapter, and the control that reveals it. */
 .scsl-pp-more { font-size: .9em; text-decoration: none; }
+
+/* ── Scripture page: the summary above the sermons ────────── */
+
+/*
+ * A lead paragraph, not body copy. It is the first prose on the page and the
+ * thing a search result or an assistant is most likely to quote, so it is given
+ * room to sit apart from the cards. Without the gap it reads as a caption
+ * belonging to the first card rather than as an introduction to all of them.
+ *
+ * Deliberately no max-width: the cards below run the full container, and a
+ * narrower column here would read as a different kind of content.
+ */
+.scsl-scripture-summary {
+	margin: 0 0 3rem;
+}
+
+.scsl-scripture-summary p {
+	margin: 0 0 1rem;
+	line-height: 1.7;
+}
+
+.scsl-scripture-summary p:last-child {
+	margin-bottom: 0;
+}
+
+/* ── Scripture page: sections below the passage's own sermons ────────── */
+
+/*
+ * Air above each following section. These sit under a run of sermon cards,
+ * and without a clear gap the heading reads as a caption belonging to the
+ * last card rather than the start of something new.
+ */
+.scsl-scripture-articles,
+.scsl-scripture-book {
+	margin-top: 3.5rem;
+}
+
+/*
+ * Sized here rather than left to the theme. These headings open a section under
+ * a run of cards, and at the theme's default they came out barely larger than
+ * the card titles beneath them, which reads as a caption rather than a heading.
+ * Both scripture sections share the size so they look like siblings.
+ */
+.scsl-scripture-book__title,
+.scsl-scripture-articles .scsl-content-list__heading {
+	font-size: clamp(1.5rem, 2.6vw, 1.9rem);
+	font-weight: 700;
+	line-height: 1.2;
+	margin: 0 0 1.5rem;
+}
+
+/*
+ * The book list is capped rather than paginated, so this link is the way
+ * through to the rest. Shown even when nothing was cut off, because the book
+ * page is a fuller view either way: it includes the sermons listed at the top
+ * of this page, which this section deliberately leaves out.
+ */
+.scsl-scripture-book__more,
+.scsl-loadmore {
+	margin: 2.25rem 0 0;
+}

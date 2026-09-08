@@ -20,7 +20,7 @@ if ( defined( 'SEEDCAST_CORE_VERSION' ) ) {
 	return;
 }
 
-define( 'SEEDCAST_CORE_VERSION', '1.24.4' );
+define( 'SEEDCAST_CORE_VERSION', '1.26.2' );
 define( 'SEEDCAST_CORE_DIR', __DIR__ . '/' );
 define( 'SEEDCAST_CORE_URL', plugin_dir_url( __FILE__ ) );
 

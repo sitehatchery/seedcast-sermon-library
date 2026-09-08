@@ -110,6 +110,9 @@ class ContentList {
 			'order'   => 'recent',
 			'title'   => '',
 			'series'  => '',
+			'include' => '',
+			'offset'  => 0,
+			'wrapper' => 'true',
 			'paginate'=> 'false',
 		], (array) $atts, 'scsl_content' );
 
@@ -182,6 +185,15 @@ class ContentList {
 			'no_found_rows'       => ! $paginate,
 		];
 
+		// Skipping the first n, for a caller appending a further batch to a
+		// list it has already drawn. Offset and paged cannot both apply, so
+		// pagination wins if somebody asks for both.
+		$offset = absint( $atts['offset'] );
+
+		if ( $offset && ! $paginate ) {
+			$args['offset'] = $offset;
+		}
+
 		if ( $paginate ) {
 			$args['paged'] = $this->current_page();
 		}
@@ -210,6 +222,18 @@ class ContentList {
 		} else {
 			$args['orderby'] = 'date';
 			$args['order']   = 'DESC';
+		}
+
+		if ( '' !== trim( (string) $atts['include'] ) ) {
+			// A caller that has already worked out which sermons belong here,
+			// such as a scripture page that resolved overlapping passages,
+			// passes the ids rather than making this repeat the work.
+			$ids = array_values( array_filter( array_map( 'absint', explode( ',', (string) $atts['include'] ) ) ) );
+
+			// Asked for specific sermons and none were valid. An empty list
+			// would fall through to WordPress's defaults and show unrelated
+			// posts, so ask for something that cannot match instead.
+			$args['post__in'] = $ids ? $ids : [ 0 ];
 		}
 
 		if ( $atts['series'] ) {
@@ -272,10 +296,20 @@ class ContentList {
 		// listing is about, then put back so nothing else is affected.
 		$this->tab = (string) $kind['tab'];
 
+		/*
+		 * A caller appending a further batch to a grid it has already drawn
+		 * wants the cards alone. Wrapping them again would nest a second
+		 * section and a second grid inside the first, which starts the new
+		 * cards on their own row instead of continuing the one in progress.
+		 */
+		$wrapper = ! in_array( strtolower( (string) $atts['wrapper'] ), [ 'false', '0', 'no', 'off' ], true );
+
 		ob_start();
 		?>
+		<?php if ( $wrapper ) : ?>
 		<section class="scsl-content-list">
-			<?php if ( '' !== $heading ) : ?>
+		<?php endif; ?>
+			<?php if ( $wrapper && '' !== $heading ) : ?>
 				<h2 class="sc-content-section-heading scsl-content-list__heading"><?php echo esc_html( $heading ); ?></h2>
 			<?php endif; ?>
 
@@ -306,7 +340,9 @@ class ContentList {
 				} else {
 					$cols = in_array( absint( $atts['columns'] ), [ 2, 3, 4 ], true ) ? absint( $atts['columns'] ) : 3;
 
-					echo '<div class="scsl-series-grid scsl-grid-cols-' . esc_attr( (string) $cols ) . '">';
+					if ( $wrapper ) {
+						echo '<div class="scsl-series-grid scsl-grid-cols-' . esc_attr( (string) $cols ) . '">';
+					}
 				}
 
 				while ( $query->have_posts() ) {
@@ -325,7 +361,7 @@ class ContentList {
 
 				if ( $open ) {
 					\Seedcast\Core\Frontend\Slider::close();
-				} else {
+				} elseif ( $wrapper ) {
 					echo '</div>';
 				}
 			}
@@ -346,7 +382,9 @@ class ContentList {
 				echo '</div>';
 			}
 			?>
+		<?php if ( $wrapper ) : ?>
 		</section>
+		<?php endif; ?>
 		<?php
 
 		wp_reset_postdata();

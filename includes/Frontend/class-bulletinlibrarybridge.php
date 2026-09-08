@@ -181,11 +181,26 @@ final class BulletinLibraryBridge {
 		// Whether the metadata aside will have anything to show. Only render
 		// the column when there is at least one line, otherwise the vertical
 		// separator would sit against an empty region.
+		/**
+		 * Extra rows for a sermon card's detail column.
+		 *
+		 * Lets a page add context the card itself has no business knowing
+		 * about. A scripture archive uses this to say which passages in the
+		 * book being viewed a sermon actually touches.
+		 *
+		 * Must return escaped HTML, since it is echoed as-is.
+		 *
+		 * @param string $rows      Empty by default.
+		 * @param int    $sermon_id The sermon being drawn.
+		 */
+		$extra_rows = (string) apply_filters( 'scsl_sermon_card_meta_rows', '', $sermon->ID );
+
 		$has_meta = ( '' !== $speaker )
 			|| ( '' !== $series_name )
 			|| ( '' !== $article_title && $has_article )
 			|| $has_bible_std
-			|| $has_transcript;
+			|| $has_transcript
+			|| ( '' !== $extra_rows );
 
 		ob_start();
 		?>
@@ -248,6 +263,12 @@ final class BulletinLibraryBridge {
 							</a>
 						</p>
 					<?php endif; ?>
+
+					<?php
+					// Contributed by whatever page is drawing this card. Escaped
+					// by the contributor; see the filter above.
+					echo $extra_rows; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+					?>
 				</aside>
 			<?php endif; ?>
 		</article>

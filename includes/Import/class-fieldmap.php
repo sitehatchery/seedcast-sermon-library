@@ -76,7 +76,22 @@ class FieldMap {
 			'_scsl_content_description' => __( 'Description', 'seedcast-sermon-library' ),
 			'_scsl_article_body'        => __( 'Article', 'seedcast-sermon-library' ),
 			'_scsl_bible_study'         => __( 'Bible Study', 'seedcast-sermon-library' ),
-			'_scsl_transcript_clean'    => __( 'Transcript', 'seedcast-sermon-library' ),
+
+			/*
+			 * Named for the work, not for the field.
+			 *
+			 * This list is what somebody is asking to have written, and what
+			 * happens here is a tidying: the words are already on the sermon,
+			 * verbatim, and this rewrites them into something readable. Calling
+			 * it "Transcript" made it look like the choice between having a
+			 * transcript and not having one, when the transcript is there
+			 * either way.
+			 *
+			 * The field itself stays "Transcript" in sections() and on the tab,
+			 * because it holds whichever version the sermon has. Only the act
+			 * of cleaning is optional, and only that is named here.
+			 */
+			'_scsl_transcript_clean'    => __( 'Cleaned Transcript', 'seedcast-sermon-library' ),
 		];
 	}
 
