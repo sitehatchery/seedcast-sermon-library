@@ -300,6 +300,22 @@ class SermonMeta {
 					if ( ! $p ) continue; ?>
 					<div class="scsl-passage-row scsl-passage-row--extra">
 						<?php $this->render_passage_picker( 'scsl_other_passages[]', $p, $books ); ?>
+						<?php
+						/*
+						 * Promote rather than retype. Which passage a sermon was
+						 * built on is often only settled after the others are
+						 * listed, and correcting it meant typing one reference
+						 * twice and deleting another.
+						 *
+						 * A swap rather than a move, so the passage being
+						 * displaced keeps its place in the list instead of being
+						 * silently dropped.
+						 */
+						?>
+						<button type="button" class="button scsl-make-focus"
+								title="<?php esc_attr_e( 'Make this the focus passage, and move the current one down here', 'seedcast-sermon-library' ); ?>">
+							<?php esc_html_e( 'Focus', 'seedcast-sermon-library' ); ?>
+						</button>
 						<button type="button" class="button scsl-remove-passage"><?php esc_html_e( 'Remove', 'seedcast-sermon-library' ); ?></button>
 					</div>
 				<?php endforeach; ?>
@@ -689,6 +705,20 @@ class SermonMeta {
 
 		<input type="hidden" name="scsl_faq_present" value="1" />
 
+		<?php
+		/*
+		 * Where generated questions arrive.
+		 *
+		 * Content written by the AI engine is put into the form and left for
+		 * the person to save, which means every field it can fill has to be a
+		 * control with a name. A list of pairs is not something a control can
+		 * hold, so this one carries them as JSON and the rows are rebuilt from
+		 * it. Rendered empty on purpose: it is an inbox, not a copy of what is
+		 * already here, and a stale copy would come back to life on save.
+		 */
+		?>
+		<textarea name="scsl_faq" id="scsl-faq-incoming" class="scsl-faq-incoming" hidden></textarea>
+
 		<div id="scsl-faq-rows">
 			<?php foreach ( $scsl_pairs as $scsl_i => $scsl_pair ) : ?>
 			<div class="scsl-faq-row" style="margin-bottom:10px;padding:10px 12px;background:#f9f9f9;border:1px solid #dcdcde;border-radius:4px;">
@@ -963,6 +993,24 @@ class SermonMeta {
 			$faq_rows  = isset( $post_data['scsl_faq'] ) && is_array( $post_data['scsl_faq'] )
 				? array_values( (array) $post_data['scsl_faq'] )
 				: [];
+
+			/*
+			 * Nothing in the rows but something in the inbox means generated
+			 * questions arrived and the script that lays them out did not run.
+			 * Reading them here rather than dropping them is the difference
+			 * between a slow page and losing what was written.
+			 *
+			 * Only when the rows are empty. Once they exist they are what the
+			 * person actually looked at, including when they emptied them on
+			 * purpose to reject the lot.
+			 */
+			if ( ! $faq_rows && ! empty( $post_data['scsl_faq'] ) && is_string( $post_data['scsl_faq'] ) ) {
+				$decoded = json_decode( (string) $post_data['scsl_faq'], true );
+
+				if ( is_array( $decoded ) ) {
+					$faq_rows = $decoded;
+				}
+			}
 
 			foreach ( $faq_rows as $faq_row ) {
 				if ( ! is_array( $faq_row ) ) continue;

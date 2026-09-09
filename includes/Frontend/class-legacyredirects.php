@@ -166,13 +166,76 @@ class LegacyRedirects {
 	/**
 	 * The topic archive a slug refers to.
 	 *
-	 * Only reached for a feed address, since a live topic page resolves on its
-	 * own and never gets this far.
+	 * A live topic page resolves on its own and never gets this far, so this is
+	 * reached in two cases: a feed address under /topic/, and a topic that has
+	 * since been deleted.
 	 *
 	 * @return string Term link, or an empty string.
 	 */
 	private static function topic_for( string $slug ): string {
 		$term = get_term_by( 'slug', $slug, 'scsl_topic' );
+
+		if ( ! $term instanceof \WP_Term ) {
+			return self::retired( 'scsl_topic', $slug );
+		}
+
+		$link = get_term_link( $term );
+
+		return is_wp_error( $link ) ? '' : (string) $link;
+	}
+
+	/**
+	 * Where a term that no longer exists should send somebody.
+	 *
+	 * A church that reorganises its topics leaves the old addresses behind,
+	 * and those are the ones search engines already know. Deleting a term
+	 * turns them into 404s, which is a worse outcome than the untidy
+	 * vocabulary that prompted the tidying.
+	 *
+	 * The map is the site's to supply, because only the site knows that its
+	 * old "Hope & Encouragement" is now "Hope". Values may be a slug in the
+	 * same taxonomy or a full address; anything unrecognised is ignored and
+	 * the 404 stands, which is correct for a topic that had no successor and
+	 * was not worth keeping.
+	 *
+	 * @return string Address, or an empty string.
+	 */
+	private static function retired( string $taxonomy, string $slug ): string {
+		/*
+		 * Kept as an option rather than in code, because the site that retires
+		 * a term is the site that knows where it went, and the person doing it
+		 * is reorganising a vocabulary rather than editing a plugin.
+		 */
+		$stored = get_option( 'scsl_retired_terms', [] );
+		$stored = is_array( $stored ) && isset( $stored[ $taxonomy ] ) && is_array( $stored[ $taxonomy ] )
+			? $stored[ $taxonomy ]
+			: [];
+
+		/**
+		 * Retired terms and where they now point.
+		 *
+		 * @param array<string, string> $stored   Old slug to slug or URL.
+		 * @param string                $taxonomy Taxonomy the slug was in.
+		 */
+		$map = (array) apply_filters( 'scsl_retired_terms', $stored, $taxonomy );
+
+		if ( ! isset( $map[ $slug ] ) ) {
+			return '';
+		}
+
+		$target = (string) $map[ $slug ];
+
+		if ( '' === $target ) {
+			return '';
+		}
+
+		// A full address is used as given; anything else is read as a slug in
+		// the taxonomy the old term belonged to.
+		if ( 0 === strpos( $target, 'http' ) || 0 === strpos( $target, '/' ) ) {
+			return 0 === strpos( $target, '/' ) ? home_url( $target ) : $target;
+		}
+
+		$term = get_term_by( 'slug', $target, $taxonomy );
 
 		if ( ! $term instanceof \WP_Term ) {
 			return '';

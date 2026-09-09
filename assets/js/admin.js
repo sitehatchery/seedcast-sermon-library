@@ -123,10 +123,77 @@
 
         var $row = $( '<div class="scsl-passage-row sf-passage-row--extra">' )
             .append( $picker )
+            .append( '<button type="button" class="button scsl-make-focus" title="Make this the focus passage, and move the current one down here">Focus</button>' )
             .append( '<button type="button" class="button scsl-remove-passage">Remove</button>' );
 
         $( '#scsl-passages-wrap' ).append( $row );
         $row.find( '.scsl-pp-book' ).trigger( 'focus' );
+    } );
+
+    /*
+     * Promote an additional passage to the focus passage.
+     *
+     * A swap, not a move. The passage being displaced goes into the row the
+     * promoted one came from, so nothing is lost and the list keeps its
+     * length. When there is no focus yet the row is simply emptied, which is
+     * the same thing with nothing coming back.
+     *
+     * The controls are copied field by field rather than the hidden value
+     * being written directly, because the visible selects are what a person
+     * reads and what the next edit works from. Writing only the hidden field
+     * would leave the boxes showing the old passage.
+     */
+    $( document ).on( 'click', '.scsl-make-focus', function() {
+        var $row   = $( this ).closest( '.scsl-passage-row' );
+        var $from  = $row.find( '.scsl-passage-picker' );
+        var $focus = $( '.scsl-passage-picker[data-field="scsl_focus_passage"]' ).first();
+
+        if ( ! $from.length || ! $focus.length ) {
+            return;
+        }
+
+        var parts = [
+            '.scsl-pp-book',
+            '.scsl-pp-chapter',
+            '.scsl-pp-verse-start',
+            '.scsl-pp-chapter-end',
+            '.scsl-pp-verse-end'
+        ];
+
+        $.each( parts, function ( _, part ) {
+            var $a = $focus.find( part );
+            var $b = $from.find( part );
+
+            var held = $a.length ? $a.val() : '';
+
+            if ( $a.length ) {
+                $a.val( $b.length ? $b.val() : '' );
+            }
+
+            if ( $b.length ) {
+                $b.val( held );
+            }
+        } );
+
+        // An end chapter is hidden until it is wanted, and the passage moving
+        // up may need it shown where the one moving down did not.
+        $.each( [ $focus, $from ], function ( _, $picker ) {
+            var end = $picker.find( '.scsl-pp-chapter-end' ).val();
+
+            if ( end ) {
+                $picker.find( '.scsl-pp-chapter-end, .scsl-pp-colon-end' ).prop( 'hidden', false );
+            }
+        } );
+
+        updatePassagePicker( $focus );
+        updatePassagePicker( $from );
+
+        // An empty row after the swap held nothing worth keeping.
+        if ( ! $from.find( '.scsl-pp-book' ).val() ) {
+            $row.remove();
+        }
+
+        $focus.find( '.scsl-pp-book' ).trigger( 'focus' );
     } );
 
     $( document ).on( 'click', '.scsl-remove-passage', function() {
@@ -276,6 +343,99 @@
         $( '#scsl-faq-rows' ).append( slFaqRow( idx ) );
         slFaqRenumber();
         $( '#scsl-faq-rows .scsl-faq-row' ).last().find( 'input[type=text]' ).focus();
+    } );
+
+    /*
+     * Generated questions that could not be laid out.
+     *
+     * Showing the field rather than swallowing it. Content arrived, and a
+     * screen that quietly shows nothing tells whoever is looking that
+     * generation failed, which is both wrong and unfixable from where they
+     * are standing. Revealed, it says what actually came through.
+     */
+    function slFaqShowRaw( $field ) {
+        if ( $field.data( 'scslShown' ) ) {
+            return;
+        }
+
+        $field.data( 'scslShown', true )
+              .prop( 'hidden', false )
+              .attr( 'rows', 6 )
+              .addClass( 'large-text code' )
+              .before(
+                  $( '<p class="description"/>' )
+                      .css( 'color', '#b32d2e' )
+                      .text(
+                          'Questions were generated but arrived in a form this screen could not lay out. '
+                          + 'They are shown below so they are not lost.'
+                      )
+              );
+    }
+
+    /*
+     * Generated questions arriving from the AI engine.
+     *
+     * The engine puts content into whatever control a field declares and
+     * fires a change on it. A list of pairs cannot live in a control, so it
+     * arrives as JSON in a hidden field and the visible rows are built from
+     * it here. The hidden field is emptied afterwards so the rows are the
+     * only thing the save reads, and emptying them still means reject.
+     */
+    $( document ).on( 'change', '#scsl-faq-incoming', function() {
+        var raw = $.trim( $( this ).val() || '' );
+
+        if ( ! raw ) {
+            return;
+        }
+
+        var pairs;
+
+        try {
+            pairs = JSON.parse( raw );
+        } catch ( e ) {
+            slFaqShowRaw( $( this ) );
+            return;
+        }
+
+        if ( ! Array.isArray( pairs ) || ! pairs.length ) {
+            slFaqShowRaw( $( this ) );
+            return;
+        }
+
+        var $rows = $( '#scsl-faq-rows' );
+        $rows.empty();
+
+        $.each( pairs, function ( i, pair ) {
+            if ( ! pair ) {
+                return;
+            }
+
+            var q = pair.question || pair.q || '';
+            var a = pair.answer || pair.a || '';
+
+            if ( ! q || ! a ) {
+                return;
+            }
+
+            $rows.append( slFaqRow( i ) );
+
+            var $row = $rows.children( '.scsl-faq-row' ).last();
+
+            $row.find( 'input[type=text]' ).val( q );
+
+            // Paragraph tags come off for editing and go back on when the page
+            // is drawn, the same as an answer typed by hand.
+            $row.find( 'textarea' ).val(
+                $.trim(
+                    a.replace( /<br\s*\/?>/gi, '\n' )
+                     .replace( /<\/p\s*>/gi, '\n\n' )
+                     .replace( /<p[^>]*>/gi, '' )
+                )
+            );
+        } );
+
+        slFaqRenumber();
+        $( this ).val( '' );
     } );
 
     $( document ).on( 'click', '.scsl-remove-faq', function() {

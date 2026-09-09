@@ -24,6 +24,7 @@
 namespace SeedcastSermonLibrary\Pro;
 
 use SeedcastSermonLibrary\Import\FieldMap;
+use SeedcastSermonLibrary\Topics\Assignment;
 use SeedcastSermonLibrary\Scripture\ScriptureParser;
 use SeedcastSermonLibrary\Admin\SermonMeta;
 
@@ -108,7 +109,7 @@ class ProBridge {
 	public function assets( string $hook ): void {
 		if ( false === strpos( $hook, self::PAGE ) ) return;
 
-		wp_enqueue_style( 'scsl-admin', SCSL_PLUGIN_URL . 'assets/css/admin.css', [], SCSL_VERSION );
+		wp_enqueue_style( 'scsl-admin', SCSL_PLUGIN_URL . 'assets/css/admin.css', [], scsl_asset_version( 'assets/css/admin.css' ) );
 
 		/*
 		 * The passage picker's own behaviour.
@@ -119,7 +120,7 @@ class ProBridge {
 		 * handlers are bound to the document, so they work wherever the markup
 		 * is; the script simply has to be on the page.
 		 */
-		wp_enqueue_script( 'scsl-admin', SCSL_PLUGIN_URL . 'assets/js/admin.js', [ 'jquery' ], SCSL_VERSION, true );
+		wp_enqueue_script( 'scsl-admin', SCSL_PLUGIN_URL . 'assets/js/admin.js', [ 'jquery' ], scsl_asset_version( 'assets/js/admin.js' ), true );
 	}
 
 	/**
@@ -180,6 +181,49 @@ class ProBridge {
 			 * that key is absent so an older API cannot leave the field empty.
 			 */
 			'structured'  => FieldMap::structured(),
+
+			/*
+			 * Fields that become terms rather than content.
+			 *
+			 * `choices` is the whole of what may be picked, and it travels with
+			 * the request so the model chooses from this church's vocabulary
+			 * instead of inventing one. `max` is the most that may come back and
+			 * fewer is a valid answer, including none: a sermon about one thing
+			 * filed under three topics has two topics that are not true.
+			 *
+			 * Whatever comes back is intersected against `choices` at this end
+			 * before anything is written, so an invented topic cannot land even
+			 * if one is returned.
+			 */
+			'taxonomy'    => [
+				'topics' => [
+					'taxonomy' => 'scsl_topic',
+					'source'   => 'terms',
+					'max'      => Assignment::MAX,
+					'closed'   => true,
+					'choices'  => Assignment::choices(),
+				],
+			],
+			/*
+			 * Writing that belongs to a page rather than to a sermon.
+			 *
+			 * A passage page can say what its set of sermons adds up to, which
+			 * is writing this site does not otherwise have: the sermons each
+			 * speak for themselves and nothing says what they come to
+			 * together. It is named here rather than hooked over there so the
+			 * engine goes on knowing nothing about this plugin's hooks.
+			 *
+			 * Five arguments, because the filter passes the summary already on
+			 * the page alongside the term, the sermons and the shape of the
+			 * set.
+			 */
+			'prose'       => [
+				'scripture_summary' => [
+					'filter' => 'scsl_scripture_summary_generate',
+					'kind'   => 'scripture',
+					'args'   => 5,
+				],
+			],
 			'append'      => [
 				'meta'   => '_scsl_resources',
 				'fields' => FieldMap::appended_fields(),
@@ -238,6 +282,12 @@ class ProBridge {
 				'_scsl_article_body'        => [ 'name' => 'scsl_article_body',        'type' => 'editor' ],
 				'_scsl_bible_study'         => [ 'name' => 'scsl_bible_study',         'type' => 'editor' ],
 				'_scsl_resources'           => [ 'name' => 'scsl_resources',           'type' => 'editor' ],
+				// Questions arrive as a list rather than as text, so the control
+				// named here is a hidden field that carries them as JSON. The
+				// visible rows are built from it on the change event that filling
+				// any control fires, so what lands on screen is the same editable
+				// pairs a person would have typed.
+				'_scsl_faq'                 => [ 'name' => 'scsl_faq',              'type' => 'textarea' ],
 			],
 			// What this screen actually produces, which is what the generate
 			// request asks for. Listing anything else promises content that

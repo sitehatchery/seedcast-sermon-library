@@ -44,6 +44,7 @@ class Autoloader {
 		'LegacyRedirects'       => 'class-legacyredirects.php',
 		'LlmsIndex'             => 'class-llmsindex.php',
 		'Faq'                   => 'class-faq.php',
+		'ScriptureSummaries'    => 'class-scripturesummaries.php',
 	];
 
 	public function load( string $class ): void {

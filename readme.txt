@@ -3,7 +3,7 @@ Contributors: seedcast
 Tags: sermons, church, preaching, bible, audio
 Requires at least: 6.2
 Tested up to: 7.1
-Stable tag: 2.73.0
+Stable tag: 2.73.1
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -38,7 +38,7 @@ A visitor may read instead of watching a 45-minute video. A member who missed Su
 
 **Scripture.** Every book, chapter and passage gets its own page. Overlapping passages are understood intelligently, so a sermon on Ephesians 6:10-20 can be found by someone looking at Ephesians 6:15.
 
-**Topics.** Organize teaching around subjects people actually want to explore.
+**Topics.** Organize teaching around subjects people actually want to explore, with a limit of three per sermon so a topic page stays a real way in rather than a list of everything.
 
 **Series.** Give every series its own artwork, description, date range and archive.
 
@@ -200,12 +200,24 @@ No. Sermons, series and speakers remain in the database.
 
 == Changelog ==
 
+= 2.73.1 =
+
+* Generated questions that cannot be laid out as rows are now shown as they arrived rather than silently dropped.
+* Fixes to the Edit Sermon screen are fetched rather than served from the browser's cache.
+* Removed the Scripture References checklist WordPress was adding beside the sermon. Passages are managed in the Scripture box, and a checklist of every passage in the Bible is not something anyone was going to tick.
+* Any additional passage can be promoted with a new Focus button. It swaps places with the current focus passage, so nothing has to be retyped and nothing is lost.
+* The Questions box now sits under Content even if you had already rearranged your meta boxes.
+* New Scripture Summaries screen for reading, editing and approving the summary at the top of a book or chapter page. The list runs Genesis to Revelation and can be sorted by how many sermons a passage has. A rewritten summary now waits for your approval instead of replacing what is published, with a count beside the menu while any are waiting. Editing one yourself marks it as your writing and stops it being rewritten, unless you tick the box that says otherwise.
+
 = 2.73.0 =
 
 * Sermons can now carry the questions they answer, shown on the sermon page as a numbered list of questions with their answers. A sermon is largely someone answering questions people already have, and this makes those answers findable by anyone scanning the page instead of only by someone reading the whole transcript.
 * The questions are described to search engines as structured data, and give AI assistants a clean question and answer to quote rather than a point buried in a transcript.
 * Write them yourself in the new Questions box under Content on the Edit Sermon screen, a row per question with its answer, or let Sermon Library AI write them from what was preached.
 * Questions can be switched off for the whole site in Settings, and count towards a sermon's completeness score when they are on.
+* Topics are now picked rather than ticked, with a limit of three per sermon. A topic that ends up on four sermons in five is a label on the whole library rather than a way into it, and a checklist tends to produce either nothing ticked or everything ticked.
+* Sermon Library AI can choose them, but only from the topics your church already has. It cannot invent one, so your vocabulary stays yours and does not split into three near-identical terms.
+* Retiring a topic no longer leaves broken addresses behind. Point the old topic at whichever one replaced it, or at the sermon archive, and visitors and search engines are redirected instead of finding a missing page.
 
 = 2.72.1 =
 
@@ -250,6 +262,10 @@ No. Sermons, series and speakers remain in the database.
 Complete historical changelog: see `changelog.txt`.
 
 == Upgrade Notice ==
+
+= 2.73.1 =
+
+Fixes a problem where generated questions were handed to the Edit Sermon screen and silently dropped. Recommended for anyone running 2.73.0.
 
 = 2.73.0 =
 

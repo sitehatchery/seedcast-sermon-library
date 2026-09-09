@@ -142,7 +142,7 @@ class Completeness {
 		$screen = get_current_screen();
 		if ( ! $screen || 'scsl_sermon' !== $screen->post_type ) return;
 
-		wp_enqueue_style( 'scsl-admin', SCSL_PLUGIN_URL . 'assets/css/admin.css', [], SCSL_VERSION );
+		wp_enqueue_style( 'scsl-admin', SCSL_PLUGIN_URL . 'assets/css/admin.css', [], scsl_asset_version( 'assets/css/admin.css' ) );
 	}
 
 	/**

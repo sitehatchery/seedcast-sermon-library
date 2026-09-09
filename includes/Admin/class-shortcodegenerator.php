@@ -510,8 +510,8 @@ class ShortcodeGenerator {
 
 	public function enqueue_assets( string $hook ): void {
 		if ( strpos( $hook, 'seedcast-sermon-library-shortcodes' ) === false ) return;
-		wp_enqueue_style(  'scsl-admin', SCSL_PLUGIN_URL . 'assets/css/admin.css', [], SCSL_VERSION );
-		wp_enqueue_script( 'scsl-admin', SCSL_PLUGIN_URL . 'assets/js/admin.js', [ 'jquery' ], SCSL_VERSION, true );
+		wp_enqueue_style(  'scsl-admin', SCSL_PLUGIN_URL . 'assets/css/admin.css', [], scsl_asset_version( 'assets/css/admin.css' ) );
+		wp_enqueue_script( 'scsl-admin', SCSL_PLUGIN_URL . 'assets/js/admin.js', [ 'jquery' ], scsl_asset_version( 'assets/js/admin.js' ), true );
 		wp_add_inline_style(  'scsl-admin', <<<'CSS'
 /* ── Layout ───────────────────────────── */
 .scsl-sc-wrap { max-width: 1100px; }

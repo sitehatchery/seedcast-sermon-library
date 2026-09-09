@@ -2,6 +2,33 @@
 
 Complete historical changelog moved out of readme.txt to keep the WordPress.org readme concise.
 
+= 2.73.1 =
+
+**Fixes**
+
+* Generated questions that arrive in a form the Edit Sermon screen cannot lay out are now shown as they arrived, with a note saying so, rather than silently discarded. Content had been written, handed to the browser and dropped without a word, which reads as a generation that failed and cannot be diagnosed from where anybody is standing.
+* Admin JavaScript is versioned by the file's own timestamp, so a fix to the Edit Sermon screen is actually fetched rather than served from whatever the browser already had.
+* WordPress's own Scripture References checklist is off the Edit Sermon screen again. Scripture became hierarchical in 2.72.0, which changes the id WordPress gives that box, so the line removing it silently stopped matching and a checklist of seventeen hundred passages reappeared beside the sermon. Both ids are now removed, for topics as well.
+* The Questions box sits under Content for everybody, including anybody who had dragged their boxes into an order of their own before it existed. WordPress remembers that arrangement and puts anything it has not seen at the bottom of the screen; the saved arrangement is now amended rather than ignored, so a box people did arrange deliberately stays where they left it.
+
+**Scripture summaries**
+
+* A Scripture Summaries screen under Sermon Library, where the writing at the top of a book or chapter page is read, edited and approved. Passages are not edited there, and that is the point: scripture terms are a projection of what each sermon says its passages are, so renaming one stops it matching the sermons that made it, deleting one brings it back on the next save without the summary that died with it, and neither changes the sermon that is the actual source. Passages belong to the sermon and are edited there. What genuinely lives on the term is the summary, so that is what the screen offers.
+* A rewrite no longer replaces a published summary on its own. The first summary for a passage goes straight out, because holding it back would leave the section blank; a rewrite of something already public waits to be looked at, and the page goes on showing what it was showing until somebody says yes. Approve it, or keep what is published and the rewrite is thrown away.
+* Editing a summary marks it as your own writing, and nothing will rewrite it afterwards. A checkbox on the same screen says otherwise, for a passage where a later rewrite would be welcome. Off unless it is turned on, so connecting a generator to a site that already has hand-written summaries cannot treat silence as consent. On a site with nothing connected the question is not put at all, and the answer is still recorded as no, which is what makes connecting one later safe.
+* Allowing a rewrite is not the same as losing what is there: a rewrite of an existing summary is staged for review either way, so the most that happens is a suggestion arriving in the queue.
+* Summaries you wrote but left open to rewriting have a view of their own in the list, because they are otherwise indistinguishable from the rest and are the ones worth checking on.
+* The screen says who is going to write these and what will happen on its own, which differs by site and is otherwise guesswork. It tells apart a site with nothing connected, a site running Sermon Library AI, which writes sermon content but not these, and a site where something is writing them: on a screen that plainly has the AI Engine installed, "nothing is connected" reads as a fault rather than as the truth it is.
+* Emptying the box removes the summary and hands the passage back to be written automatically.
+* The list is ordered by passage: Genesis to Revelation, then by chapter, then by verse, which is the order anybody scanning it is already reading in. Alphabetical would put Amos above Genesis and Titus above Matthew, which is not an order anybody wants a Bible in, and comparing chapters as text would put 10 before 9. Passage and Sermons are both sortable, each starting in the direction that suits it, and equal sermon counts fall back to passage order so a column of identical numbers is still a readable list.
+* The list can be filtered by state, by whether a passage is a book, a chapter or a single verse, and searched. Passages with too few sermons to be worth summarising are left out entirely, which on a library of any size is most of them.
+* A count sits beside the menu title while rewrites are waiting, in the same place WordPress puts one for comments. Work that waits quietly for review is work that does not happen.
+* Saving a summary stays on that summary, so it can be read back. Approving or discarding from the list goes back to the list, and either way the filters, the search and the page being worked through survive: acting on one row out of a filtered set does not drop somebody back into all four hundred.
+
+**Passages**
+
+* An additional passage can be promoted to the focus passage with a Focus button beside Remove. Which passage a sermon was built on is often only settled once the others are listed, and correcting it meant typing one reference twice and deleting another. The two swap places, so the passage being displaced keeps its spot in the list rather than being dropped.
+
 = 2.73.0 =
 
 **Questions**
@@ -14,11 +41,27 @@ Complete historical changelog moved out of readme.txt to keep the WordPress.org 
 * Questions appear as a section in Settings alongside transcript, article and study, so a church that does not want them can switch them off, and in the completeness report so a sermon missing them says so.
 * Sermon Library AI writes them from what was preached, where it is connected.
 
+**Topics**
+
+* Topics can now be picked for a sermon rather than ticked, with a cap of three. A topic carried by four sermons in five is not a way into a library, it is a label on the whole library, and a checklist produces either nothing ticked or everything ticked. Three is the most a sermon may carry and none is a permitted answer.
+* The list is closed. Whatever is choosing may only choose from the topics the church already has, and anything else is dropped rather than created. Allowed to invent a topic, any generator will produce "Forgiveness", "Forgiving Others" and "Grace and Forgiveness" inside a month, and a vocabulary that splits three ways is worse than a coarse one. New topics stay a decision somebody makes on purpose.
+* A sermon that already has topics is left alone unless overwriting is asked for. Somebody may have chosen those by hand and a generated set arriving later cannot tell the difference.
+* Retiring a topic no longer breaks the addresses search engines already know. A retired term can name its successor, and requests to the old address are sent there with a 301 instead of finding a 404. Where a topic had no successor, which is the honest answer for a label that applied to almost everything, it can point at the sermon archive.
+
+**Fixes**
+
+* Admin CSS and JavaScript are versioned by the file's own timestamp, the same as the front end has been since 2.72.0. Without it an edit between releases kept the same address, so browsers went on serving the file they already had and a change to the Edit Sermon screen looked as though it had not been installed.
+
 **For other code**
 
 * Content the plugin stores is no longer assumed to be a block of HTML. A product can declare that a field's value lives in a named key of the response rather than in its rendered text, which is how question and answer pairs arrive intact instead of as headings that would have to be parsed back apart. `FieldMap::structured()` describes those fields and travels to the AI engine through the product declaration.
 * `_scsl_faq` holds a list of `[ 'question' => ..., 'answer' => ... ]`. A JSON string is accepted and decoded, and `q` and `a` are read as well as the long spellings, so a pair written by hand or by an older importer still renders. Anything missing either half is dropped rather than shown as a question with nothing under it.
+* `_scsl_faq` also reads a run of headings and paragraphs, recovering a question from each heading and its answer from what follows. That is the shape the API renders alongside the pairs and the shape the questions had when they lived in the resources field, so anything that stored the rendered text rather than the parts now displays instead of silently showing nothing. Only headings are read as questions; a bolded line is left alone, being as likely to be emphasis inside an answer.
 * `scsl_sermon_faq` filters the pairs shown for a sermon.
+* The product declaration names a control for every field generated content can be put into, and questions now name one too: a hidden field carrying the pairs as JSON, from which the visible rows are built. A field with no control declared is skipped rather than guessed at, so before this the questions were generated, staged, and had nowhere on the screen to land. The rows are what a save reads; the hidden field is only read when the rows are empty and it is not, which is a browser that never laid them out.
+* `SeedcastSermonLibrary\Topics\Assignment` resolves picked topics against the terms that exist, keeps the order they arrived in, and caps the result. `scsl_max_topics` changes the cap and `scsl_topic_choices` changes what may be picked.
+* The product declaration gained `taxonomy`, describing where a set of picked terms belongs, how many may come back, and the whole vocabulary they must be chosen from. The vocabulary travels with the request so the model chooses from this church's list rather than inventing one, and whatever comes back is intersected against that list again before anything is written.
+* `scsl_retired_terms` filters the map of retired term slugs to their successors, which is otherwise read from the `scsl_retired_terms` option.
 
 = 2.72.1 =
 

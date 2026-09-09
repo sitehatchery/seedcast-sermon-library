@@ -61,7 +61,7 @@ class Faq {
 
 		if ( is_string( $raw ) && '' !== $raw ) {
 			$decoded = json_decode( $raw, true );
-			$raw     = is_array( $decoded ) ? $decoded : [];
+			$raw     = is_array( $decoded ) ? $decoded : self::from_html( $raw );
 		}
 
 		if ( ! is_array( $raw ) ) {
@@ -83,6 +83,53 @@ class Faq {
 			}
 
 			$out[] = [ 'question' => $q, 'answer' => $a ];
+		}
+
+		return $out;
+	}
+
+	/**
+	 * Pairs recovered from a run of headings and paragraphs.
+	 *
+	 * A question and its answer can arrive already flattened into HTML: it is
+	 * the shape the API renders alongside the pairs, the shape the questions
+	 * had when they lived in the resources field, and the shape anything
+	 * writing this meta from the rendered text would leave behind.
+	 *
+	 * Reading it costs a regular expression and turns a section that would
+	 * silently show nothing into one that works. Splitting it back apart is
+	 * lossless enough for the purpose, because a heading is a question and what
+	 * follows it is the answer.
+	 *
+	 * Only headings are treated as questions. A bolded line is left alone: it
+	 * is as likely to be emphasis inside an answer as a question, and guessing
+	 * wrong would cut an answer in half.
+	 *
+	 * @return array<int, array{question: string, answer: string}>
+	 */
+	private static function from_html( string $html ): array {
+		if ( false === stripos( $html, '<h' ) ) {
+			return [];
+		}
+
+		$found = preg_match_all(
+			'#<h[2-4][^>]*>(.*?)</h[2-4]\s*>(.*?)(?=<h[2-4][^>]*>|$)#is',
+			$html,
+			$matches,
+			PREG_SET_ORDER
+		);
+
+		if ( ! $found ) {
+			return [];
+		}
+
+		$out = [];
+
+		foreach ( $matches as $match ) {
+			$out[] = [
+				'question' => $match[1],
+				'answer'   => $match[2],
+			];
 		}
 
 		return $out;

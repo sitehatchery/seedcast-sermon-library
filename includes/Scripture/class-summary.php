@@ -38,6 +38,38 @@ class Summary {
 	/** Meta key holding the unix time generation was last attempted. */
 	private const META_TRIED = '_scsl_summary_tried';
 
+	/**
+	 * Meta key holding a rewrite waiting to be looked at.
+	 *
+	 * A first summary goes straight out: there is nothing on the page to
+	 * protect and holding it back would leave the section blank. A rewrite is
+	 * different. Something already published is about to be replaced by
+	 * machine-written prose nobody has read, on a page that is already
+	 * indexed, so it waits here until somebody says yes.
+	 */
+	public const META_PENDING = '_scsl_summary_pending';
+
+	/**
+	 * Meta key marking a summary as somebody's own writing.
+	 *
+	 * Set when a person edits one by hand. Nothing regenerates over it, ever,
+	 * and the way back is to clear the flag rather than to wait for the set to
+	 * change. Without this, adding one sermon to a book silently replaces
+	 * paragraphs somebody wrote.
+	 */
+	public const META_BY_HAND = '_scsl_summary_by_hand';
+
+	/**
+	 * Meta key recording that a hand-written summary may be replaced anyway.
+	 *
+	 * Only meaningful alongside the flag above: generated prose is rewritable
+	 * by definition, and the question is only ever asked about somebody's own
+	 * writing. Off unless it was deliberately turned on, so a church that
+	 * connects a generator later does not find its own paragraphs queued for
+	 * replacement by having done nothing.
+	 */
+	public const META_REWRITABLE = '_scsl_summary_rewritable';
+
 	/** How long to wait before attempting generation again after a failure. */
 	private const RETRY_AFTER = DAY_IN_SECONDS;
 
@@ -75,8 +107,15 @@ class Summary {
 			return '';
 		}
 
-		$hash   = self::hash( $sermon_ids );
 		$stored = (string) get_term_meta( $term_id, self::META_TEXT, true );
+
+		// Somebody's own words, with no permission given to replace them. Not
+		// stale, not regenerated, not queued.
+		if ( $stored && ! self::may_rewrite( $term_id ) ) {
+			return $stored;
+		}
+
+		$hash   = self::hash( $sermon_ids );
 		$known  = (string) get_term_meta( $term_id, self::META_HASH, true );
 		$at     = (int) get_term_meta( $term_id, self::META_TIME, true );
 
@@ -101,6 +140,24 @@ class Summary {
 
 		// A changed set still shows the old summary until the new one lands.
 		return $stored;
+	}
+
+	/**
+	 * The summary a page is showing now, and whose writing it is.
+	 *
+	 * Whose it is matters as much as what it says. A generated paragraph is a
+	 * starting point to carry forward. A church's own, which only reaches here
+	 * when they have said it may be rewritten, is their wording and their
+	 * emphasis, and the most a rewrite should do is add what the set now
+	 * supports.
+	 *
+	 * @return array{text: string, source: string}
+	 */
+	private static function previous( int $term_id ): array {
+		return [
+			'text'   => (string) get_term_meta( $term_id, self::META_TEXT, true ),
+			'source' => get_term_meta( $term_id, self::META_BY_HAND, true ) ? 'church' : 'generated',
+		];
 	}
 
 	/**
@@ -196,12 +253,26 @@ class Summary {
 		 * sentence true of this church; the sermon list alone tends to produce
 		 * commentary that would fit any church preaching the same book.
 		 *
-		 * @param string   $summary Empty by default, meaning no service is connected.
-		 * @param \WP_Term $term    The passage the page is about.
-		 * @param array    $sources One entry per sermon: id, title, passage, abstract.
-		 * @param array    $context level, book, chapters, series, totals.
+		 * $previous is what the page says now. A rewrite happens because the
+		 * set changed, usually by a sermon or two, and a writer given nothing
+		 * to work from writes the page again from scratch: the paragraph
+		 * somebody approved last month comes back saying the same thing in
+		 * different words, for no reason a reader could see.
+		 *
+		 * @param string   $summary  Empty by default, meaning no service is connected.
+		 * @param \WP_Term $term     The passage the page is about.
+		 * @param array    $sources  One entry per sermon: id, title, passage, abstract.
+		 * @param array    $context  level, book, chapters, series, totals.
+		 * @param array    $previous { text: what the page says now, source: generated or church }.
 		 */
-		$summary = (string) apply_filters( 'scsl_scripture_summary_generate', '', $term, $sources, self::context( $term, $sermon_ids ) );
+		$summary = (string) apply_filters(
+			'scsl_scripture_summary_generate',
+			'',
+			$term,
+			$sources,
+			self::context( $term, $sermon_ids ),
+			self::previous( $term_id )
+		);
 
 		$summary = trim( wp_strip_all_tags( $summary ) );
 
@@ -209,9 +280,224 @@ class Summary {
 			return;
 		}
 
-		update_term_meta( $term_id, self::META_TEXT, $summary );
 		update_term_meta( $term_id, self::META_HASH, self::hash( $sermon_ids ) );
 		update_term_meta( $term_id, self::META_TIME, time() );
+
+		/*
+		 * Replacing something that is already public is somebody's decision.
+		 *
+		 * The hash and the time are written either way, so a set that has been
+		 * summarised once is not queued again while its rewrite sits waiting.
+		 * The page goes on showing what it was showing.
+		 */
+		if ( '' !== (string) get_term_meta( $term_id, self::META_TEXT, true ) ) {
+			update_term_meta( $term_id, self::META_PENDING, $summary );
+
+			return;
+		}
+
+		update_term_meta( $term_id, self::META_TEXT, $summary );
+	}
+
+	/**
+	 * What state a term's summary is in.
+	 *
+	 * @return string none | published | pending | hand
+	 */
+	public static function status( int $term_id ): string {
+		if ( '' !== (string) get_term_meta( $term_id, self::META_PENDING, true ) ) {
+			return 'pending';
+		}
+
+		if ( '' === (string) get_term_meta( $term_id, self::META_TEXT, true ) ) {
+			return 'none';
+		}
+
+		if ( ! get_term_meta( $term_id, self::META_BY_HAND, true ) ) {
+			return 'published';
+		}
+
+		return get_term_meta( $term_id, self::META_REWRITABLE, true ) ? 'open' : 'hand';
+	}
+
+	/**
+	 * Whether anything is allowed to replace a term's summary.
+	 *
+	 * True for generated prose, and for somebody's own writing where they said
+	 * so. Note that allowing it is not the same as losing it: a rewrite of an
+	 * existing summary is staged for review rather than published, so the worst
+	 * that happens is a suggestion appearing in the queue.
+	 */
+	public static function may_rewrite( int $term_id ): bool {
+		if ( ! get_term_meta( $term_id, self::META_BY_HAND, true ) ) {
+			return true;
+		}
+
+		return (bool) get_term_meta( $term_id, self::META_REWRITABLE, true );
+	}
+
+	/**
+	 * Whether anything is listening to write summaries at all.
+	 *
+	 * With nothing connected the question of permission does not arise, so it
+	 * is not put. The answer is still recorded, as a no, which is what makes
+	 * connecting a generator later safe.
+	 */
+	public static function generator_connected(): bool {
+		return 'writing' === self::generator_state();
+	}
+
+	/**
+	 * Who, if anyone, is going to write these.
+	 *
+	 * Three answers rather than two, because "nothing is connected" is a
+	 * misleading thing to tell somebody looking at a site with the AI Engine
+	 * installed. The engine writes sermon content; writing the summary at the
+	 * top of a passage page is a separate job it does not do yet, and saying so
+	 * is the difference between a screen that seems broken and one that is
+	 * merely waiting.
+	 *
+	 * @return string writing | engine | none
+	 */
+	public static function generator_state(): string {
+		if ( has_filter( 'scsl_scripture_summary_generate' ) ) {
+			return 'writing';
+		}
+
+		return defined( 'SCPRO_VERSION' ) ? 'engine' : 'none';
+	}
+
+	/**
+	 * The rewrite waiting on a term, if there is one.
+	 */
+	public static function pending( int $term_id ): string {
+		return (string) get_term_meta( $term_id, self::META_PENDING, true );
+	}
+
+	/**
+	 * How many rewrites are waiting to be looked at.
+	 *
+	 * One query rather than a walk of seventeen hundred terms, because this is
+	 * asked on every admin page load to draw the count beside the menu.
+	 */
+	public static function pending_count(): int {
+		global $wpdb;
+
+		$count = wp_cache_get( 'scsl_pending_summaries', 'scsl' );
+
+		if ( false === $count ) {
+			$count = (int) $wpdb->get_var( $wpdb->prepare(
+				"SELECT COUNT(*) FROM {$wpdb->termmeta} WHERE meta_key = %s AND meta_value <> ''",
+				self::META_PENDING
+			) );
+
+			wp_cache_set( 'scsl_pending_summaries', $count, 'scsl', 5 * MINUTE_IN_SECONDS );
+		}
+
+		return (int) $count;
+	}
+
+	/**
+	 * Publish the rewrite waiting on a term.
+	 *
+	 * @return bool Whether there was one to publish.
+	 */
+	public static function approve( int $term_id ): bool {
+		$pending = self::pending( $term_id );
+
+		if ( '' === $pending ) {
+			return false;
+		}
+
+		update_term_meta( $term_id, self::META_TEXT, $pending );
+		update_term_meta( $term_id, self::META_TIME, time() );
+
+		// Approving generated prose means it is not somebody's own writing,
+		// whatever it was before.
+		delete_term_meta( $term_id, self::META_BY_HAND );
+		delete_term_meta( $term_id, self::META_REWRITABLE );
+		delete_term_meta( $term_id, self::META_PENDING );
+
+		self::forget_count();
+
+		return true;
+	}
+
+	/**
+	 * Throw away the rewrite waiting on a term and keep what is published.
+	 *
+	 * The hash stays as it is, so the set that produced the rejected version
+	 * is not immediately queued again. Rejecting a rewrite should be quiet,
+	 * not a request for another one straight away.
+	 *
+	 * @return bool Whether there was one to discard.
+	 */
+	public static function discard( int $term_id ): bool {
+		if ( '' === self::pending( $term_id ) ) {
+			return false;
+		}
+
+		delete_term_meta( $term_id, self::META_PENDING );
+		self::forget_count();
+
+		return true;
+	}
+
+	/**
+	 * Save prose somebody wrote or edited themselves.
+	 *
+	 * Marks the term as hand written, which stops regeneration for good, and
+	 * clears any rewrite that was waiting: a person who has just written the
+	 * thing has answered the question the queue was asking.
+	 *
+	 * An empty string clears the summary and the flag with it, which is how a
+	 * term goes back to being generated.
+	 *
+	 * @return void
+	 */
+	public static function write( int $term_id, string $prose, bool $may_rewrite = false ): void {
+		$prose = trim( wp_strip_all_tags( $prose ) );
+
+		delete_term_meta( $term_id, self::META_PENDING );
+
+		if ( '' === $prose ) {
+			delete_term_meta( $term_id, self::META_TEXT );
+			delete_term_meta( $term_id, self::META_BY_HAND );
+			delete_term_meta( $term_id, self::META_REWRITABLE );
+			delete_term_meta( $term_id, self::META_HASH );
+
+			self::forget_count();
+
+			return;
+		}
+
+		update_term_meta( $term_id, self::META_TEXT, $prose );
+		update_term_meta( $term_id, self::META_BY_HAND, 1 );
+		update_term_meta( $term_id, self::META_TIME, time() );
+
+		if ( $may_rewrite ) {
+			update_term_meta( $term_id, self::META_REWRITABLE, 1 );
+		} else {
+			delete_term_meta( $term_id, self::META_REWRITABLE );
+		}
+
+		self::forget_count();
+	}
+
+	/**
+	 * Hand a term back to the generator.
+	 *
+	 * @return void
+	 */
+	public static function release( int $term_id ): void {
+		update_term_meta( $term_id, self::META_REWRITABLE, 1 );
+	}
+
+	/**
+	 * @return void
+	 */
+	private static function forget_count(): void {
+		wp_cache_delete( 'scsl_pending_summaries', 'scsl' );
 	}
 
 	/**

@@ -51,6 +51,7 @@ class MetaBoxes {
 		 */
 		add_action( 'post_submitbox_misc_actions', [ $this->sermon_meta, 'submitbox_unlisted' ] );
 		add_action( 'add_meta_boxes',        [ $this, 'reorder_meta_boxes' ], 99 );
+		add_filter( 'get_user_option_meta-box-order_scsl_sermon', [ $this, 'place_new_meta_boxes' ] );
 		add_action( 'save_post',             [ $this, 'save'              ], 10, 2 );
 		add_action( 'save_post',             [ $this, 'clear_post_cache'  ], 10, 2 );
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_scripts'   ] );
@@ -73,9 +74,23 @@ class MetaBoxes {
 		add_meta_box( 'scsl_series_details',    __( 'Series Details',  'seedcast-sermon-library' ), [ $this->series_meta,  'series_details_cb'    ], 'scsl_series',  'normal', 'high' );
 		add_meta_box( 'scsl_speaker_details',   __( 'Speaker Details', 'seedcast-sermon-library' ), [ $this->speaker_meta, 'speaker_details_cb'   ], 'scsl_speaker', 'normal', 'high' );
 
-		// Remove auto-generated taxonomy meta boxes: managed via the Scripture meta box
-		remove_meta_box( 'tagsdiv-scsl_scripture', 'scsl_sermon', 'side' );
-		remove_meta_box( 'tagsdiv-scsl_topic',     'scsl_sermon', 'side' );
+		/*
+		 * Remove the taxonomy boxes WordPress adds for itself. Both are managed
+		 * from the Scripture and Topics boxes instead, and a checklist of
+		 * seventeen hundred passages is not something anybody is going to tick.
+		 *
+		 * Both ids, because the one WordPress uses depends on the taxonomy:
+		 * a flat one gets `tagsdiv-{taxonomy}` and a hierarchical one gets
+		 * `{taxonomy}div`. Scripture became hierarchical in 2.72.0, which
+		 * silently stopped the old removal from matching and put the checklist
+		 * back on screen.
+		 */
+		foreach ( [ 'scsl_scripture', 'scsl_topic' ] as $taxonomy ) {
+			foreach ( [ 'side', 'normal', 'advanced' ] as $context ) {
+				remove_meta_box( 'tagsdiv-' . $taxonomy, 'scsl_sermon', $context );
+				remove_meta_box( $taxonomy . 'div', 'scsl_sermon', $context );
+			}
+		}
 	}
 
 	/**
@@ -88,13 +103,71 @@ class MetaBoxes {
 		$screen = get_current_screen();
 		if ( ! $screen || ! in_array( $screen->post_type, [ 'scsl_sermon', 'scsl_series', 'scsl_speaker' ], true ) ) return;
 
-		wp_enqueue_style(  'scsl-admin', SCSL_PLUGIN_URL . 'assets/css/admin.css',   [], SCSL_VERSION );
-		wp_enqueue_script( 'scsl-admin', SCSL_PLUGIN_URL . 'assets/js/admin.js', [ 'jquery' ], SCSL_VERSION, true );
+		wp_enqueue_style(  'scsl-admin', SCSL_PLUGIN_URL . 'assets/css/admin.css',   [], scsl_asset_version( 'assets/css/admin.css' ) );
+		wp_enqueue_script( 'scsl-admin', SCSL_PLUGIN_URL . 'assets/js/admin.js', [ 'jquery' ], scsl_asset_version( 'assets/js/admin.js' ), true );
 		wp_localize_script( 'scsl-admin', 'scslAdmin', [
 			'ajaxUrl'    => admin_url( 'admin-ajax.php' ),
 			'nonce'      => wp_create_nonce( 'scsl_admin_nonce' ),
 			'generating' => __( 'Generating…', 'seedcast-sermon-library' ),
 		] );
+	}
+
+	/**
+	 * Put a newly added box where it belongs in somebody's own arrangement.
+	 *
+	 * WordPress remembers the order each person dragged their meta boxes into,
+	 * and that memory wins over the order they were registered in. A box added
+	 * in a later release is not in that saved list, so it lands at the bottom
+	 * of the screen for everybody who has ever moved anything, which is not
+	 * where it was put and not where it reads.
+	 *
+	 * So the saved order is amended rather than overridden: each new box is
+	 * inserted after the one it belongs with, and everything somebody arranged
+	 * deliberately stays where they put it.
+	 *
+	 * @param mixed $order Saved order, or false when nothing was ever saved.
+	 * @return mixed
+	 */
+	public function place_new_meta_boxes( $order ) {
+		// Nothing saved means the registration order is already in force.
+		if ( ! is_array( $order ) ) {
+			return $order;
+		}
+
+		// New box id => the box it should follow.
+		$after = [
+			'scsl_sermon_questions' => 'scsl_sermon_content',
+		];
+
+		foreach ( $after as $box => $follows ) {
+			$seen = false;
+
+			foreach ( $order as $ids ) {
+				if ( in_array( $box, array_filter( explode( ',', (string) $ids ) ), true ) ) {
+					$seen = true;
+					break;
+				}
+			}
+
+			if ( $seen ) {
+				continue;
+			}
+
+			foreach ( $order as $context => $ids ) {
+				$list = array_filter( explode( ',', (string) $ids ) );
+				$at   = array_search( $follows, $list, true );
+
+				if ( false === $at ) {
+					continue;
+				}
+
+				array_splice( $list, $at + 1, 0, [ $box ] );
+				$order[ $context ] = implode( ',', $list );
+				break;
+			}
+		}
+
+		return $order;
 	}
 
 	/**
