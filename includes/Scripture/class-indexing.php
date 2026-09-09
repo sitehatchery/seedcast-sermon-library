@@ -116,19 +116,39 @@ class Indexing {
 	 * @return array
 	 */
 	public static function exclude_from_sitemap( $excluded ) {
-		$terms = get_terms( [
-			'taxonomy'   => 'scsl_scripture',
-			'hide_empty' => false,
-		] );
+		global $wpdb;
 
-		if ( is_wp_error( $terms ) ) {
-			return $excluded;
-		}
+		/*
+		 * One query, not one per term.
+		 *
+		 * Asking is_thin() about every term walked the tree and looked up a
+		 * book for each of them, which on a couple of thousand references is
+		 * thousands of queries every time a sitemap is built. Sitemaps are
+		 * fetched by crawlers, repeatedly, so that was enough to hold a request
+		 * open long enough for the edge to give up on it.
+		 */
+		$min = (int) apply_filters( 'scsl_min_book_sermons_for_index', self::MIN_BOOK_SERMONS, null );
 
-		foreach ( $terms as $term ) {
-			if ( self::is_thin( $term ) ) {
-				$excluded[] = (int) $term->term_id;
-			}
+		$ids = $wpdb->get_col( $wpdb->prepare(
+			"SELECT tt.term_id
+			   FROM {$wpdb->term_taxonomy} tt
+			   LEFT JOIN {$wpdb->term_taxonomy} chapter
+				 ON chapter.term_id = tt.parent AND chapter.taxonomy = 'scsl_scripture'
+			   LEFT JOIN {$wpdb->term_taxonomy} book
+				 ON book.term_id = COALESCE( NULLIF( chapter.parent, 0 ), tt.parent )
+				AND book.taxonomy = 'scsl_scripture'
+			  WHERE tt.taxonomy = 'scsl_scripture'
+				AND NOT EXISTS (
+					  SELECT 1 FROM {$wpdb->term_taxonomy} child
+					   WHERE child.taxonomy = 'scsl_scripture'
+						 AND child.parent = tt.term_id
+					)
+				AND COALESCE( book.count, 0 ) < %d",
+			$min
+		) );
+
+		foreach ( (array) $ids as $id ) {
+			$excluded[] = (int) $id;
 		}
 
 		return $excluded;
