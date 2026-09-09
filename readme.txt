@@ -3,7 +3,7 @@ Contributors: seedcast
 Tags: sermons, church, preaching, bible, audio
 Requires at least: 6.2
 Tested up to: 7.1
-Stable tag: 2.72.0
+Stable tag: 2.72.1
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -36,7 +36,7 @@ A visitor may read instead of watching a 45-minute video. A member who missed Su
 
 = Build a real library, not just a video archive =
 
-**Scripture.** Browse sermons by book, chapter and passage. Overlapping passages are understood intelligently, so a sermon on Ephesians 6:10-20 can be found by someone looking at Ephesians 6:15.
+**Scripture.** Every book, chapter and passage gets its own page. Overlapping passages are understood intelligently, so a sermon on Ephesians 6:10-20 can be found by someone looking at Ephesians 6:15.
 
 **Topics.** Organize teaching around subjects people actually want to explore.
 
@@ -45,6 +45,18 @@ A visitor may read instead of watching a 45-minute video. A member who missed Su
 **Speakers.** Create speaker profiles with a photo, biography, links and every sermon they have preached.
 
 Together, these turn years of Sunday messages into an interconnected body of teaching rather than a long list of recordings.
+
+= Every passage becomes a page worth landing on =
+
+A verse page listing a single sermon is a dead end for whoever found it.
+
+Sermon Library builds each passage page out. The sermons on that passage come first, then the articles written from them, then the rest of your teaching in that book. Someone who arrives looking for Ephesians 6:15 finds the message on that verse and a way into everything else your church has preached from Ephesians.
+
+Books and chapters are real pages too. One address gathers every sermon you have preached from Romans, and another gathers Romans 8, so the connections between years of Sunday messages are something a visitor can follow rather than something only you can see.
+
+Each sermon in the list also shows which passages in that book it actually touches, so a reader can tell at a glance which message is about the verse they came for.
+
+Passages in books your church has barely preached are kept out of search results on their own, and come back on their own once there is enough teaching to make the page worth reading. Nothing to configure, and nothing to remember to undo later.
 
 = Help people discover what your church actually teaches =
 
@@ -125,6 +137,8 @@ Sermon Library gives every sermon a place for a transcript, article and Bible st
 
 Upload the sermon recording you already made, and Seedcast processes what was actually preached and prepares the transcript, article and Bible study inside the sermon.
 
+Sermon Library AI can also write the short summary that sits at the top of a book or chapter page, describing what that group of sermons covers as a body of teaching rather than repeating any one of them.
+
 Nothing publishes automatically. Generated content is staged for review so your church stays in control.
 
 Instead of spending hours transcribing, summarizing and writing after every Sunday, your team can begin with the recording you already made, review the generated content and build a more complete sermon record.
@@ -163,7 +177,7 @@ Yes. Transcripts, articles, Bible studies and sermon notes each have a PDF downl
 
 = Can people search sermons by Scripture? =
 
-Yes. Scripture uses a structured passage picker. Visitors can filter by book, and every passage has its own page. Overlapping passages are matched intelligently.
+Yes. Scripture uses a structured passage picker. Visitors can filter by book, and every book, chapter and passage has its own page. Overlapping passages are matched intelligently, and a passage page also shows the articles written from those sermons and the rest of your teaching in that book.
 
 = Does it work with Elementor, Divi, Yoast and Rank Math? =
 
@@ -185,6 +199,25 @@ No. Sermons, series and speakers remain in the database.
 8. Completeness drill-down showing what needs work
 
 == Changelog ==
+
+= 2.72.1 =
+
+* Passage pages no longer queue background work on every view, which on a site being crawled could use up every available PHP process. Nothing is queued now unless a summary service is connected.
+* Building the sitemap is a single query rather than several thousand.
+* Addresses written before the site placed a separator between chapter and verse now reach the right page, so /scripture/john-844/ leads to /scripture/john-8-44/. The same applies to sermon addresses left behind by a previous plugin.
+* Passage and topic feeds are switched off. They were slow enough that crawlers recorded errors against them, and a passage archive is not something anyone subscribes to. Those addresses now lead to the page.
+
+= 2.72.0 =
+
+**Passage pages rebuilt**
+
+* Every book, chapter and passage now has a real page. One address gathers everything your church has preached from Romans, another gathers Romans 8, and a verse page leads with the sermons on that verse.
+* A passage page continues past its own sermons: the articles written from them, then the rest of your teaching in that book. A page that used to hold a single sermon card now holds a way into the whole book.
+* Sermon cards on a passage page show which passages in that book each sermon actually touches.
+* Long lists load more on request rather than paging, with the first batch in the page itself so search engines still see it.
+* Book and chapter pages can carry a short written summary of what their sermons cover. Sermon Library AI writes it; without a service connected the section simply does not appear.
+* Passages in books your church has barely preached are kept out of search results automatically, and return on their own as you preach there.
+* Passage pages load in about a second where they previously took several, after a fix to how Scripture references are parsed.
 
 = 2.71.0 =
 * Every setting the shared Seedcast library stores was renamed to a longer, more distinctive prefix, so it cannot collide with another plugin that happened to choose the same short one. Your church details, service times, theme and spam settings are carried across automatically the first time the plugin loads; nothing needs re-entering.
@@ -208,6 +241,14 @@ No. Sermons, series and speakers remain in the database.
 Complete historical changelog: see `changelog.txt`.
 
 == Upgrade Notice ==
+
+= 2.72.1 =
+
+Fixes a problem where passage pages queued background work on every view, which on a busy or heavily crawled site could exhaust available PHP processes. Recommended for every site running 2.72.0.
+
+= 2.72.0 =
+
+Books, chapters and passages each become a real page, with related articles and the rest of the book beneath. Visit Settings > Permalinks and save once after upgrading so the new addresses take effect.
 
 = 2.71.0 =
 

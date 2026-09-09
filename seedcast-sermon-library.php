@@ -3,7 +3,7 @@
  * Plugin Name: Seedcast Sermon Library
  * Plugin URI:  https://seedcast.ai/sermon-library
  * Description: A complete sermon series and content management system for churches. Manage sermons, series, speakers, transcripts, Bible studies, and more.
- * Version:     2.72.0
+ * Version:     2.72.1
  * Author:      Seedcast
  * Author URI:  https://seedcast.ai
  * License:     GPL-2.0-or-later
@@ -20,7 +20,7 @@ namespace SeedcastSermonLibrary;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define( 'SCSL_VERSION',          '2.72.0' );
+define( 'SCSL_VERSION',          '2.72.1' );
 define( 'SCSL_PLUGIN_FILE',      __FILE__ );
 define( 'SCSL_PLUGIN_DIR',       plugin_dir_path( __FILE__ ) );
 define( 'SCSL_PLUGIN_URL',       plugin_dir_url( __FILE__ ) );

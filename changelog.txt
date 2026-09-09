@@ -2,6 +2,16 @@
 
 Complete historical changelog moved out of readme.txt to keep the WordPress.org readme concise.
 
+= 2.72.1 =
+
+**Fixes**
+
+* Passage pages no longer queue work on every view. When no summary service is connected the job could not succeed, so the stored fingerprint never changed and the next visitor queued it again. On a site being crawled that was thousands of jobs, each reading the details of every sermon on the page, and enough of them at once to use up every available PHP process. Nothing is queued now unless something is listening, a failed attempt waits a day before trying again, and only the passage reference travels with the job rather than the whole list of sermons.
+* Building the sitemap asked the same question of every scripture term one at a time, several thousand queries for a file crawlers request repeatedly. It is now a single query returning the same result.
+* Slugs written before the site placed a separator between chapter and verse now find their way to the right page: /scripture/john-844/ goes to /scripture/john-8-44/. Whether 844 means 8:44 or 84:4 cannot be decided by pattern, but it can by comparison, because exactly one existing passage matches once the separators are removed from both. The same comparison rescues sermon addresses that differ only in how an apostrophe was written, and addresses left behind by a previous sermon plugin.
+* Passage and topic feeds are switched off. They answered slowly enough that crawlers recorded server errors against them, and a passage archive has nothing anybody would subscribe to. Their addresses now lead to the page instead.
+* On sites without an SEO plugin, the robots tag on a thin passage page was written in the wrong shape and said nothing meaningful.
+
 = 2.72.0 =
 
 **Passage pages rebuilt**
