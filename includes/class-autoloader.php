@@ -41,6 +41,7 @@ class Autoloader {
 		'ScriptureParser'       => 'class-scriptureparser.php',
 		'CardPassages'          => 'class-cardpassages.php',
 		'ListLoader'            => 'class-listloader.php',
+		'LegacyRedirects'       => 'class-legacyredirects.php',
 	];
 
 	public function load( string $class ): void {

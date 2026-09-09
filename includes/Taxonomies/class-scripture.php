@@ -26,7 +26,17 @@ class Scripture {
 			'show_in_menu'      => true,
 			'show_in_rest'      => true,
 			'show_admin_column' => true,
-			'rewrite'           => [ 'slug' => 'scripture' ],
+			/*
+			 * No feeds. A passage archive has nothing a reader would subscribe
+			 * to, and the feed route was answering slowly enough that crawlers
+			 * recorded server errors against it. Turning the route off is the
+			 * whole fix: the pages themselves are unaffected.
+			 *
+			 * 'feed', not 'feeds'. A taxonomy hands its rewrite arguments to
+			 * add_permastruct, whose option is singular; the plural is the post
+			 * type spelling and is ignored here without complaint.
+			 */
+			'rewrite'           => [ 'slug' => 'scripture', 'feed' => false ],
 		] );
 	}
 }

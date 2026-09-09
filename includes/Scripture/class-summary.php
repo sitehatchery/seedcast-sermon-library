@@ -35,6 +35,12 @@ class Summary {
 	/** Meta key holding the unix time the prose was last confirmed current. */
 	private const META_TIME = '_scsl_summary_at';
 
+	/** Meta key holding the unix time generation was last attempted. */
+	private const META_TRIED = '_scsl_summary_tried';
+
+	/** How long to wait before attempting generation again after a failure. */
+	private const RETRY_AFTER = DAY_IN_SECONDS;
+
 	/** How long a summary stays fresh. */
 	private const TTL = 7 * DAY_IN_SECONDS;
 
@@ -54,7 +60,7 @@ class Summary {
 	 * @return void
 	 */
 	public static function init(): void {
-		add_action( 'scsl_generate_scripture_summary', [ self::class, 'generate' ], 10, 2 );
+		add_action( 'scsl_generate_scripture_summary', [ self::class, 'generate' ], 10, 1 );
 	}
 
 	/**
@@ -104,11 +110,38 @@ class Summary {
 	 * @return void
 	 */
 	private static function queue( int $term_id, array $sermon_ids ): void {
-		$args = [ $term_id, $sermon_ids ];
+		/*
+		 * Nothing is listening, so there is nothing to wait for. Without this
+		 * every view of every passage page queues a job that cannot succeed,
+		 * which never updates the stored hash, so the next view queues it
+		 * again. On a site being crawled that is thousands of pointless jobs,
+		 * each one reading meta for every sermon on the page.
+		 */
+		if ( ! has_filter( 'scsl_scripture_summary_generate' ) ) {
+			return;
+		}
+
+		// Tried recently and produced nothing. Back off rather than hammer.
+		$tried = (int) get_term_meta( $term_id, self::META_TRIED, true );
+
+		if ( $tried && ( time() - $tried ) < self::RETRY_AFTER ) {
+			return;
+		}
+
+		/*
+		 * The term alone, not the sermon list. Cron arguments are stored in an
+		 * autoloaded option and hashed to identify the job, so passing an array
+		 * of every sermon id would put that array into an option read on every
+		 * single request, and a set that changed by one sermon would look like
+		 * a different job rather than a replacement for the old one.
+		 */
+		$args = [ $term_id ];
 
 		if ( wp_next_scheduled( 'scsl_generate_scripture_summary', $args ) ) {
 			return;
 		}
+
+		update_term_meta( $term_id, self::META_TRIED, time() );
 
 		wp_schedule_single_event( time() + 30, 'scsl_generate_scripture_summary', $args );
 	}
@@ -116,15 +149,18 @@ class Summary {
 	/**
 	 * Write a summary for a term. Runs on the scheduled event, never in a page load.
 	 *
-	 * @param int[] $sermon_ids
 	 * @return void
 	 */
-	public static function generate( int $term_id, array $sermon_ids ): void {
+	public static function generate( int $term_id ): void {
 		$term = get_term( $term_id, 'scsl_scripture' );
 
 		if ( ! $term instanceof \WP_Term ) {
 			return;
 		}
+
+		// Worked out here rather than carried through cron, so the job stays a
+		// single integer and the set is whatever it is when the job runs.
+		$sermon_ids = wp_list_pluck( ListLoader::cross_referenced( $term, -1 )->posts, 'ID' );
 
 		$sources = [];
 

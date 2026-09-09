@@ -26,7 +26,13 @@ class Topic {
 			'show_in_menu'      => true,
 			'show_in_rest'      => true,
 			'show_admin_column' => true,
-			'rewrite'           => [ 'slug' => 'topic' ],
+			/*
+			 * No feeds. A passage archive has nothing a reader would subscribe
+			 * to, and the feed route was answering slowly enough that crawlers
+			 * recorded server errors against it. Turning the route off is the
+			 * whole fix: the pages themselves are unaffected.
+			 */
+			'rewrite'           => [ 'slug' => 'topic', 'feed' => false ],
 		] );
 	}
 }
