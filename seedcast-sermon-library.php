@@ -95,6 +95,7 @@ final class SermonLibrary {
 		Scripture\ListLoader::init();
 		Scripture\Indexing::init();
 		Frontend\LegacyRedirects::init();
+		( new Frontend\LlmsIndex() )->init();
 		( new Frontend\ViewCounter() )->init();
 		( new Frontend\ImageFallback() )->init();
 		( new Frontend\PodcastFeed() )->init();

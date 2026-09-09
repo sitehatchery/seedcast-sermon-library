@@ -42,6 +42,7 @@ class Autoloader {
 		'CardPassages'          => 'class-cardpassages.php',
 		'ListLoader'            => 'class-listloader.php',
 		'LegacyRedirects'       => 'class-legacyredirects.php',
+		'LlmsIndex'             => 'class-llmsindex.php',
 	];
 
 	public function load( string $class ): void {

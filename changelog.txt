@@ -12,6 +12,17 @@ Complete historical changelog moved out of readme.txt to keep the WordPress.org 
 * Passage and topic feeds are switched off. They answered slowly enough that crawlers recorded server errors against them, and a passage archive has nothing anybody would subscribe to. Their addresses now lead to the page instead.
 * On sites without an SEO plugin, the robots tag on a thin passage page was written in the wrong shape and said nothing meaningful.
 
+**A description of the library for language models**
+
+* New at /llms-full.txt: one plain text document listing every published sermon, grouped by series, each with the passage it was built on, the speaker, the date and a few lines of what it covers, followed by a breakdown of which books of the Bible the teaching sits in. An assistant asked what a church teaches about a subject can read one file rather than crawling a hundred and thirty pages.
+* It is deliberately not the transcripts. Those run to megabytes, and enough to choose the right sermon plus a link to read it is more use than everything at once.
+* This exists because the llms.txt an SEO plugin generates lists a handful of recent items per content type, which describes a blog well and a sermon library poorly. Where WordPress serves robots.txt, the new file is advertised there; a site with a real robots.txt file in the web root needs that line added by hand.
+* Built once and kept until a sermon changes.
+
+**For other code**
+
+* `scsl_scripture_summary_generate` now receives a fourth argument describing the shape of the set: whether the page is a book, a chapter or a single passage, which chapters the teaching actually touches and how often, and which series it arrived through. Given only the list of sermons, a summary tends to come back as commentary that would fit any church preaching the same book. Given the shape, it can say where this church's teaching actually sits.
+
 = 2.72.0 =
 
 **Passage pages rebuilt**

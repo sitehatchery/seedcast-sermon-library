@@ -190,11 +190,18 @@ class Summary {
 		 * body of teaching. Not a list of the sermons, which the page already
 		 * shows, and not a restatement of any one of them.
 		 *
-		 * @param string     $summary  Empty by default, meaning no service is connected.
-		 * @param \WP_Term   $term     The passage the page is about.
-		 * @param array      $sources  One entry per sermon: id, title, passage, abstract.
+		 * $context carries the shape of the set rather than its contents, and it
+		 * is what keeps a summary specific. Knowing that a book's teaching sits
+		 * mostly in two chapters, or arrived through one series, produces a
+		 * sentence true of this church; the sermon list alone tends to produce
+		 * commentary that would fit any church preaching the same book.
+		 *
+		 * @param string   $summary Empty by default, meaning no service is connected.
+		 * @param \WP_Term $term    The passage the page is about.
+		 * @param array    $sources One entry per sermon: id, title, passage, abstract.
+		 * @param array    $context level, book, chapters, series, totals.
 		 */
-		$summary = (string) apply_filters( 'scsl_scripture_summary_generate', '', $term, $sources );
+		$summary = (string) apply_filters( 'scsl_scripture_summary_generate', '', $term, $sources, self::context( $term, $sermon_ids ) );
 
 		$summary = trim( wp_strip_all_tags( $summary ) );
 
@@ -205,6 +212,61 @@ class Summary {
 		update_term_meta( $term_id, self::META_TEXT, $summary );
 		update_term_meta( $term_id, self::META_HASH, self::hash( $sermon_ids ) );
 		update_term_meta( $term_id, self::META_TIME, time() );
+	}
+
+	/**
+	 * The shape of a passage's teaching: where it sits and how it arrived.
+	 *
+	 * @param int[] $sermon_ids
+	 * @return array{level: string, book: string, chapters: array<int,int>, series: array<string,int>, sermons: int}
+	 */
+	public static function context( \WP_Term $term, array $sermon_ids ): array {
+		$book = (string) ScriptureParser::extract_book( (string) $term->name );
+
+		$children = get_term_children( (int) $term->term_id, 'scsl_scripture' );
+		$children = is_wp_error( $children ) ? [] : $children;
+
+		if ( $children ) {
+			$level = ( 0 === (int) $term->parent ) ? 'book' : 'chapter';
+		} else {
+			$level = 'passage';
+		}
+
+		$chapters = [];
+		$series   = [];
+
+		foreach ( $sermon_ids as $sermon_id ) {
+			$sid = (int) get_post_meta( (int) $sermon_id, '_scsl_series_id', true );
+
+			if ( $sid ) {
+				$name = get_the_title( $sid );
+
+				if ( '' !== $name ) {
+					$series[ $name ] = ( $series[ $name ] ?? 0 ) + 1;
+				}
+			}
+
+			foreach ( self::passages_for( (int) $sermon_id ) as $passage ) {
+				if ( ScriptureParser::extract_book( $passage ) !== $book ) {
+					continue;
+				}
+
+				if ( preg_match( '/^' . preg_quote( $book, '/' ) . '\s+(\d+)/', $passage, $m ) ) {
+					$chapters[ (int) $m[1] ] = ( $chapters[ (int) $m[1] ] ?? 0 ) + 1;
+				}
+			}
+		}
+
+		arsort( $series );
+		arsort( $chapters );
+
+		return [
+			'level'    => $level,
+			'book'     => $book,
+			'chapters' => $chapters,
+			'series'   => array_slice( $series, 0, 5, true ),
+			'sermons'  => count( $sermon_ids ),
+		];
 	}
 
 	/**

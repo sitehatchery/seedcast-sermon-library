@@ -206,6 +206,8 @@ No. Sermons, series and speakers remain in the database.
 * Building the sitemap is a single query rather than several thousand.
 * Addresses written before the site placed a separator between chapter and verse now reach the right page, so /scripture/john-844/ leads to /scripture/john-8-44/. The same applies to sermon addresses left behind by a previous plugin.
 * Passage and topic feeds are switched off. They were slow enough that crawlers recorded errors against them, and a passage archive is not something anyone subscribes to. Those addresses now lead to the page.
+* New at /llms-full.txt: a single plain text description of your whole sermon library for AI assistants, listing every sermon with its passage, speaker and a summary of what it covers. Most llms.txt files list only a handful of recent items; this one describes the library.
+* Book and chapter summaries are given more to work with, so a generated summary describes where your church's teaching actually sits rather than reading like general commentary on the book.
 
 = 2.72.0 =
 
