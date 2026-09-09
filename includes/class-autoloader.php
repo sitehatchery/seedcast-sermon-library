@@ -43,6 +43,7 @@ class Autoloader {
 		'ListLoader'            => 'class-listloader.php',
 		'LegacyRedirects'       => 'class-legacyredirects.php',
 		'LlmsIndex'             => 'class-llmsindex.php',
+		'Faq'                   => 'class-faq.php',
 	];
 
 	public function load( string $class ): void {

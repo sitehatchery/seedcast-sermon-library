@@ -2481,3 +2481,95 @@ button.scsl-btn--platform:hover {
 .scsl-loadmore {
 	margin: 2.25rem 0 0;
 }
+
+/* ── Sermon questions ────────────────────────────────────────────────── */
+
+/*
+ * Numbered, and set as a list rather than a run of headings.
+ *
+ * A page of questions and answers formatted as plain prose is hard to scan and
+ * looks like the transcript it came from. Numbering each one gives the eye a
+ * place to land, and the count itself tells a reader how much is here before
+ * they start.
+ *
+ * The counter is drawn rather than using the list marker, so it can sit in the
+ * accent colour and hold its shape next to a question that wraps to two lines.
+ */
+.scsl-faq {
+	counter-reset: scsl-faq;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.scsl-faq__item {
+	counter-increment: scsl-faq;
+	position: relative;
+	display: flex;
+	gap: 1rem;
+	padding: 1.25rem 1.25rem 1.25rem 1.1rem;
+	margin: 0 0 .75rem;
+	background: var(--sc-color-bg-subtle, #f7f7f8);
+	border-radius: var(--sc-radius, 8px);
+
+	/* A quiet edge in the accent colour, so a run of these reads as one set. */
+	border-left: 3px solid var(--sc-color-accent, #c9975a);
+}
+
+.scsl-faq__item::before {
+	content: counter(scsl-faq);
+	flex: 0 0 auto;
+	width: 1.65rem;
+	height: 1.65rem;
+	margin-top: .1rem;
+	border-radius: 50%;
+	background: var(--sc-color-accent, #c9975a);
+	color: #fff;
+	font-size: .8rem;
+	font-weight: 700;
+	line-height: 1.65rem;
+	text-align: center;
+}
+
+.scsl-faq__body {
+	min-width: 0;
+}
+
+.scsl-faq__question {
+	margin: 0 0 .4rem;
+	font-size: 1.05rem;
+	font-weight: 700;
+	line-height: 1.35;
+	color: var(--sc-color-text, #1a1a1a);
+}
+
+.scsl-faq__answer {
+	color: var(--sc-color-muted, #55555f);
+	line-height: 1.65;
+}
+
+.scsl-faq__answer > p {
+	margin: 0 0 .65rem;
+}
+
+.scsl-faq__answer > p:last-child {
+	margin-bottom: 0;
+}
+
+/*
+ * A scripture reference at the end of an answer is a fact worth finding again,
+ * so it is set apart from the sentence around it rather than left as run of
+ * body text.
+ */
+.scsl-faq__answer strong,
+.scsl-faq__answer b {
+	color: var(--sc-color-text, #1a1a1a);
+	font-weight: 600;
+}
+
+@media (max-width: 480px) {
+	.scsl-faq__item {
+		gap: .75rem;
+		padding: 1rem .9rem;
+	}
+}

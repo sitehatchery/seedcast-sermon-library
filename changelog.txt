@@ -2,6 +2,24 @@
 
 Complete historical changelog moved out of readme.txt to keep the WordPress.org readme concise.
 
+= 2.73.0 =
+
+**Questions**
+
+* A sermon can now carry the questions it answers, set out as questions with answers rather than as prose. They appear on the sermon page under Questions, numbered, each question a real heading with its answer beneath it.
+* A sermon is largely someone answering questions people already have. Left as a transcript, that is only reachable by reading the whole thing; set out as questions it is reachable by anybody scanning the page, and by anything reading it.
+* The questions are also described to search engines as structured data (FAQPage). A note on what that is worth: Google stopped showing FAQ rich results for ordinary sites in 2023, so this is not a route to a rich snippet. It earns its place because the questions are visible content matching what somebody actually typed, and because an assistant extracts a clean question and answer far more reliably than the same point buried in a transcript.
+* A Questions box sits under Content on the Edit Sermon screen, one row per question with its answer, numbered as they will appear. Rows can be added and removed, a row with only one half filled in is left out rather than published half finished, and removing every row clears the section. Nothing here needs the AI engine: a church can write its own questions.
+* Answers are written and edited as text, a blank line between paragraphs, and the paragraph markup is put back when the page is drawn. An answer arriving from the API wrapped in paragraph tags reads the same in the box as one typed by hand; a list or an emphasis inside it is left alone.
+* Questions appear as a section in Settings alongside transcript, article and study, so a church that does not want them can switch them off, and in the completeness report so a sermon missing them says so.
+* Sermon Library AI writes them from what was preached, where it is connected.
+
+**For other code**
+
+* Content the plugin stores is no longer assumed to be a block of HTML. A product can declare that a field's value lives in a named key of the response rather than in its rendered text, which is how question and answer pairs arrive intact instead of as headings that would have to be parsed back apart. `FieldMap::structured()` describes those fields and travels to the AI engine through the product declaration.
+* `_scsl_faq` holds a list of `[ 'question' => ..., 'answer' => ... ]`. A JSON string is accepted and decoded, and `q` and `a` are read as well as the long spellings, so a pair written by hand or by an older importer still renders. Anything missing either half is dropped rather than shown as a question with nothing under it.
+* `scsl_sermon_faq` filters the pairs shown for a sermon.
+
 = 2.72.1 =
 
 **Fixes**

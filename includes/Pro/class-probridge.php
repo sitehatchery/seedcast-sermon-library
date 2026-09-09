@@ -169,6 +169,17 @@ class ProBridge {
 				'_scsl_article_title' => '_scsl_article_body',
 			],
 			'plain_text'  => FieldMap::plain_text_meta(),
+
+			/*
+			 * Fields where a named part of the response is the value.
+			 *
+			 * Each entry says which key to take instead of the rendered text:
+			 * faqs arrives with both a `value` of HTML and the `pairs` it was
+			 * built from, and this plugin stores the pairs. Pro should write
+			 * whatever `source` names, unchanged, and fall back to `value` if
+			 * that key is absent so an older API cannot leave the field empty.
+			 */
+			'structured'  => FieldMap::structured(),
 			'append'      => [
 				'meta'   => '_scsl_resources',
 				'fields' => FieldMap::appended_fields(),

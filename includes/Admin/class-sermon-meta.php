@@ -656,6 +656,69 @@ class SermonMeta {
 		<?php
 	}
 
+	// ── SERMON: Questions ───────────────────────────────────────────────────
+
+	/**
+	 * The questions this sermon answers.
+	 *
+	 * Its own box below Content rather than another tab inside it. A pair of
+	 * fields repeated a dozen times needs the full width of the screen, and
+	 * the shape of what is being written should be obvious before anybody
+	 * starts typing.
+	 */
+	public function sermon_questions_cb( \WP_Post $post ): void {
+		$scsl_pairs = \SeedcastSermonLibrary\Frontend\Faq::stored( $post->ID );
+
+		// One empty row to write into, so the box is never a lone button.
+		if ( ! $scsl_pairs ) {
+			$scsl_pairs = [ [ 'question' => '', 'answer' => '' ] ];
+		}
+		?>
+		<?php if ( ! \SeedcastSermonLibrary\Import\FieldMap::uses( \SeedcastSermonLibrary\Frontend\Faq::META ) ) : ?>
+			<div class="scsl-section-off"><p>
+				<?php esc_html_e( 'Your church has this switched off, so it does not appear on your sermon pages.', 'seedcast-sermon-library' ); ?>
+				<a href="<?php echo esc_url( \Seedcast\Core\Admin\Settings::url( SettingsPage::SECTION ) ); ?>">
+					<?php esc_html_e( 'Change which content you use', 'seedcast-sermon-library' ); ?>
+				</a>
+			</p></div>
+		<?php endif; ?>
+
+		<p class="description" style="margin-bottom:1rem;">
+			<?php esc_html_e( 'Questions this sermon answers, shown numbered on the sermon page and described to search engines. Write the question the way somebody would ask it, and answer it in a sentence or two.', 'seedcast-sermon-library' ); ?>
+		</p>
+
+		<input type="hidden" name="scsl_faq_present" value="1" />
+
+		<div id="scsl-faq-rows">
+			<?php foreach ( $scsl_pairs as $scsl_i => $scsl_pair ) : ?>
+			<div class="scsl-faq-row" style="margin-bottom:10px;padding:10px 12px;background:#f9f9f9;border:1px solid #dcdcde;border-radius:4px;">
+				<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+					<span class="scsl-faq-number" style="font-weight:600;color:#646970;"><?php echo esc_html( (string) ( (int) $scsl_i + 1 ) ); ?>.</span>
+					<input type="text"
+						   name="scsl_faq[<?php echo esc_attr( (string) $scsl_i ); ?>][question]"
+						   value="<?php echo esc_attr( $scsl_pair['question'] ); ?>"
+						   placeholder="<?php esc_attr_e( 'Question, e.g. What does it mean to stand firm?', 'seedcast-sermon-library' ); ?>"
+						   class="regular-text" style="flex:1;font-weight:600;" />
+					<button type="button" class="button-link scsl-remove-faq" style="color:#b32d2e;">
+						✕ <?php esc_html_e( 'Remove', 'seedcast-sermon-library' ); ?>
+					</button>
+				</div>
+				<textarea name="scsl_faq[<?php echo esc_attr( (string) $scsl_i ); ?>][answer]"
+						  rows="3" class="large-text"
+						  placeholder="<?php esc_attr_e( 'Answer', 'seedcast-sermon-library' ); ?>"><?php echo esc_textarea( $scsl_pair['answer'] ); ?></textarea>
+			</div>
+			<?php endforeach; ?>
+		</div>
+
+		<p>
+			<button type="button" class="button scsl-add-faq">+ <?php esc_html_e( 'Add Question', 'seedcast-sermon-library' ); ?></button>
+			<span class="description" style="margin-left:.5rem;">
+				<?php esc_html_e( 'A question with no answer, or an answer with no question, is left out.', 'seedcast-sermon-library' ); ?>
+			</span>
+		</p>
+		<?php
+	}
+
 	// ── SERMON: Sermon Notes ────────────────────────────────────────────────
 
 	public function sermon_notes_cb( \WP_Post $post ): void {
@@ -886,6 +949,41 @@ class SermonMeta {
 			}
 		}
 		update_post_meta( $post_id, '_scsl_notes_files', $notes_files );
+
+		/*
+		 * Questions.
+		 *
+		 * Written only when the box was on the screen: the hidden marker is what
+		 * separates "every row was removed" from a save by something that never
+		 * showed the box at all, and the first should clear the field while the
+		 * second must leave it alone.
+		 */
+		if ( isset( $post_data['scsl_faq_present'] ) ) {
+			$faq_pairs = [];
+			$faq_rows  = isset( $post_data['scsl_faq'] ) && is_array( $post_data['scsl_faq'] )
+				? array_values( (array) $post_data['scsl_faq'] )
+				: [];
+
+			foreach ( $faq_rows as $faq_row ) {
+				if ( ! is_array( $faq_row ) ) continue;
+
+				$question = sanitize_text_field( $faq_row['question'] ?? '' );
+				$answer   = wp_kses_post( $faq_row['answer'] ?? '' );
+
+				// Half a pair reads as a question nobody answered, on the page and
+				// in the structured data alike. An empty row is simply one the
+				// writer did not use.
+				if ( '' === $question || '' === trim( wp_strip_all_tags( $answer ) ) ) continue;
+
+				$faq_pairs[] = [ 'question' => $question, 'answer' => $answer ];
+			}
+
+			if ( $faq_pairs ) {
+				update_post_meta( $post_id, \SeedcastSermonLibrary\Frontend\Faq::META, $faq_pairs );
+			} else {
+				delete_post_meta( $post_id, \SeedcastSermonLibrary\Frontend\Faq::META );
+			}
+		}
 
 		// External platform links
 		$ext_links = [];

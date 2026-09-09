@@ -65,6 +65,7 @@ class MetaBoxes {
 		add_meta_box( 'scsl_sermon_details',    __( 'Sermon Details',       'seedcast-sermon-library' ), [ $this->sermon_meta,  'sermon_details_cb'    ], 'scsl_sermon', 'normal', 'high'    );
 		add_meta_box( 'scsl_sermon_podcast',    __( 'Audio Feed',           'seedcast-sermon-library' ), [ $this->sermon_meta,  'sermon_podcast_cb'    ], 'scsl_sermon', 'normal', 'default' );
 		add_meta_box( 'scsl_sermon_content',    __( 'Content',              'seedcast-sermon-library' ), [ $this->sermon_meta,  'sermon_content_cb'    ], 'scsl_sermon', 'normal', 'default' );
+		add_meta_box( 'scsl_sermon_questions',  __( 'Questions',            'seedcast-sermon-library' ), [ $this->sermon_meta,  'sermon_questions_cb'  ], 'scsl_sermon', 'normal', 'default' );
 		add_meta_box( 'scsl_sermon_scripture',  __( 'Scripture',            'seedcast-sermon-library' ), [ $this->sermon_meta,  'sermon_scripture_cb'  ], 'scsl_sermon', 'normal', 'default' );
 		add_meta_box( 'scsl_sermon_notes',      __( 'Sermon Notes',         'seedcast-sermon-library' ), [ $this->sermon_meta,  'sermon_notes_cb'      ], 'scsl_sermon', 'normal', 'default' );
 
@@ -135,6 +136,7 @@ class MetaBoxes {
 			'scsl_sermon_source',
 			'scsl_sermon_details',
 			'scsl_sermon_content',
+			'scsl_sermon_questions',
 			'scsl_sermon_scripture',
 			'scsl_sermon_podcast',
 			'scsl_sermon_notes',

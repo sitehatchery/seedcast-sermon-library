@@ -249,6 +249,40 @@
         $( this ).closest( '.scsl-theme-option' ).addClass( 'is-selected' );
     } );
 
+    // ── Questions ──────────────────────────────────────────
+
+    function slFaqRow( idx ) {
+        return '<div class="scsl-faq-row" style="margin-bottom:10px;padding:10px 12px;background:#f9f9f9;border:1px solid #dcdcde;border-radius:4px;">'
+            + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">'
+            + '<span class="scsl-faq-number" style="font-weight:600;color:#646970;"></span>'
+            + '<input type="text" name="scsl_faq[' + idx + '][question]" placeholder="Question, e.g. What does it mean to stand firm?" class="regular-text" style="flex:1;font-weight:600;" />'
+            + '<button type="button" class="button-link scsl-remove-faq" style="color:#b32d2e;">✕ Remove</button>'
+            + '</div>'
+            + '<textarea name="scsl_faq[' + idx + '][answer]" rows="3" class="large-text" placeholder="Answer"></textarea>'
+            + '</div>';
+    }
+
+    // The numbers are what a visitor sees on the sermon page, so they should
+    // read the same here after a row is added or taken out.
+    function slFaqRenumber() {
+        $( '#scsl-faq-rows .scsl-faq-row' ).each( function( i ) {
+            $( this ).find( '.scsl-faq-number' ).text( ( i + 1 ) + '.' );
+        } );
+    }
+
+    $( document ).on( 'click', '.scsl-add-faq', function() {
+        // Indexes only have to be unique: save() reindexes what it keeps.
+        var idx = $( '#scsl-faq-rows .scsl-faq-row' ).length;
+        $( '#scsl-faq-rows' ).append( slFaqRow( idx ) );
+        slFaqRenumber();
+        $( '#scsl-faq-rows .scsl-faq-row' ).last().find( 'input[type=text]' ).focus();
+    } );
+
+    $( document ).on( 'click', '.scsl-remove-faq', function() {
+        $( this ).closest( '.scsl-faq-row' ).remove();
+        slFaqRenumber();
+    } );
+
     // ── Sermon Notes Attachments ──────────────────────────────────────────────
 
     function slNotesRow( idx ) {

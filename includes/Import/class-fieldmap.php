@@ -39,6 +39,7 @@ class FieldMap {
 			'summary'            => '_scsl_content_description',
 			'article'            => '_scsl_article_body',
 			'study_guide'        => '_scsl_bible_study',
+			'faqs'               => '_scsl_faq',
 			'cleaned_transcript' => '_scsl_transcript_clean',
 		];
 	}
@@ -58,7 +59,30 @@ class FieldMap {
 	 * @return string[]
 	 */
 	public static function appended_fields(): array {
-		return [ 'outline', 'study_notes', 'faqs', 'trivia' ];
+		/*
+		 * FAQs used to be here, flattened into the resources field as a run of
+		 * headings. They are their own field now: the API returns them as
+		 * question and answer pairs, and pairs can be laid out, counted and
+		 * described to a search engine in ways a wall of headings cannot.
+		 */
+		return [ 'outline', 'study_notes', 'trivia' ];
+	}
+
+	/**
+	 * Fields stored from a named part of the response rather than its text.
+	 *
+	 * Most generated content is a block of HTML and the whole of it is the
+	 * value. FAQs are not: the API returns both a rendered `value` and the
+	 * `pairs` it was rendered from, and the pairs are what this plugin wants,
+	 * because a question and an answer kept apart can be numbered, laid out and
+	 * described as structured data. Flattened to HTML that is all lost.
+	 *
+	 * @return array<string, array{meta: string, source: string}>
+	 */
+	public static function structured(): array {
+		return [
+			'faqs' => [ 'meta' => '_scsl_faq', 'source' => 'pairs' ],
+		];
 	}
 
 	/**
@@ -76,6 +100,7 @@ class FieldMap {
 			'_scsl_content_description' => __( 'Description', 'seedcast-sermon-library' ),
 			'_scsl_article_body'        => __( 'Article', 'seedcast-sermon-library' ),
 			'_scsl_bible_study'         => __( 'Bible Study', 'seedcast-sermon-library' ),
+			'_scsl_faq'                 => __( 'Questions', 'seedcast-sermon-library' ),
 
 			/*
 			 * Named for the work, not for the field.
@@ -127,6 +152,7 @@ class FieldMap {
 			'_scsl_content_description' => __( 'Description', 'seedcast-sermon-library' ),
 			'_scsl_article_body'        => __( 'Article', 'seedcast-sermon-library' ),
 			'_scsl_bible_study'         => __( 'Bible Study', 'seedcast-sermon-library' ),
+			'_scsl_faq'                 => __( 'Questions', 'seedcast-sermon-library' ),
 			'_scsl_transcript_clean'    => __( 'Transcript', 'seedcast-sermon-library' ),
 			'_scsl_resources'           => (string) get_option( 'scsl_tab_more_label', __( 'More', 'seedcast-sermon-library' ) ),
 			'_scsl_other_passages'      => __( 'Scripture references', 'seedcast-sermon-library' ),

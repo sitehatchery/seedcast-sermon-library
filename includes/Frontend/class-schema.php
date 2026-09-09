@@ -232,6 +232,17 @@ class Schema {
 		$crumbs[] = [ 'label' => get_the_title( $post_id ), 'url' => $permalink ];
 		$graph[]  = $this->breadcrumb_schema( $crumbs );
 
+		/*
+		 * Only describes questions the page actually shows. Structured data is
+		 * not allowed to claim content a visitor cannot read, and Faq::schema()
+		 * returns null whenever the section did not render.
+		 */
+		$faq = Faq::schema( $post_id );
+
+		if ( $faq ) {
+			$graph[] = $faq;
+		}
+
 		$this->print_schema( $graph );
 	}
 

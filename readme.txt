@@ -3,7 +3,7 @@ Contributors: seedcast
 Tags: sermons, church, preaching, bible, audio
 Requires at least: 6.2
 Tested up to: 7.1
-Stable tag: 2.72.1
+Stable tag: 2.73.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -28,11 +28,11 @@ Everything below is included in the free plugin. Sermon Library AI is an optiona
 
 = One sermon becomes many ways to engage =
 
-A sermon can include video, audio, transcript, article, Bible study, sermon notes, Scripture references, speaker and series information, and downloadable PDFs.
+A sermon can include video, audio, transcript, article, Bible study, sermon notes, the questions it answers, Scripture references, speaker and series information, and downloadable PDFs.
 
 Everything stays connected to the original sermon instead of being scattered across separate posts and pages.
 
-A visitor may read instead of watching a 45-minute video. A member who missed Sunday may listen later. Someone studying a passage may find the sermon through Scripture. A small group may use the Bible study during the week.
+A visitor may read instead of watching a 45-minute video. A member who missed Sunday may listen later. Someone studying a passage may find the sermon through Scripture. Someone who arrived with a question may find it answered near the top of the page. A small group may use the Bible study during the week.
 
 = Build a real library, not just a video archive =
 
@@ -133,9 +133,9 @@ Everything above is included in the free Sermon Library plugin.
 
 = Turn the recording into content automatically with Sermon Library AI =
 
-Sermon Library gives every sermon a place for a transcript, article and Bible study. **Sermon Library AI creates this content for you.**
+Sermon Library gives every sermon a place for a transcript, article, Bible study and the questions it answers. **Sermon Library AI creates this content for you.**
 
-Upload the sermon recording you already made, and Seedcast processes what was actually preached and prepares the transcript, article and Bible study inside the sermon.
+Upload the sermon recording you already made, and Seedcast processes what was actually preached and prepares the transcript, article, Bible study and questions inside the sermon.
 
 Sermon Library AI can also write the short summary that sits at the top of a book or chapter page, describing what that group of sermons covers as a body of teaching rather than repeating any one of them.
 
@@ -200,6 +200,13 @@ No. Sermons, series and speakers remain in the database.
 
 == Changelog ==
 
+= 2.73.0 =
+
+* Sermons can now carry the questions they answer, shown on the sermon page as a numbered list of questions with their answers. A sermon is largely someone answering questions people already have, and this makes those answers findable by anyone scanning the page instead of only by someone reading the whole transcript.
+* The questions are described to search engines as structured data, and give AI assistants a clean question and answer to quote rather than a point buried in a transcript.
+* Write them yourself in the new Questions box under Content on the Edit Sermon screen, a row per question with its answer, or let Sermon Library AI write them from what was preached.
+* Questions can be switched off for the whole site in Settings, and count towards a sermon's completeness score when they are on.
+
 = 2.72.1 =
 
 * Passage pages no longer queue background work on every view, which on a site being crawled could use up every available PHP process. Nothing is queued now unless a summary service is connected.
@@ -243,6 +250,10 @@ No. Sermons, series and speakers remain in the database.
 Complete historical changelog: see `changelog.txt`.
 
 == Upgrade Notice ==
+
+= 2.73.0 =
+
+Adds Questions: the questions a sermon answers, shown on the sermon page and described to search engines. Write them in the new Questions box under Content, or let Sermon Library AI write them. Switch the section off in Settings if you do not want it.
 
 = 2.72.1 =
 

@@ -4,6 +4,8 @@
  * Override: your-theme/seedcast-sermon-library/single/single-sermon.php
  */
 if ( ! defined( 'ABSPATH' ) ) exit;
+
+use SeedcastSermonLibrary\Frontend\Faq;
 use SeedcastSermonLibrary\Frontend\TemplateLoader;
 use SeedcastSermonLibrary\PDF\PDFGenerator;
 
@@ -192,6 +194,7 @@ while ( have_posts() ) :
 
 			if ( $scsl_article && $scsl_uses( '_scsl_article_body' ) )        $scsl_tabs['article']    = __( 'Article',     'seedcast-sermon-library' );
 			if ( $scsl_bible_study && $scsl_uses( '_scsl_bible_study' ) )     $scsl_tabs['bible-study'] = __( 'Bible Study', 'seedcast-sermon-library' );
+			if ( Faq::has( $scsl_post_id ) && $scsl_uses( Faq::META ) )       $scsl_tabs['questions']   = __( 'Questions',   'seedcast-sermon-library' );
 			if ( $scsl_transcript && $scsl_uses( '_scsl_transcript_clean' ) ) $scsl_tabs['transcript']  = __( 'Transcript',  'seedcast-sermon-library' );
 			if ( $scsl_resources && $scsl_uses( '_scsl_resources' ) )         $scsl_tabs['more']        = $scsl_more_label;
 			if ( $scsl_has_notes )   $scsl_tabs['notes']       = __( 'Sermon Notes', 'seedcast-sermon-library' );
@@ -269,6 +272,14 @@ while ( have_posts() ) :
 						case 'bible-study':
 							echo '<div class="scsl-study-content">' . wp_kses_post( scsl_demote_headings( $scsl_bible_study ) ) . '</div>';
 							echo '<div class="scsl-pdf-row">' . PDFGenerator::download_button( $scsl_post_id, 'bible_study', '⬇ ' . __( 'Download Study PDF', 'seedcast-sermon-library' ) ) . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- PDFGenerator::download_button() returns escaped HTML
+							break;
+						case 'questions':
+							/*
+							 * Plain headings and paragraphs. The schema graph
+							 * describes these questions, and structured data may
+							 * only describe what a visitor can actually read.
+							 */
+							echo Faq::render( $scsl_post_id ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Escaped by Faq::render().
 							break;
 						case 'transcript':
 							echo wp_kses_post( '<div class="scsl-transcript">' . wpautop( wp_kses_post( $scsl_transcript ) ) . '</div>' );
