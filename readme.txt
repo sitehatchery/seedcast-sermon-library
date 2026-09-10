@@ -118,7 +118,15 @@ Sermon Library creates an iTunes-compatible RSS feed for Apple, Spotify and othe
 
 = Shortcodes =
 
-`[scsl_sermon_list]` sermons with filters; `[scsl_series_grid]` series; `[scsl_speaker_grid]` speakers; `[scsl_latest]` latest sermon; `[scsl_content]` articles or studies; `[scsl_topic_list]` topics; `[scsl_scripture_list]` Scripture index; `[scsl_sermon_index]` all sermons by year; `[seedcast_church_details]` shared church information.
+* `[scsl_sermon_list]` sermons with filters
+* `[scsl_series_grid]` series
+* `[scsl_speaker_grid]` speakers
+* `[scsl_latest]` latest sermon
+* `[scsl_content]` articles or studies
+* `[scsl_topic_list]` topics
+* `[scsl_scripture_list]` Scripture index
+* `[scsl_sermon_index]` all sermons by year
+* `[seedcast_church_details]` shared church information
 
 = See it in action =
 
