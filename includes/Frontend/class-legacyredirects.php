@@ -151,6 +151,7 @@ class LegacyRedirects {
 	private static function by_loose_slug( string $slug ): ?\WP_Post {
 		global $wpdb;
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- No WordPress API matches a slug with its dashes removed.
 		$id = $wpdb->get_var( $wpdb->prepare(
 			"SELECT ID FROM {$wpdb->posts}
 			  WHERE post_type = 'scsl_sermon'
@@ -254,6 +255,7 @@ class LegacyRedirects {
 	private static function passage_for( string $slug ): string {
 		global $wpdb;
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- No WordPress API matches a slug with its dashes removed.
 		$id = $wpdb->get_var( $wpdb->prepare(
 			"SELECT t.term_id
 			   FROM {$wpdb->terms} t

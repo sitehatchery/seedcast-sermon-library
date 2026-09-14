@@ -386,6 +386,7 @@ class Summary {
 		$count = wp_cache_get( 'scsl_pending_summaries', 'scsl' );
 
 		if ( false === $count ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Cached either side of this; no API counts term meta by key and value.
 			$count = (int) $wpdb->get_var( $wpdb->prepare(
 				"SELECT COUNT(*) FROM {$wpdb->termmeta} WHERE meta_key = %s AND meta_value <> ''",
 				self::META_PENDING

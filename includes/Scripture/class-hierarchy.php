@@ -142,20 +142,22 @@ class Hierarchy {
 			$ids   = get_term_children( $term->term_id, 'scsl_scripture' );
 			$ids   = is_wp_error( $ids ) ? [] : $ids;
 			$ids[] = $term->term_id;
+			$ids   = array_map( 'intval', $ids );
 
-			$in = implode( ',', array_map( 'intval', $ids ) );
-
-			$count = (int) $wpdb->get_var(
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- A recount has to read the relationships as they are now; a cached answer is the stale count being corrected.
+			$count = (int) $wpdb->get_var( $wpdb->prepare(
 				"SELECT COUNT(DISTINCT tr.object_id)
 				 FROM {$wpdb->term_relationships} tr
 				 JOIN {$wpdb->term_taxonomy} tt ON tt.term_taxonomy_id = tr.term_taxonomy_id
 				 JOIN {$wpdb->posts} p ON p.ID = tr.object_id
 				 WHERE tt.taxonomy = 'scsl_scripture'
-				   AND tt.term_id IN ($in)
-				   AND p.post_status = 'publish'"
-			);
+				   AND tt.term_id IN (" . implode( ',', array_fill( 0, count( $ids ), '%d' ) ) . ")
+				   AND p.post_status = 'publish'",
+				$ids
+			) );
 
 			if ( (int) $term->count !== $count ) {
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- No API stores a count that includes the passages beneath a term; core's recount counts direct relationships only.
 				$wpdb->update(
 					$wpdb->term_taxonomy,
 					[ 'count' => $count ],

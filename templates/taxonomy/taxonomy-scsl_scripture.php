@@ -188,13 +188,18 @@ wp_enqueue_style( 'scsl-frontend' );
 		if ( $scsl_total > $scsl_per_page ) {
 			wp_enqueue_script( 'scsl-load-more' );
 
-			echo ListLoader::button( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Returns escaped HTML.
+			// Built first and echoed on a line of its own. A phpcs:ignore covers
+			// only the line it sits on, so the arguments of a call spread over
+			// several lines were being reported as unescaped output.
+			$scsl_more_button = ListLoader::button(
 				$scsl_term,
 				'cross',
 				count( $scsl_visible ),
 				__( 'Show more sermons', 'seedcast-sermon-library' ),
 				$scsl_book_term instanceof \WP_Term ? get_term_link( $scsl_book_term ) : get_post_type_archive_link( 'scsl_sermon' )
 			);
+
+			echo $scsl_more_button; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- ListLoader::button() escapes everything it prints.
 		}
 		?>
 
@@ -256,13 +261,15 @@ wp_enqueue_style( 'scsl-frontend' );
 			if ( $scsl_with_article > $scsl_article_batch ) {
 				wp_enqueue_script( 'scsl-load-more' );
 
-				echo ListLoader::button( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Returns escaped HTML.
+				$scsl_more_button = ListLoader::button(
 					$scsl_term,
 					'articles',
 					$scsl_article_batch,
 					__( 'Show more articles', 'seedcast-sermon-library' ),
 					$scsl_book_term instanceof \WP_Term ? get_term_link( $scsl_book_term ) : get_permalink()
 				);
+
+				echo $scsl_more_button; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- ListLoader::button() escapes everything it prints.
 			}
 
 			echo '</section>';
@@ -299,7 +306,7 @@ wp_enqueue_style( 'scsl-frontend' );
 			if ( $scsl_book_sermons->found_posts > $scsl_per_page ) {
 				wp_enqueue_script( 'scsl-load-more' );
 
-				echo ListLoader::button( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Returns escaped HTML.
+				$scsl_more_button = ListLoader::button(
 					$scsl_term,
 					'book',
 					$scsl_book_sermons->post_count,
@@ -307,6 +314,8 @@ wp_enqueue_style( 'scsl-frontend' );
 					sprintf( __( 'Show more from %s', 'seedcast-sermon-library' ), $scsl_book_term->name ),
 					get_term_link( $scsl_book_term )
 				);
+
+				echo $scsl_more_button; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- ListLoader::button() escapes everything it prints.
 			}
 			?>
 

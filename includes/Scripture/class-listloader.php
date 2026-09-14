@@ -162,7 +162,7 @@ class ListLoader {
 	 */
 	public static function rest_of_book( \WP_Term $book, array $exclude, int $per_page, int $offset = 0 ): \WP_Query {
 		return new \WP_Query( self::base_args( $per_page, $offset ) + [
-			'post__not_in' => array_map( 'intval', $exclude ),
+			'post__not_in' => array_map( 'intval', $exclude ), // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_post__not_in -- Leaves out only the sermons already listed above it on the page.
 			'tax_query'    => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
 				[
 					'taxonomy'         => 'scsl_scripture',

@@ -129,6 +129,7 @@ class Indexing {
 		 */
 		$min = (int) apply_filters( 'scsl_min_book_sermons_for_index', self::MIN_BOOK_SERMONS, null );
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- One query in place of thousands, as above; no API selects terms by the sermon count of their book.
 		$ids = $wpdb->get_col( $wpdb->prepare(
 			"SELECT tt.term_id
 			   FROM {$wpdb->term_taxonomy} tt

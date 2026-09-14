@@ -124,7 +124,8 @@ class ScriptureSummaries {
 				break;
 
 			case 'save':
-				$prose = isset( $_POST['scsl_summary'] ) ? wp_unslash( $_POST['scsl_summary'] ) : '';
+				// Keeps the line breaks, which become the paragraphs on the page.
+				$prose = isset( $_POST['scsl_summary'] ) ? sanitize_textarea_field( wp_unslash( $_POST['scsl_summary'] ) ) : '';
 
 				/*
 				 * With no generator connected the question is never put, so the
@@ -171,8 +172,8 @@ class ScriptureSummaries {
 			return;
 		}
 
-		if ( isset( $_GET['edit'] ) ) {
-			$this->render_editor( absint( $_GET['edit'] ) );
+		if ( isset( $_GET['edit'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read only: which summary to open.
+			$this->render_editor( absint( $_GET['edit'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read only: which summary to open.
 
 			return;
 		}
@@ -186,6 +187,7 @@ class ScriptureSummaries {
 	 * @return void
 	 */
 	private function render_list(): void {
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- The list's filters, search, page and sort order are read-only view state. Everything that changes data checks a nonce first.
 		$status = isset( $_GET['status'] ) ? sanitize_key( wp_unslash( $_GET['status'] ) ) : 'all';
 		$level  = isset( $_GET['level'] ) ? sanitize_key( wp_unslash( $_GET['level'] ) ) : 'all';
 		$search = isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : '';
@@ -193,6 +195,7 @@ class ScriptureSummaries {
 
 		$orderby = isset( $_GET['orderby'] ) && 'count' === $_GET['orderby'] ? 'count' : 'passage';
 		$order   = isset( $_GET['order'] ) && 'desc' === $_GET['order'] ? 'desc' : 'asc';
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 
 		$rows   = $this->rows( $status, $level, $search, $orderby, $order );
 		$counts = $this->counts();
@@ -430,7 +433,7 @@ class ScriptureSummaries {
 				 * saving one summary out of a filtered list drops you back into
 				 * all four hundred.
 				 */
-				foreach ( array_filter( $this->context( $_GET ) ) as $scsl_key => $scsl_value ) :
+				foreach ( array_filter( $this->context( $_GET ) ) as $scsl_key => $scsl_value ) : // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Carries the list's read-only filters; context() sanitizes each one.
 					?>
 					<input type="hidden" name="<?php echo esc_attr( $scsl_key ); ?>" value="<?php echo esc_attr( (string) $scsl_value ); ?>" />
 				<?php endforeach; ?>
@@ -696,7 +699,7 @@ class ScriptureSummaries {
 	 */
 	private function url( array $args = [] ): string {
 		return add_query_arg(
-			array_filter( array_merge( [ 'page' => self::PAGE ], $this->context( $_GET ), $args ) ),
+			array_filter( array_merge( [ 'page' => self::PAGE ], $this->context( $_GET ), $args ) ), // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Carries the list's read-only filters; context() sanitizes each one.
 			admin_url( 'admin.php' )
 		);
 	}
@@ -751,7 +754,7 @@ class ScriptureSummaries {
 	 * @return void
 	 */
 	private function notice(): void {
-		$done = isset( $_GET['done'] ) ? sanitize_key( wp_unslash( $_GET['done'] ) ) : '';
+		$done = isset( $_GET['done'] ) ? sanitize_key( wp_unslash( $_GET['done'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read only: which confirmation to show after a redirect.
 
 		$messages = [
 			'approved'  => __( 'Published. That page now shows the new summary.', 'seedcast-sermon-library' ),
