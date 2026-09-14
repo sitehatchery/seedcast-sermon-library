@@ -3,7 +3,7 @@ Contributors: seedcast
 Tags: sermons, church, preaching, bible, audio
 Requires at least: 6.2
 Tested up to: 7.1
-Stable tag: 2.73.1
+Stable tag: 2.74.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -208,6 +208,12 @@ No. Sermons, series and speakers remain in the database.
 
 == Changelog ==
 
+= 2.74.0 =
+
+* A gallery added with Add Media to a sermon's Article, Bible Study or More tab now shows as a gallery. It used to print as its shortcode text.
+* Galleries on sermon, series and speaker pages show as a grid of even tiles that follows the gallery's column setting, and open full size in a lightbox with previous and next. Themes that leave gallery styling to themselves had been stacking the photos full width.
+* Bundles version 1.27.0 of the shared Seedcast library, which provides the gallery grid and lightbox.
+
 = 2.73.1 =
 
 * Generated questions that cannot be laid out as rows are now shown as they arrived rather than silently dropped.
@@ -270,6 +276,10 @@ No. Sermons, series and speakers remain in the database.
 Complete historical changelog: see `changelog.txt`.
 
 == Upgrade Notice ==
+
+= 2.74.0 =
+
+Galleries added with Add Media now show on sermons, as a grid that opens in a lightbox.
 
 = 2.73.1 =
 

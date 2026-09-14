@@ -20,7 +20,7 @@ if ( defined( 'SEEDCAST_CORE_VERSION' ) ) {
 	return;
 }
 
-define( 'SEEDCAST_CORE_VERSION', '1.26.2' );
+define( 'SEEDCAST_CORE_VERSION', '1.27.0' );
 define( 'SEEDCAST_CORE_DIR', __DIR__ . '/' );
 define( 'SEEDCAST_CORE_URL', plugin_dir_url( __FILE__ ) );
 
@@ -52,6 +52,7 @@ require_once SEEDCAST_CORE_DIR . 'Frontend/class-pagination.php';
 require_once SEEDCAST_CORE_DIR . 'Frontend/class-audioplayer.php';
 require_once SEEDCAST_CORE_DIR . 'Frontend/class-sharebuttons.php';
 require_once SEEDCAST_CORE_DIR . 'Frontend/class-churchdetails.php';
+require_once SEEDCAST_CORE_DIR . 'Frontend/class-gallery.php';
 require_once SEEDCAST_CORE_DIR . 'Frontend/class-elementorchurch.php';
 
 require_once SEEDCAST_CORE_DIR . 'Admin/class-settings.php';

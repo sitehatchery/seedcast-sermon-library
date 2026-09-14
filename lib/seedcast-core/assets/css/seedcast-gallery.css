@@ -1,0 +1,167 @@
+/* Seedcast Core - WordPress galleries and the lightbox.
+
+   GENERATED FILE. DO NOT EDIT.
+   Source of truth lives in the seedcast-core repository.
+   ------------------------------------------------------------------
+   Loaded by Frontend\Gallery only on the pages a plugin enables it for,
+   and there only when the page has photos. Everything is scoped to the
+   .sc-gallery body class that comes with it, so none of it can reach
+   another page. */
+
+/* ── Galleries ───────────────────────────────────
+   A grid of even tiles that follows the gallery's own column count, two
+   across on a phone. Handles both markups WordPress prints: <figure> for
+   themes that declare HTML5 galleries, <dl> for the rest. */
+.sc-gallery .gallery {
+  display: grid;
+  grid-template-columns: repeat(var(--sc-gallery-cols, 3), minmax(0, 1fr));
+  gap: .75rem;
+  margin: 1.5rem 0;
+}
+.sc-gallery .gallery-columns-1 { --sc-gallery-cols: 1; }
+.sc-gallery .gallery-columns-2 { --sc-gallery-cols: 2; }
+.sc-gallery .gallery-columns-3 { --sc-gallery-cols: 3; }
+.sc-gallery .gallery-columns-4 { --sc-gallery-cols: 4; }
+.sc-gallery .gallery-columns-5 { --sc-gallery-cols: 5; }
+.sc-gallery .gallery-columns-6 { --sc-gallery-cols: 6; }
+.sc-gallery .gallery-columns-7 { --sc-gallery-cols: 7; }
+.sc-gallery .gallery-columns-8 { --sc-gallery-cols: 8; }
+.sc-gallery .gallery-columns-9 { --sc-gallery-cols: 9; }
+.sc-gallery .gallery > br { display: none; }
+.sc-gallery .gallery-item {
+  margin: 0;
+  min-width: 0;
+}
+.sc-gallery .gallery-icon {
+  margin: 0;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: var(--sc-radius, 6px);
+  background: var(--sc-color-bg-subtle, #f6f7f7);
+}
+.sc-gallery .gallery-icon a,
+.sc-gallery .gallery-icon img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: zoom-in;
+}
+.sc-gallery .gallery-icon img {
+  object-fit: cover;
+  max-width: none;
+  border: 0;
+  box-shadow: none;
+  transition: transform .2s ease;
+}
+.sc-gallery .gallery-icon a:hover img,
+.sc-gallery .gallery-icon a:focus-visible img {
+  transform: scale(1.03);
+}
+.sc-gallery .gallery-caption {
+  margin: .35rem 0 0;
+  font-size: .875rem;
+  line-height: 1.4;
+  color: var(--sc-color-muted, #6b7280);
+}
+@media (max-width: 600px) {
+  .sc-gallery .gallery:not(.gallery-columns-1) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ── Lightbox ────────────────────────────────────
+   Opened by seedcast-lightbox.js. !important on color, border and shadow
+   only, the same host-bleed fix as .sc-btn and the tab buttons in
+   seedcast-core.css: page builders style every button on the page. */
+html.sc-lightbox-open { overflow: hidden; }
+.sc-lightbox {
+  width: 100vw;
+  height: 100vh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  overflow: hidden;
+}
+.sc-lightbox::backdrop { background: rgba(0, 0, 0, .88); }
+.sc-lightbox__figure {
+  box-sizing: border-box;
+  height: 100%;
+  margin: 0;
+  padding: 3.5rem 4.5rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.sc-lightbox__img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: calc(100vh - 8rem);
+  object-fit: contain;
+  border-radius: 4px;
+  box-shadow: none;
+}
+.sc-lightbox__caption {
+  max-width: 60rem;
+  margin-top: .75rem;
+  font-size: .95rem;
+  line-height: 1.5;
+  text-align: center;
+  color: #e5e7eb;
+}
+.sc-lightbox__count {
+  position: absolute;
+  top: 1.1rem;
+  left: 1.25rem;
+  margin: 0;
+  font-size: .9rem;
+  color: #d1d5db;
+}
+.sc-lightbox button {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .14) !important;
+  color: #fff !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  font-size: 1.75rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.sc-lightbox button:hover { background: rgba(255, 255, 255, .28) !important; }
+.sc-lightbox button:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+.sc-lightbox__close { top: .75rem; right: .75rem; }
+.sc-lightbox__prev,
+.sc-lightbox__next {
+  top: 50%;
+  transform: translateY(-50%);
+}
+.sc-lightbox__prev { left: .75rem; }
+.sc-lightbox__next { right: .75rem; }
+.sc-lightbox[data-single] .sc-lightbox__prev,
+.sc-lightbox[data-single] .sc-lightbox__next,
+.sc-lightbox[data-single] .sc-lightbox__count { display: none; }
+@media (max-width: 600px) {
+  .sc-lightbox__figure { padding: 3.5rem .5rem 4.5rem; }
+  .sc-lightbox__prev,
+  .sc-lightbox__next {
+    top: auto;
+    bottom: .75rem;
+    transform: none;
+  }
+}

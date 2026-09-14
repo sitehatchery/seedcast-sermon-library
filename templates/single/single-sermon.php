@@ -266,11 +266,11 @@ while ( have_posts() ) :
 								echo '<img src="' . esc_url( $scsl_thumbnail_url ) . '" alt="' . esc_attr( $scsl_sermon_title ) . '" />';
 								echo '</div>';
 							}
-							echo '<div class="scsl-article-content">' . wp_kses_post( scsl_demote_headings( $scsl_article ) ) . '</div>';
+							echo '<div class="scsl-article-content">' . wp_kses_post( scsl_demote_headings( scsl_do_gallery_shortcodes( $scsl_article ) ) ) . '</div>';
 							echo wp_kses_post( '<div class="scsl-pdf-row">' . PDFGenerator::download_button( $scsl_post_id, 'article', '⬇ ' . __( 'Download Article PDF', 'seedcast-sermon-library' ) ) . '</div>' );
 							break;
 						case 'bible-study':
-							echo '<div class="scsl-study-content">' . wp_kses_post( scsl_demote_headings( $scsl_bible_study ) ) . '</div>';
+							echo '<div class="scsl-study-content">' . wp_kses_post( scsl_demote_headings( scsl_do_gallery_shortcodes( $scsl_bible_study ) ) ) . '</div>';
 							echo '<div class="scsl-pdf-row">' . PDFGenerator::download_button( $scsl_post_id, 'bible_study', '⬇ ' . __( 'Download Study PDF', 'seedcast-sermon-library' ) ) . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- PDFGenerator::download_button() returns escaped HTML
 							break;
 						case 'questions':
@@ -311,7 +311,7 @@ while ( have_posts() ) :
 							echo '</div>';
 							break;
 						case 'more':
-							echo wp_kses_post( '<div class="scsl-resources-content">' . wpautop( wp_kses_post( $scsl_resources ) ) . '</div>' );
+							echo wp_kses_post( '<div class="scsl-resources-content">' . scsl_do_gallery_shortcodes( wpautop( wp_kses_post( $scsl_resources ) ) ) . '</div>' );
 							break;
 					}
 					?>

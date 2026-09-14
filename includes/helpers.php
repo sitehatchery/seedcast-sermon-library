@@ -88,3 +88,31 @@ function scsl_asset_version( string $relative ): string {
 
 	return SCSL_VERSION;
 }
+
+if ( ! function_exists( 'scsl_do_gallery_shortcodes' ) ) {
+	/**
+	 * Run the [gallery] shortcodes in an editor field, and no other shortcode.
+	 *
+	 * The sermon's Article, Bible Study and More fields each have an Add Media
+	 * button, and Add Media > Create Gallery inserts a [gallery]. The template
+	 * prints those fields as HTML without running shortcodes, so the gallery
+	 * came out as its own shortcode text. Running only [gallery] keeps the
+	 * change to what that button makes: nothing else typed in square brackets
+	 * starts behaving differently.
+	 *
+	 * A shortcode alone on a line ends up wrapped in a paragraph, and a
+	 * gallery inside a <p> is invalid markup, so that wrapper comes off first,
+	 * the same way WordPress does it for post content.
+	 *
+	 * @param string $html Field HTML.
+	 * @return string
+	 */
+	function scsl_do_gallery_shortcodes( $html ) {
+		$html = (string) $html;
+		if ( false === strpos( $html, '[gallery' ) ) {
+			return $html;
+		}
+		$html = shortcode_unautop( $html );
+		return (string) preg_replace_callback( '/' . get_shortcode_regex( array( 'gallery' ) ) . '/', 'do_shortcode_tag', $html );
+	}
+}

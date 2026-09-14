@@ -3,7 +3,7 @@
  * Plugin Name: Seedcast Sermon Library
  * Plugin URI:  https://seedcast.ai/sermon-library
  * Description: A complete sermon series and content management system for churches. Manage sermons, series, speakers, transcripts, Bible studies, and more.
- * Version:     2.73.1
+ * Version:     2.74.0
  * Author:      Seedcast
  * Author URI:  https://seedcast.ai
  * License:     GPL-2.0-or-later
@@ -20,7 +20,7 @@ namespace SeedcastSermonLibrary;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define( 'SCSL_VERSION',          '2.73.1' );
+define( 'SCSL_VERSION',          '2.74.0' );
 define( 'SCSL_PLUGIN_FILE',      __FILE__ );
 define( 'SCSL_PLUGIN_DIR',       plugin_dir_path( __FILE__ ) );
 define( 'SCSL_PLUGIN_URL',       plugin_dir_url( __FILE__ ) );
@@ -31,7 +31,7 @@ define( 'SCSL_PLUGIN_BASENAME',  plugin_basename( __FILE__ ) );
  * features. They match today; they diverge as soon as another Seedcast plugin
  * ships a newer core and this one has not caught up.
  */
-define( 'SCSL_CORE_VERSION',     '1.26.2' );
+define( 'SCSL_CORE_VERSION',     '1.27.0' );
 define( 'SCSL_CORE_MIN_VERSION', '1.17.1' );
 
 /*
@@ -78,6 +78,7 @@ final class SermonLibrary {
 		add_action( 'elementor/editor/after_enqueue_styles', [ $this, 'elementor_assets' ] );
 
 		add_action( 'init', [ $this, 'register_with_core' ], 0 );
+		add_action( 'wp',   [ $this, 'enable_gallery' ] );
 
 		( new Admin\AdminMenu() )->init();
 		( new Admin\MetaBoxes() )->init();
@@ -210,6 +211,47 @@ final class SermonLibrary {
 				wp_enqueue_media();
 			}
 		}
+	}
+
+	/**
+	 * WordPress's own [gallery], added with Add Media to a sermon's Article,
+	 * Bible Study or More tab, or to a series or speaker page: a grid of even
+	 * tiles, links to the image file, and a lightbox. The fix lives in the
+	 * shared library, and Bulletin Library uses the same one for services.
+	 * Skipped when this plugin's CSS is switched off, and on a library too old
+	 * to have it. Runs on 'wp', after whichever copy of the library won has
+	 * loaded.
+	 */
+	public function enable_gallery(): void {
+		if ( ! class_exists( '\\Seedcast\\Core\\Frontend\\Gallery' ) || get_option( 'scsl_disable_css' ) === '1' ) {
+			return;
+		}
+		\Seedcast\Core\Frontend\Gallery::enable_for( [ 'scsl_sermon', 'scsl_series', 'scsl_speaker' ] );
+		add_filter( 'seedcast/gallery/has_photos', [ $this, 'sermon_has_gallery' ], 10, 2 );
+	}
+
+	/**
+	 * A sermon keeps its galleries in the Article, Bible Study and More
+	 * fields rather than in post_content, so it tells the shared library
+	 * about them itself, and the grid and lightbox load.
+	 *
+	 * @param bool          $has_photos Whether the page already has photos.
+	 * @param \WP_Post|null $post       The page's post.
+	 * @return bool
+	 */
+	public function sermon_has_gallery( $has_photos, $post ): bool {
+		if ( $has_photos ) {
+			return true;
+		}
+		if ( ! $post instanceof \WP_Post || 'scsl_sermon' !== $post->post_type ) {
+			return false;
+		}
+		foreach ( [ '_scsl_article_body', '_scsl_bible_study', '_scsl_resources' ] as $key ) {
+			if ( has_shortcode( (string) get_post_meta( $post->ID, $key, true ), 'gallery' ) ) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public function frontend_assets(): void {

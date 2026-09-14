@@ -314,10 +314,11 @@
 }
 
 /* ── Buttons ───────────────────────────────── */
-/* !important on color/border/shadow only (never layout) - same host-bleed
-   fix applied to tabs, gallery, video, and lightbox controls elsewhere in
-   this file. Elementor's global Kit CSS is typically ID-scoped, which no
-   class-based selector can out-rank otherwise. */
+/* !important on color/border/shadow only (never layout) - the same
+   host-bleed fix as the tab buttons further down this file and the
+   lightbox controls in seedcast-gallery.css. Elementor's global Kit CSS is
+   typically ID-scoped, which no class-based selector can out-rank
+   otherwise. */
 .sc-btn {
   display: inline-block;
   padding: .7rem 1.5rem;
