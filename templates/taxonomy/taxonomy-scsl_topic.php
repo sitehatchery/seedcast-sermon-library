@@ -1,32 +1,66 @@
 <?php
 /**
- * Template: Topic Archive (sf_topic taxonomy)
+ * Template: Topic Archive (scsl_topic taxonomy)
+ *
+ * A reader arrives here having clicked a subject on a sermon, so the subject is
+ * what they asked about and the sermons on it come first, all of them, with no
+ * pagination. These lists run to a few dozen at most, and a page break in a few
+ * dozen is a wall put up for no reason.
+ *
+ * Beneath that the page widens rather than repeats: what this church has
+ * actually taught on the subject, the articles written out of those sermons,
+ * and then the subjects it is taught alongside. That last section is what
+ * carries a thin page. A topic with three sermons on it is not a destination,
+ * and the way out of that is not more cards from the same three sermons but a
+ * way through to the subjects they sit beside.
+ *
+ * Related subjects are worked out from the sermons themselves. Two topics are
+ * related here because this church has preached them together, which is a fact
+ * about the library rather than a vocabulary somebody has to maintain.
+ *
+ * Uses the same sermon card the service and scripture pages use. A church
+ * should not find three lists of the same sermons on one site that look nothing
+ * alike, and keeping one component means they cannot drift.
+ *
+ * @package SeedcastSermonLibrary
  */
+
 if ( ! defined( 'ABSPATH' ) ) exit;
-use SeedcastSermonLibrary\Frontend\TemplateLoader;
-use SeedcastSermonLibrary\Frontend\Shortcodes;
+
+use SeedcastSermonLibrary\Frontend\BulletinLibraryBridge;
+use SeedcastSermonLibrary\Scripture\ListLoader as ScriptureList;
+use SeedcastSermonLibrary\Topics\ListLoader;
+use SeedcastSermonLibrary\Topics\Summary;
 
 get_header();
 
-$scsl_term     = get_queried_object();
-$scsl_per_page = absint( get_option( 'scsl_sermons_per_page', 10 ) );
-$scsl_page_raw = get_query_var( 'scsl_page', 1 );
-$scsl_paged = max( 1, absint( $scsl_page_raw ) );
+$scsl_term = get_queried_object();
 
-$scsl_sermons = new \WP_Query( [
-	'post_type'      => 'scsl_sermon',
-	'post_status'    => 'publish',
-	'posts_per_page' => $scsl_per_page,
-	'paged'          => $scsl_paged,
-	'meta_key'       => '_scsl_recorded_date', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-	'orderby'        => 'meta_value', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
-	'order'          => 'DESC',
-	'tax_query'      => [ [ 'taxonomy' => 'scsl_topic', 'field' => 'term_id', 'terms' => $scsl_term->term_id ] ], // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
-] );
+/*
+ * Every sermon on this topic, worked out once and shared with the endpoint that
+ * appends later batches, so a fetched batch is drawn from exactly the same set
+ * as the batch above it.
+ *
+ * Ids only. The full set is needed for the summary, for excluding these from
+ * the related sections, and for counting articles, but only the first batch is
+ * drawn, so fetching every post object would be work thrown away.
+ */
+$scsl_per_page = ScriptureList::per_page();
 
-wp_enqueue_script( 'scsl-sermon-list' );
-wp_enqueue_style( 'scsl-frontend' );
-$scsl_uid = 'scsl-topic-' . $scsl_term->term_id;
+$scsl_listed = wp_list_pluck( ListLoader::for_topic( $scsl_term, -1 )->posts, 'ID' );
+$scsl_total  = count( $scsl_listed );
+$scsl_visible = array_slice( $scsl_listed, 0, $scsl_per_page );
+
+/*
+ * What this church has taught on the subject, in prose.
+ *
+ * Empty unless a church has connected a service to write it, and never asked
+ * for on a topic carrying one sermon. See the Summary class for why.
+ */
+$scsl_summary = Summary::get( (int) $scsl_term->term_id, $scsl_listed );
+
+// The subjects these same sermons are also filed under, strongest first.
+$scsl_related = ListLoader::related( $scsl_term, $scsl_listed );
 ?>
 
 <div class="sc-wrap">
@@ -41,73 +75,211 @@ $scsl_uid = 'scsl-topic-' . $scsl_term->term_id;
 
 	<header class="scsl-archive-header">
 		<h1 class="scsl-archive-title"><?php echo esc_html( $scsl_term->name ); ?></h1>
+
 		<?php if ( $scsl_term->description ) : ?>
 			<p class="scsl-archive-desc"><?php echo esc_html( $scsl_term->description ); ?></p>
 		<?php endif; ?>
+
 		<p class="scsl-archive-count">
 			<?php
-			// translators: %d is the number of sermons
-			printf( esc_html( _n( '%d sermon', '%d sermons', $scsl_sermons->found_posts, 'seedcast-sermon-library' ) ), esc_html( number_format_i18n( $scsl_sermons->found_posts ) ) ); ?>
+			printf(
+				/* translators: %s: number of sermons. */
+				esc_html( _n( '%s sermon', '%s sermons', $scsl_total, 'seedcast-sermon-library' ) ),
+				esc_html( number_format_i18n( $scsl_total ) )
+			);
+			?>
 		</p>
 	</header>
 
-	<div class="scsl-sermon-list-wrap"
-		 id="<?php echo esc_attr( $scsl_uid ); ?>"
-		 data-topic="<?php echo esc_attr( $scsl_term->slug ); ?>"
-		 data-series-id=""
-		 data-speaker-id=""
-		 data-book=""
-		 data-per-page="<?php echo esc_attr( $scsl_per_page ); ?>"
-		 data-orderby="recorded_date"
-		 data-order="DESC"
-		 data-template="episode-card"
-		 data-nonce="<?php echo esc_attr( wp_create_nonce( 'scsl_list_nonce' ) ); ?>">
+	<?php if ( '' !== $scsl_summary ) : ?>
+		<div class="scsl-topic-summary scsl-scripture-summary">
+			<?php echo wp_kses_post( wpautop( $scsl_summary ) ); ?>
+		</div>
+	<?php endif; ?>
 
-		<!-- Filter bar -->
+	<?php if ( $scsl_visible ) : ?>
+
+		<div class="scsl-service-sermons scsl-topic-sermons">
+			<?php
+			foreach ( $scsl_visible as $scsl_id ) {
+				// The service page's card, unchanged. Already escaped by the
+				// component that built it.
+				echo BulletinLibraryBridge::card( get_post( (int) $scsl_id ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			}
+			?>
+		</div>
+
 		<?php
-		// Sort order as extra filter for topic context
-		$scsl_topic_extra = [];
-		ob_start();
-		echo '<select id="' . esc_attr( $scsl_uid ) . '-order" name="scsl_order" class="scsl-filter-select" data-filter="order" aria-label="' . esc_attr__( 'Sort order', 'seedcast-sermon-library' ) . '">';
-		echo '<option value="DESC">' . esc_html__( 'Newest First', 'seedcast-sermon-library' ) . '</option>';
-		echo '<option value="ASC">'  . esc_html__( 'Oldest First', 'seedcast-sermon-library' ) . '</option>';
-		echo '</select>';
-		$scsl_topic_extra[] = ob_get_clean();
+		if ( $scsl_total > $scsl_per_page ) {
+			wp_enqueue_script( 'scsl-load-more' );
 
-		$scsl_threshold = absint( get_option( 'scsl_filter_threshold', 0 ) );
-		$scsl_count = isset( $scsl_sermons ) ? $scsl_sermons->found_posts : 999;
-		if ( $scsl_threshold === 0 || $scsl_count > $scsl_threshold ) :
-		( new Shortcodes() )->render_filter_bar( [
-			'uid'           => $scsl_uid,
-			'lock_topic'    => true, // already on a topic page
-			'extra_filters' => $scsl_topic_extra,
-		] );
-		endif;
+			// Built first and echoed on a line of its own. A phpcs:ignore covers
+			// only the line it sits on, so the arguments of a call spread over
+			// several lines were being reported as unescaped output.
+			$scsl_more_button = ListLoader::button(
+				$scsl_term,
+				'topic',
+				count( $scsl_visible ),
+				__( 'Show more sermons', 'seedcast-sermon-library' ),
+				get_post_type_archive_link( 'scsl_sermon' )
+			);
+
+			echo $scsl_more_button; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- ListLoader::button() escapes everything it prints.
+		}
 		?>
 
-		<!-- Results -->
-		<div class="scsl-list-results scsl-list-results--cards">
-			<?php while ( $scsl_sermons->have_posts() ) : $scsl_sermons->the_post();
-				TemplateLoader::partial( 'episode-card', [ 'post' => get_post() ] );
-			endwhile; wp_reset_postdata(); ?>
-		</div>
+	<?php else : ?>
 
-		<!-- SEO Pagination -->
-		<?php if ( $scsl_sermons->max_num_pages > 1 ) : ?>
-		<div class="scsl-list-pagination scsl-list-pagination--seo">
-			<nav class="sc-pagination sc-pagination--links" aria-label="<?php esc_attr_e( 'Pages', 'seedcast-sermon-library' ); ?>">
-				<?php if ( $scsl_paged > 1 ) : ?><a href="<?php echo esc_url( add_query_arg( 'scsl_page', $scsl_paged - 1 ) ); ?>" class="scsl-btn scsl-btn--ghost scsl-page-link" rel="prev">&larr; <?php esc_html_e( 'Prev', 'seedcast-sermon-library' ); ?></a><?php endif; ?>
-				<span class="scsl-page-info"><?php
-				// translators: %1$d is the current page number, %2$d is the total number of pages
-				printf( esc_html__( 'Page %1$d of %2$d', 'seedcast-sermon-library' ), esc_html( $scsl_paged ), esc_html( $scsl_sermons->max_num_pages ) ); ?></span>
-				<?php if ( $scsl_paged < $scsl_sermons->max_num_pages ) : ?><a href="<?php echo esc_url( add_query_arg( 'scsl_page', $scsl_paged + 1 ) ); ?>" class="scsl-btn scsl-btn--ghost scsl-page-link" rel="next"><?php esc_html_e( 'Next', 'seedcast-sermon-library' ); ?> &rarr;</a><?php endif; ?>
-			</nav>
-		</div>
-		<div class="scsl-list-pagination scsl-list-pagination--ajax" style="display:none;"></div>
-		<?php endif; ?>
+		<p class="scsl-archive-empty"><?php esc_html_e( 'No sermons on this topic yet.', 'seedcast-sermon-library' ); ?></p>
 
-		<div class="scsl-list-loading" style="display:none;"></div>
-	</div>
+	<?php endif; ?>
+
+	<?php
+	/*
+	 * Articles written out of these same sermons.
+	 *
+	 * Held back below two, because a lone card cannot fill a row and a heading
+	 * over a single item reads as a section that failed to load. The shortcode
+	 * renders nothing when none of these sermons carry an article, so a church
+	 * that does not write them never sees the heading either.
+	 */
+	$scsl_with_article = 0;
+
+	foreach ( $scsl_listed as $scsl_id ) {
+		if ( '' !== trim( (string) get_post_meta( (int) $scsl_id, '_scsl_article_body', true ) ) ) {
+			$scsl_with_article++;
+		}
+	}
+
+	if ( $scsl_with_article > 1 ) {
+		$scsl_article_batch = ScriptureList::article_batch();
+
+		$scsl_articles = do_shortcode(
+			sprintf(
+				'[scsl_content type="articles" include="%s" count="%d" columns="3" layout="grid" title="%s"]',
+				esc_attr( implode( ',', $scsl_listed ) ),
+				$scsl_article_batch,
+				/* translators: %s: a topic, for example Forgiveness. */
+				esc_attr( sprintf( __( 'Reading on %s', 'seedcast-sermon-library' ), $scsl_term->name ) )
+			)
+		);
+
+		if ( '' !== trim( $scsl_articles ) ) {
+			echo '<section class="scsl-topic-articles scsl-scripture-articles">' . $scsl_articles; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Shortcode output.
+
+			if ( $scsl_with_article > $scsl_article_batch ) {
+				wp_enqueue_script( 'scsl-load-more' );
+
+				$scsl_more_articles = ListLoader::button(
+					$scsl_term,
+					'articles',
+					$scsl_article_batch,
+					__( 'Show more articles', 'seedcast-sermon-library' ),
+					get_post_type_archive_link( 'scsl_sermon' )
+				);
+
+				echo $scsl_more_articles; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- ListLoader::button() escapes everything it prints.
+			}
+
+			echo '</section>';
+		}
+	}
+	?>
+
+	<?php if ( $scsl_related ) : ?>
+
+		<?php
+		/*
+		 * Why these subjects are here, which decides what the heading can
+		 * claim. Where this church has taught two subjects together, that is
+		 * what the section is; where it has not, these are the subjects
+		 * preached from the same books, and saying so is the difference
+		 * between a true heading and a flattering one.
+		 */
+		$scsl_by_passage = 'passages' === (string) ( $scsl_related[0]['reason'] ?? '' );
+		?>
+
+		<section class="scsl-topic-related">
+			<h2 class="sc-content-section-heading scsl-topic-related__title">
+				<?php
+				if ( $scsl_by_passage ) {
+					printf(
+						/* translators: %s: a topic, for example Forgiveness. */
+						esc_html__( 'Preached From the Same Scriptures as %s', 'seedcast-sermon-library' ),
+						esc_html( $scsl_term->name )
+					);
+				} else {
+					printf(
+						/* translators: %s: a topic, for example Forgiveness. */
+						esc_html__( 'Taught Alongside %s', 'seedcast-sermon-library' ),
+						esc_html( $scsl_term->name )
+					);
+				}
+				?>
+			</h2>
+
+			<?php
+			foreach ( $scsl_related as $scsl_near ) :
+				$scsl_near_term = $scsl_near['term'];
+
+				/*
+				 * Excluding what is already above. The reader has just been
+				 * shown those, and a second copy under a heading promising
+				 * something else is a broken promise. If that empties a
+				 * subject it is left out rather than shown as a heading with
+				 * nothing under it.
+				 */
+				$scsl_near_sermons = ListLoader::from_related(
+					$scsl_near_term,
+					$scsl_listed,
+					ListLoader::RELATED_SERMONS
+				);
+
+				if ( ! $scsl_near_sermons->have_posts() ) {
+					continue;
+				}
+				?>
+
+				<div class="scsl-topic-related__group">
+					<h3 class="scsl-topic-related__name">
+						<a href="<?php echo esc_url( get_term_link( $scsl_near_term ) ); ?>"><?php echo esc_html( $scsl_near_term->name ); ?></a>
+						<span class="scsl-topic-related__shared">
+							<?php
+							if ( 'passages' === (string) $scsl_near['reason'] ) {
+								printf(
+									/* translators: %s: a list of books of the Bible, for example "Romans, Luke and Acts". */
+									esc_html__( 'Also preached from %s', 'seedcast-sermon-library' ),
+									esc_html( wp_sprintf( '%l', (array) ( $scsl_near['books'] ?? [] ) ) )
+								);
+							} else {
+								printf(
+									/* translators: %s: number of sermons both topics are on. */
+									esc_html( _n( '%s sermon in common', '%s sermons in common', (int) $scsl_near['shared'], 'seedcast-sermon-library' ) ),
+									esc_html( number_format_i18n( (int) $scsl_near['shared'] ) )
+								);
+							}
+							?>
+						</span>
+					</h3>
+
+					<div class="scsl-service-sermons scsl-topic-sermons">
+						<?php
+						while ( $scsl_near_sermons->have_posts() ) :
+							$scsl_near_sermons->the_post();
+
+							echo BulletinLibraryBridge::card( get_post() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+						endwhile;
+
+						wp_reset_postdata();
+						?>
+					</div>
+				</div>
+
+			<?php endforeach; ?>
+
+		</section>
+
+	<?php endif; ?>
 
 </div>
 

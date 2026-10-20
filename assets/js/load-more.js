@@ -1,5 +1,5 @@
 /**
- * Append further batches to the lists on a scripture page.
+ * Append further batches to the lists on a scripture or topic page.
  *
  * Progressive enhancement. Every button is a real link to somewhere the reader
  * can go, so nothing here is required for the page to work; this only spares
@@ -73,7 +73,15 @@
 		button.setAttribute( 'aria-busy', 'true' );
 		button.textContent = button.getAttribute( 'data-loading' ) || 'Loading…';
 
-		var url = window.scslLoadMore.endpoint
+		/*
+		 * The endpoint a button names, or the scripture one it falls back to.
+		 *
+		 * Topic pages ask a route of their own, and carrying it on the button
+		 * keeps one script for both rather than a second copy of all of this
+		 * differing by a URL.
+		 */
+		var endpoint = button.getAttribute( 'data-endpoint' ) || window.scslLoadMore.endpoint;
+		var url = endpoint
 			+ '?term=' + encodeURIComponent( button.getAttribute( 'data-term' ) )
 			+ '&list=' + encodeURIComponent( button.getAttribute( 'data-scsl-loadmore' ) )
 			+ '&offset=' + encodeURIComponent( button.getAttribute( 'data-offset' ) );

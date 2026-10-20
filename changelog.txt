@@ -2,7 +2,18 @@
 
 Complete historical changelog moved out of readme.txt to keep the WordPress.org readme concise.
 
-= 2.74.1 =
+= 2.75.0 =
+
+**Topic pages are pages now**
+
+* A topic page was a list of sermon cards with a heading over it. It now gets the treatment scripture pages got in 2.72.0: every sermon on the subject, unpaginated, then what this church has actually taught about it in prose, then the articles written out of those sermons, then a way through to the subjects it sits beside. A topic with three sermons on it was not a destination, and the way out of that is not more cards from the same three sermons.
+* What a church has taught on a subject can be described at the top of the page, the way a passage page describes its set. It needs Sermon Library AI and the service writing it, and a topic carrying one sermon is never asked about. The description is written from the shape of the set rather than from the sermons alone: which passages the teaching comes out of, which series carried it, what it is taught alongside, and how far back it goes. That is what makes it a description of this church rather than a paragraph about the subject.
+* A new section carries the thin pages: the subjects this one is taught alongside, each with its own sermons. Two subjects are related here because this church has preached them together, counted from the sermons themselves, so there is no second vocabulary to maintain.
+* Where a church files one subject per sermon there is nothing to count that way, and on a real library that is most of them: eight of twenty-four pages had nothing to offer, among them Prayer and False Teaching, which are not thin by any other measure. Those pages widen by scripture instead, offering the subjects preached from the same books and saying which books those are. The heading says which of the two it is showing, because "taught alongside" and "preached from the same scriptures" are different claims.
+* Related subjects are scored as a share of the two sets rather than as a count of what they have in common. A count only ever finds the biggest subjects: every page's answer came back Forgiveness, Obedience and Salvation, which have sermons in most books and so share books with everything.
+* A topic page with fewer than two sermons is left out of the index and the sitemap, and starts being indexed by itself once the church has preached the subject again. Follow stays on: the sermon it links to is worth crawling even when the page listing it is not worth listing.
+* Everything a summary page does apart from describing itself now lives in one place, shared by scripture and topic pages: the caching, serving a stale copy while a new one is written, holding a rewrite of a church's own words for review, and backing off when no service is connected. Two copies of that would have drifted.
+* The count beside the menu is counted per kind, so a topic waiting to be looked at is not counted on the scripture screen, where it could not be looked at.
 
 * A generation of Scripture references replaces its own previous set rather than piling a second reading on top of the first. Passages are added to a sermon rather than swapped in, because a list somebody typed is theirs and a run asked for references is a request for the rest, but run twice that left one sermon carrying thirty-nine references with the same passages among them in looser forms, Matthew 4 beside Matthew 4:1-11. A generation now clears what its last reading found and leaves everything else alone: anything added by hand stays, the focus passage stays, and so does a passage this reading found again.
 * Generate Sermon is no longer in the menu on sites running Sermon Library AI. Everything it did now happens on the sermon itself, which is where the recording, the details and the content already live. On sites without the engine the page is exactly as it was: it is where generation is explained and where to get it.

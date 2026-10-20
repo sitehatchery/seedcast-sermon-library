@@ -233,6 +233,19 @@ class ProBridge {
 					'kind'   => 'scripture',
 					'args'   => 5,
 				],
+
+				/*
+				 * And the same for a topic page, which is a different thing to
+				 * describe out of the same parts: what this church has taught
+				 * about a subject, rather than what it has preached from a
+				 * text. Declared here beside the other one so the engine goes
+				 * on knowing nothing about this plugin's hooks.
+				 */
+				'topic_summary' => [
+					'filter' => 'scsl_topic_summary_generate',
+					'kind'   => 'topic',
+					'args'   => 5,
+				],
 			],
 			'append'      => [
 				'meta'   => '_scsl_resources',

@@ -45,6 +45,7 @@ class Autoloader {
 		'LlmsIndex'             => 'class-llmsindex.php',
 		'Faq'                   => 'class-faq.php',
 		'ScriptureSummaries'    => 'class-scripturesummaries.php',
+		'PageSummary'           => 'class-pagesummary.php',
 	];
 
 	public function load( string $class ): void {

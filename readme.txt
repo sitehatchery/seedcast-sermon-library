@@ -3,7 +3,7 @@ Contributors: seedcast
 Tags: sermons, church, preaching, bible, audio
 Requires at least: 6.2
 Tested up to: 7.1
-Stable tag: 2.74.1
+Stable tag: 2.75.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -208,7 +208,12 @@ No. Sermons, series and speakers remain in the database.
 
 == Changelog ==
 
-= 2.74.1 =
+= 2.75.0 =
+
+* Topic pages are rebuilt the way scripture pages were: every sermon on the subject with no pagination, what your church has taught about it in prose, the articles written out of those sermons, and the subjects it is taught alongside. A topic page used to be a list of cards with a heading over it.
+* The paragraph at the top needs Sermon Library AI and is written from the shape of the set: the passages the teaching comes out of, the series that carried it, what it is taught alongside, and how far back it goes.
+* Where your sermons carry one topic each there is nothing taught alongside to show, so those pages offer the subjects preached from the same books instead, and say which books.
+* A topic page with fewer than two sermons stays out of search results and the sitemap until the subject is preached again. The sermons it links to are still crawled.
 
 * Regenerating Scripture references now replaces the passages the last generation found rather than adding a second set beside them. Passages you added yourself, and the focus passage, are untouched.
 * Generate Sermon is no longer in the menu where Sermon Library AI is running. Everything it did now happens on the sermon itself. Without the engine the page is exactly as it was.
@@ -286,9 +291,9 @@ Complete historical changelog: see `changelog.txt`.
 
 == Upgrade Notice ==
 
-= 2.74.1 =
+= 2.75.0 =
 
-The Generate with AI panel now sits directly under the sermon's title.
+Topic pages are rebuilt: all the sermons on a subject, what your church has taught about it, and a way through to the subjects it sits beside.
 
 = 2.74.0 =
 
