@@ -208,16 +208,19 @@ No. Sermons, series and speakers remain in the database.
 
 == Changelog ==
 
+= 2.74.1 =
+
+* Generate Sermon is no longer in the menu where Sermon Library AI is running. Everything it did now happens on the sermon itself. Without the engine the page is exactly as it was.
+* Scripture passages found by a generation appear in the Scripture box while you are looking at it, already split into book, chapter and verse.
+* Scripture passages added to a sermon while you have its edit screen open are no longer lost when you press Update.
+* The Generate with AI panel now sits directly under the sermon's title rather than below every other box.
+* Fixes to the admin screens are fetched rather than served from whatever your browser already had.
+
 = 2.74.0 =
 
 * A gallery added with Add Media to a sermon's Article, Bible Study or More tab now shows as a gallery. It used to print as its shortcode text.
 * Galleries on sermon, series and speaker pages show as a grid of even tiles that follows the gallery's column setting, and open full size in a lightbox with previous and next. Themes that leave gallery styling to themselves had been stacking the photos full width.
 * Bundles version 1.27.0 of the shared Seedcast library, which provides the gallery grid and lightbox.
-
-= 2.74.1 =
-
-* Scripture passages added to a sermon while you have its edit screen open are no longer lost when you press Update.
-* The Generate with AI panel now sits directly under the sermon's title rather than below every other box.
 
 = 2.73.1 =
 
