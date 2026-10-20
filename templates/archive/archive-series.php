@@ -11,7 +11,17 @@ use SeedcastSermonLibrary\Frontend\TemplateLoader;
 get_header();
 
 $scsl_current_topic = get_query_var( 'scsl_topic', '' );
-$scsl_topics = get_terms( [ 'taxonomy' => 'scsl_topic', 'hide_empty' => true ] );
+
+/*
+ * The row of subjects above the grid, which a church can turn off.
+ *
+ * It was drawn whatever anybody wanted, and it is the one list on the site
+ * that grows with the vocabulary rather than with the library: two dozen
+ * links above the series is a different page from four.
+ */
+$scsl_topics = '1' === (string) get_option( 'scsl_show_topics_on_series_archive', '1' )
+	? get_terms( [ 'taxonomy' => 'scsl_topic', 'hide_empty' => true ] )
+	: [];
 ?>
 
 <div class="sc-wrap">

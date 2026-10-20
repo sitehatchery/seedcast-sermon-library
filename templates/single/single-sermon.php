@@ -396,6 +396,9 @@ while ( have_posts() ) :
 
 			</div><!-- /.scsl-sermon-actions -->
 
+			<!-- Topics, above the passages: the subject a reader followed in, before the texts it was preached from -->
+			<?php TemplateLoader::partial( 'topics-panel', [ 'scsl_post_id' => $scsl_post_id ] ); ?>
+
 			<!-- Scripture References -->
 			<?php TemplateLoader::partial( 'scripture-panel', [ 'scsl_post_id' => $scsl_post_id ] ); ?>
 

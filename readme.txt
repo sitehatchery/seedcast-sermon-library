@@ -210,6 +210,9 @@ No. Sermons, series and speakers remain in the database.
 
 = 2.75.0 =
 
+* Topics are shown on a sermon again, in the sidebar above Scripture, three at most. Each one is a link to the topic's page.
+* A series shows what its sermons are about. Topics belong to sermons, so a series was never filed under one itself and the section never appeared.
+* New settings to show or hide topics in each of the three places they appear: a sermon, a series, and the row above the series grid.
 * Topic pages are rebuilt the way scripture pages were: every sermon on the subject with no pagination, what your church has taught about it in prose, the articles written out of those sermons, and the subjects it is taught alongside. A topic page used to be a list of cards with a heading over it.
 * The paragraph at the top needs Sermon Library AI and is written from the shape of the set: the passages the teaching comes out of, the series that carried it, what it is taught alongside, and how far back it goes.
 * Where your sermons carry one topic each there is nothing taught alongside to show, so those pages offer the subjects preached from the same books instead, and say which books.

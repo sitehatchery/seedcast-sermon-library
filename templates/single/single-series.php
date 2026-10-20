@@ -63,8 +63,47 @@ while ( have_posts() ) :
 		}
 	}
 
-	// Topics for this series
-	$scsl_series_topics = get_the_terms( $scsl_post_id, 'scsl_topic' );
+	/*
+	 * What this series is about, which is what its sermons are about.
+	 *
+	 * Topics belong to sermons. A series was once able to carry them itself
+	 * and nothing ever filed one that way, so asking a series for its own
+	 * subjects came back empty on every series on the site and the section
+	 * never drew. Counted from the sermons instead, which needs no second pass
+	 * over anything and cannot fall out of step with them.
+	 *
+	 * Counted across the series so the ones it keeps returning to come first,
+	 * and capped, because a ten part series touches a dozen subjects and a
+	 * dozen tags in a hero is a tag cloud.
+	 */
+	$scsl_series_topics = [];
+	$scsl_topic_weight  = [];
+	$scsl_topic_terms   = [];
+
+	foreach ( $scsl_all_sermon_ids as $scsl_sid ) {
+		foreach ( (array) get_the_terms( $scsl_sid, 'scsl_topic' ) as $scsl_term ) {
+			if ( ! $scsl_term instanceof \WP_Term ) {
+				continue;
+			}
+
+			$scsl_topic_terms[ $scsl_term->term_id ]  = $scsl_term;
+			$scsl_topic_weight[ $scsl_term->term_id ] = ( $scsl_topic_weight[ $scsl_term->term_id ] ?? 0 ) + 1;
+		}
+	}
+
+	arsort( $scsl_topic_weight );
+
+	/**
+	 * How many subjects to show on a series.
+	 *
+	 * @param int $count   How many.
+	 * @param int $post_id Series being displayed.
+	 */
+	$scsl_series_topic_limit = (int) apply_filters( 'scsl_series_topic_limit', 3, $scsl_post_id );
+
+	foreach ( array_slice( array_keys( $scsl_topic_weight ), 0, max( 1, $scsl_series_topic_limit ) ) as $scsl_tid ) {
+		$scsl_series_topics[] = $scsl_topic_terms[ $scsl_tid ];
+	}
 
 	// Enqueue AJAX list script
 	wp_enqueue_script( 'scsl-sermon-list' );
@@ -126,11 +165,12 @@ while ( have_posts() ) :
 			<?php endif; ?>
 
 			<!-- Topics -->
-			<?php $scsl_show_topics = get_option( 'scsl_show_topics_on_series', '1' );
-			if ( $scsl_show_topics && $scsl_series_topics && ! is_wp_error( $scsl_series_topics ) ) : ?>
+			<?php if ( '1' === (string) get_option( 'scsl_show_topics_on_series', '1' ) && $scsl_series_topics ) : ?>
 			<div class="scsl-series-topics">
 				<?php foreach ( $scsl_series_topics as $scsl_topic ) : ?>
-					<span class="scsl-topic-tag"><?php echo esc_html( $scsl_topic->name ); ?></span>
+					<a href="<?php echo esc_url( get_term_link( $scsl_topic ) ); ?>" class="scsl-topic-tag">
+						<?php echo esc_html( $scsl_topic->name ); ?>
+					</a>
 				<?php endforeach; ?>
 			</div>
 			<?php endif; ?>

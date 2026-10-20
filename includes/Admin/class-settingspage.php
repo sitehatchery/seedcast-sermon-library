@@ -267,7 +267,9 @@ class SettingsPage {
 			'scsl_image_fallback_series',
 			'scsl_disable_css',
 			'scsl_label_sermon', 'scsl_label_sermons', 'scsl_label_series', 'scsl_label_speaker', 'scsl_label_speakers',
+			'scsl_show_topics_on_sermon',
 			'scsl_show_topics_on_series',
+			'scsl_show_topics_on_series_archive',
 			'scsl_show_search_filter',
 			'scsl_show_year_filter',
 			'scsl_show_completeness',
@@ -430,12 +432,37 @@ class SettingsPage {
 							</td>
 						</tr>
 						<tr>
-							<th><?php esc_html_e( 'Show topics on series page', 'seedcast-sermon-library' ); ?></th>
+							<th><?php esc_html_e( 'Show topics on a sermon', 'seedcast-sermon-library' ); ?></th>
 							<td>
 								<label>
+									<input type="hidden" name="scsl_show_topics_on_sermon" value="0" />
+									<input type="checkbox" name="scsl_show_topics_on_sermon" value="1"
+										   <?php checked( get_option( 'scsl_show_topics_on_sermon', '1' ), '1' ); ?> />
+									<?php esc_html_e( 'List the topics a sermon is filed under, in the sidebar above the Scripture panel', 'seedcast-sermon-library' ); ?>
+								</label>
+								<p class="description"><?php esc_html_e( 'Three at most, the best filled in first. A sermon filed under six subjects turns the sidebar into a tag cloud.', 'seedcast-sermon-library' ); ?></p>
+							</td>
+						</tr>
+						<tr>
+							<th><?php esc_html_e( 'Show topics on a series', 'seedcast-sermon-library' ); ?></th>
+							<td>
+								<label>
+									<input type="hidden" name="scsl_show_topics_on_series" value="0" />
 									<input type="checkbox" name="scsl_show_topics_on_series" value="1"
 										   <?php checked( get_option( 'scsl_show_topics_on_series', '1' ), '1' ); ?> />
 									<?php esc_html_e( 'Show topic tags in the series hero', 'seedcast-sermon-library' ); ?>
+								</label>
+								<p class="description"><?php esc_html_e( 'Taken from the sermons in the series, most often preached first. Topics belong to sermons, so a series is never filed under one itself.', 'seedcast-sermon-library' ); ?></p>
+							</td>
+						</tr>
+						<tr>
+							<th><?php esc_html_e( 'Show topics on the library page', 'seedcast-sermon-library' ); ?></th>
+							<td>
+								<label>
+									<input type="hidden" name="scsl_show_topics_on_series_archive" value="0" />
+									<input type="checkbox" name="scsl_show_topics_on_series_archive" value="1"
+										   <?php checked( get_option( 'scsl_show_topics_on_series_archive', '1' ), '1' ); ?> />
+									<?php esc_html_e( 'Show the row of topic links above the series grid', 'seedcast-sermon-library' ); ?>
 								</label>
 							</td>
 						</tr>

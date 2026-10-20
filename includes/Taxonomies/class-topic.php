@@ -18,7 +18,17 @@ class Topic {
 			'menu_name'         => __( 'Topics',          'seedcast-sermon-library' ),
 		];
 
-		register_taxonomy( 'scsl_topic', [ 'scsl_sermon', 'scsl_series' ], [
+		/*
+		 * Sermons only.
+		 *
+		 * A series was in this list and nothing ever filed one under a
+		 * subject: topics are assigned to sermons, by hand or by the
+		 * assignment pass, so every series on every site came back with none
+		 * and the section on its page never drew. What a series is about is
+		 * what its sermons are about, which the series page now works out for
+		 * itself, so there is nothing here for a series to carry.
+		 */
+		register_taxonomy( 'scsl_topic', [ 'scsl_sermon' ], [
 			'labels'            => $labels,
 			'hierarchical'      => true,
 			'public'            => true,
