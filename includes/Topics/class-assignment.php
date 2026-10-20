@@ -153,6 +153,19 @@ class Assignment {
 		$ids = self::resolve( $picked );
 
 		if ( ! $ids ) {
+			/*
+			 * Nothing chosen, which is a fair answer where somebody was asked.
+			 *
+			 * Only where this is replacing what was there: a generator that
+			 * returns no topics has decided nothing, and must not take the
+			 * church's own filing off the sermon on its way past. A person who
+			 * unticks every box has decided something, and the sermon comes out
+			 * of the topics it was in.
+			 */
+			if ( $replace ) {
+				wp_set_object_terms( $post_id, [], 'scsl_topic', false );
+			}
+
 			return [];
 		}
 

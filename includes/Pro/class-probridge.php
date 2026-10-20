@@ -78,6 +78,7 @@ class ProBridge {
 		add_action( 'seedcast_pro_draft_created_' . self::PRODUCT, [ $this, 'seed_draft' ] );
 		add_filter( 'seedcast_pro_existing_context_' . self::PRODUCT, [ $this, 'existing_context' ], 10, 2 );
 		add_action( 'seedcast_pro_imported_' . self::PRODUCT, [ $this, 'import_passages' ], 10, 2 );
+		add_action( 'seedcast_pro_imported_' . self::PRODUCT, [ $this, 'import_topics' ], 10, 2 );
 
 		/*
 		 * Its own handler, and later, on purpose.
@@ -193,28 +194,6 @@ class ProBridge {
 			'structured'  => FieldMap::structured(),
 
 			/*
-			 * Fields that become terms rather than content.
-			 *
-			 * `choices` is the whole of what may be picked, and it travels with
-			 * the request so the model chooses from this church's vocabulary
-			 * instead of inventing one. `max` is the most that may come back and
-			 * fewer is a valid answer, including none: a sermon about one thing
-			 * filed under three topics has two topics that are not true.
-			 *
-			 * Whatever comes back is intersected against `choices` at this end
-			 * before anything is written, so an invented topic cannot land even
-			 * if one is returned.
-			 */
-			'taxonomy'    => [
-				'topics' => [
-					'taxonomy' => 'scsl_topic',
-					'source'   => 'terms',
-					'max'      => Assignment::MAX,
-					'closed'   => true,
-					'choices'  => Assignment::choices(),
-				],
-			],
-			/*
 			 * Writing that belongs to a page rather than to a sermon.
 			 *
 			 * A passage page can say what its set of sermons adds up to, which
@@ -277,6 +256,18 @@ class ProBridge {
 				'scripture' => [
 					'label' => __( 'Scripture references', 'seedcast-sermon-library' ),
 					'meta'  => '_scsl_other_passages',
+				],
+
+				/*
+				 * Topics land as terms rather than in a field, so this says
+				 * which taxonomy instead of which meta key. The engine asks
+				 * whether a sermon already carries any the same way it asks
+				 * about a field, and the list of what may be chosen travels
+				 * with the job as context.
+				 */
+				'topics' => [
+					'label'    => __( 'Topics', 'seedcast-sermon-library' ),
+					'taxonomy' => 'scsl_topic',
 				],
 			],
 
@@ -811,6 +802,31 @@ class ProBridge {
 			$fields['speaker'] = sanitize_text_field( get_the_title( $speaker_id ) );
 		}
 
+		/*
+		 * The church's own topics, and how many of them one sermon may carry.
+		 *
+		 * Sent with every job because the list is theirs and changes when they
+		 * change it: a vocabulary baked into the service would be a different
+		 * church's. Anything outside it is dropped at this end anyway, so this
+		 * is what stops the service guessing rather than what enforces it.
+		 */
+		$choices = Assignment::choices();
+
+		if ( $choices ) {
+			// As words, not markup. WordPress stores an ampersand in a term
+			// name as an entity, and a model told the option is "Community
+			// &amp; The Church" may hand that back as the name.
+			$choices = array_map(
+				static function ( $name ) {
+					return html_entity_decode( (string) $name, ENT_QUOTES, 'UTF-8' );
+				},
+				$choices
+			);
+
+			$fields['topic_options'] = sanitize_text_field( implode( ', ', $choices ) );
+			$fields['topic_max']     = (string) (int) apply_filters( 'scsl_max_topics', Assignment::MAX );
+		}
+
 		return $fields;
 	}
 
@@ -1035,6 +1051,89 @@ class ProBridge {
 			// say no sermon used them.
 			\SeedcastSermonLibrary\Admin\SermonMeta::sync_scripture( $post_id );
 		}
+	}
+
+	/**
+	 * File a sermon under the subjects the service chose.
+	 *
+	 * The service is given this church's list and told to pick from it, and
+	 * what comes back is checked against that list again here: a request can be
+	 * answered by anything, and a topic this church does not have must not
+	 * become one because a model wrote it down. Assignment does the checking
+	 * and the capping, so the rules live in one place whether a person or a
+	 * generation did the choosing.
+	 *
+	 * Never over a choice already made. A church that has filed a sermon itself
+	 * has said what it is about, and a run asked for topics is a request to
+	 * fill in a blank rather than to argue.
+	 *
+	 * @param int   $post_id Sermon ID.
+	 * @param mixed $record  One result record.
+	 * @return void
+	 */
+	public function import_topics( $post_id, $record ): void {
+		$post_id = absint( $post_id );
+
+		if ( ! is_array( $record ) || empty( $record['topics'] ) ) return;
+
+		$field = (array) $record['topics'];
+
+		if ( ! empty( $field['pending'] ) ) return;
+
+		$picked = $this->topic_list( $field['value'] ?? '' );
+
+		if ( ! $picked ) return;
+
+		$assigned = Assignment::assign( $post_id, $picked, false );
+
+		if ( $assigned ) {
+			/**
+			 * Topics a generation filed a sermon under.
+			 *
+			 * @param int   $post_id  Sermon ID.
+			 * @param int[] $assigned Term ids now on the sermon.
+			 */
+			do_action( 'scsl_topics_assigned', $post_id, $assigned );
+		}
+	}
+
+	/**
+	 * Pull topic names out of whatever shape they arrive in.
+	 *
+	 * Not the passage parser, which requires a digit in every entry because a
+	 * reference has one: run through that, every topic a church has would be
+	 * dropped on the floor and a run asked for topics would quietly file
+	 * nothing.
+	 *
+	 * @param mixed $value Raw value.
+	 * @return string[]
+	 */
+	private function topic_list( $value ): array {
+		if ( is_array( $value ) ) {
+			$parts = $value;
+		} else {
+			$text  = (string) $value;
+			$text  = preg_replace( '#</li>|<br\s*/?>|</p>#i', "\n", $text );
+			$text  = wp_strip_all_tags( $text );
+			$parts = preg_split( '/[\r\n;,]+/', $text );
+		}
+
+		$out = [];
+
+		foreach ( (array) $parts as $part ) {
+			$part = trim( html_entity_decode( (string) $part, ENT_QUOTES, 'UTF-8' ) );
+			$part = trim( $part, "-* \t" );
+			$part = ltrim( $part, "\xE2\x80\xA2" );
+			$part = trim( $part );
+
+			// A topic is a name, not a sentence about one. Anything long is a
+			// model explaining its choice, which is not a topic.
+			if ( '' === $part || strlen( $part ) > 60 ) continue;
+
+			$out[] = $part;
+		}
+
+		return $out;
 	}
 
 	/**

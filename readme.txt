@@ -210,6 +210,9 @@ No. Sermons, series and speakers remain in the database.
 
 = 2.75.0 =
 
+* A Topics box on the sermon screen, so a sermon can be filed under your own topics by hand. Three at most.
+* Topics can be generated with the rest of the content: tick Topics in the list of what to write. Seedcast chooses from your topics and never invents one, and never overrules a choice you made yourself.
+* A View link on the Topics screen, beside Edit and Delete.
 * Topics are shown on a sermon again, in the sidebar above Scripture, three at most. Each one is a link to the topic's page.
 * A series shows what its sermons are about. Topics belong to sermons, so a series was never filed under one itself and the section never appeared.
 * New settings to show or hide topics in each of the three places they appear: a sermon, a series, and the row above the series grid.

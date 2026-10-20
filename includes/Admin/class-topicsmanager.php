@@ -118,6 +118,12 @@ class TopicsManager {
 									'scsl_topic_filter' => $topic->term_id,
 								], admin_url( 'edit.php' ) );
 								$edit_url   = add_query_arg( [ 'page' => 'seedcast-sermon-library-topics', 'scsl_action' => 'edit',   'term_id' => $topic->term_id ], admin_url( 'admin.php' ) );
+
+								// The page itself, which is worth looking at now: a topic
+								// page carries the sermons, what the church has taught on
+								// the subject, and the subjects beside it.
+								$view_url   = get_term_link( $topic );
+								$view_url   = is_wp_error( $view_url ) ? '' : $view_url;
 								$delete_url = wp_nonce_url( add_query_arg( [ 'page' => 'seedcast-sermon-library-topics', 'scsl_action' => 'delete', 'term_id' => $topic->term_id ], admin_url( 'admin.php' ) ), 'scsl_delete_topic_' . $topic->term_id );
 							?>
 							<tr>
@@ -139,6 +145,12 @@ class TopicsManager {
 								</td>
 								<td>
 									<a href="<?php echo esc_url( $edit_url ); ?>"><?php esc_html_e( 'Edit', 'seedcast-sermon-library' ); ?></a>
+									<?php if ( $view_url ) : ?>
+										&nbsp;|&nbsp;
+										<a href="<?php echo esc_url( $view_url ); ?>" target="_blank" rel="noopener noreferrer">
+											<?php esc_html_e( 'View', 'seedcast-sermon-library' ); ?>
+										</a>
+									<?php endif; ?>
 									&nbsp;|&nbsp;
 									<a href="<?php echo esc_url( $delete_url ); ?>"
 									   style="color:#d63638;"

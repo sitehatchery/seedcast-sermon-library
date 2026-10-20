@@ -110,6 +110,7 @@ class MetaBoxes {
 		add_meta_box( 'scsl_sermon_content',    __( 'Content',              'seedcast-sermon-library' ), [ $this->sermon_meta,  'sermon_content_cb'    ], 'scsl_sermon', 'normal', 'default' );
 		add_meta_box( 'scsl_sermon_questions',  __( 'Questions',            'seedcast-sermon-library' ), [ $this->sermon_meta,  'sermon_questions_cb'  ], 'scsl_sermon', 'normal', 'default' );
 		add_meta_box( 'scsl_sermon_scripture',  __( 'Scripture',            'seedcast-sermon-library' ), [ $this->sermon_meta,  'sermon_scripture_cb'  ], 'scsl_sermon', 'normal', 'default' );
+		add_meta_box( 'scsl_sermon_topics',     __( 'Topics',               'seedcast-sermon-library' ), [ $this->sermon_meta,  'sermon_topics_cb'     ], 'scsl_sermon', 'side',   'default' );
 		add_meta_box( 'scsl_sermon_notes',      __( 'Sermon Notes',         'seedcast-sermon-library' ), [ $this->sermon_meta,  'sermon_notes_cb'      ], 'scsl_sermon', 'normal', 'default' );
 
 		// Series and speaker meta boxes
@@ -120,6 +121,10 @@ class MetaBoxes {
 		 * Remove the taxonomy boxes WordPress adds for itself. Both are managed
 		 * from the Scripture and Topics boxes instead, and a checklist of
 		 * seventeen hundred passages is not something anybody is going to tick.
+		 *
+		 * The Topics box is this plugin's own, registered above: for a while
+		 * this removal ran without one existing, so a sermon could not be filed
+		 * under a subject from this screen at all.
 		 *
 		 * Both ids, because the one WordPress uses depends on the taxonomy:
 		 * a flat one gets `tagsdiv-{taxonomy}` and a hierarchical one gets

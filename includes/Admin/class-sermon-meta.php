@@ -15,6 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 use SeedcastSermonLibrary\PDF\PDFGenerator;
 use SeedcastSermonLibrary\Scripture\ScriptureParser;
+use SeedcastSermonLibrary\Topics\Assignment;
 
 /**
  * Provides all meta box render callbacks and save handling for sl_sermon posts.
@@ -823,6 +824,85 @@ class SermonMeta {
 		<?php
 	}
 
+	// ── SERMON: Topics ───────────────────────────────────
+
+	/**
+	 * Which subjects this sermon is filed under.
+	 *
+	 * WordPress's own checklist for the taxonomy is taken off this screen,
+	 * because a checklist of a church's whole vocabulary invites ticking
+	 * everything that applies, and a topic carried by four sermons in five is
+	 * not a way into the library but a label on the whole library.
+	 *
+	 * So the same two rules the generator works under apply here: the list is
+	 * closed, and three is the most a sermon may carry. The box says so rather
+	 * than silently dropping the fourth, and saving goes through Assignment so
+	 * there is one place that enforces it.
+	 *
+	 * @param \WP_Post $post Sermon being edited.
+	 * @return void
+	 */
+	public function sermon_topics_cb( \WP_Post $post ): void {
+		$choices = Assignment::choices();
+		$current = wp_get_object_terms( $post->ID, 'scsl_topic', [ 'fields' => 'slugs' ] );
+		$current = is_wp_error( $current ) ? [] : $current;
+		$max     = (int) apply_filters( 'scsl_max_topics', Assignment::MAX );
+
+		if ( ! $choices ) {
+			?>
+			<p class="description">
+				<?php
+				printf(
+					/* translators: %s: link to the Topics screen. */
+					wp_kses_post( __( 'No topics yet. <a href="%s">Add some on the Topics screen</a>, then file sermons under them.', 'seedcast-sermon-library' ) ),
+					esc_url( admin_url( 'admin.php?page=seedcast-sermon-library-topics' ) )
+				);
+				?>
+			</p>
+			<?php
+			return;
+		}
+		?>
+		<p class="description" style="margin-bottom:.75rem;">
+			<?php
+			printf(
+				/* translators: %d: how many topics a sermon may carry. */
+				esc_html( _n( 'What this sermon is actually about. %d at most, and none is a fair answer.', 'What this sermon is actually about. %d at most, and none is a fair answer.', $max, 'seedcast-sermon-library' ) ),
+				esc_html( number_format_i18n( $max ) )
+			);
+			?>
+		</p>
+
+		<input type="hidden" name="scsl_topics_present" value="1" />
+
+		<div class="scsl-topic-picker" data-max="<?php echo esc_attr( $max ); ?>">
+			<?php foreach ( $choices as $slug => $name ) : ?>
+				<label class="scsl-topic-picker__item">
+					<input type="checkbox" name="scsl_topics[]" value="<?php echo esc_attr( $slug ); ?>"
+						   <?php checked( in_array( $slug, $current, true ) ); ?> />
+					<?php echo esc_html( $name ); ?>
+				</label>
+			<?php endforeach; ?>
+		</div>
+
+		<p class="description scsl-topic-picker__full" hidden>
+			<?php
+			printf(
+				/* translators: %d: how many topics a sermon may carry. */
+				esc_html( __( 'That is %d. Untick one to choose another.', 'seedcast-sermon-library' ) ),
+				esc_html( number_format_i18n( $max ) )
+			);
+			?>
+		</p>
+
+		<p class="description">
+			<a href="<?php echo esc_url( admin_url( 'admin.php?page=seedcast-sermon-library-topics' ) ); ?>">
+				<?php esc_html_e( 'Manage topics', 'seedcast-sermon-library' ); ?>
+			</a>
+		</p>
+		<?php
+	}
+
 	// ── SERMON: Sermon Notes ────────────────────────────────────────────────
 
 	public function sermon_notes_cb( \WP_Post $post ): void {
@@ -1193,6 +1273,30 @@ class SermonMeta {
 
 		// Sync scripture taxonomy
 		$this->sync_scripture_taxonomy( $post_id, $focus_for_sync, $passages );
+
+		/*
+		 * And the subjects this sermon is filed under.
+		 *
+		 * Through Assignment, so the closed list and the cap are enforced in
+		 * the one place that states them: a form can be edited in a browser,
+		 * and a tick against a topic that no longer exists is not a reason to
+		 * create it.
+		 *
+		 * The key's absence is not an empty list. The box is only on the sermon
+		 * screen, and a save from anywhere else -- a quick edit, a bulk edit,
+		 * the engine writing content -- would otherwise read as somebody
+		 * clearing every topic off the sermon.
+		 */
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Checked at the top of save().
+		if ( isset( $_POST['scsl_topics'] ) ) {
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Checked at the top of save().
+			$picked = array_map( 'sanitize_title', (array) wp_unslash( $_POST['scsl_topics'] ) );
+
+			Assignment::assign( $post_id, $picked, true );
+		} elseif ( isset( $_POST['scsl_topics_present'] ) ) {
+			// The box was on screen with nothing ticked, which is an answer.
+			Assignment::assign( $post_id, [], true );
+		}
 	}
 
 	/**
