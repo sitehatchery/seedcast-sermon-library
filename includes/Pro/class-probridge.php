@@ -53,6 +53,14 @@ class ProBridge {
 	const PAGE = 'seedcast-sermon-library-generate';
 
 	/**
+	 * The passages the last generation found, as normalised keys.
+	 *
+	 * Kept so the next one can clear its own set and leave a church's own
+	 * references, and the focus passage, where they are.
+	 */
+	const META_FOUND_PASSAGES = '_scsl_passages_found';
+
+	/**
 	 * Register hooks.
 	 *
 	 * @return void
@@ -959,8 +967,37 @@ class ProBridge {
 		$focus = $this->normalise_passage( (string) get_post_meta( $post_id, '_scsl_focus_passage', true ) );
 
 		$existing = (array) get_post_meta( $post_id, '_scsl_other_passages', true );
-		$keep     = [];
-		$seen     = [];
+
+		/*
+		 * What the last generation put here, so this one replaces it rather
+		 * than piling on top of it.
+		 *
+		 * Passages are added to a sermon rather than swapped in, because a
+		 * list somebody typed is theirs and a generation asked for references
+		 * is a request for the rest. Run twice, though, that put a second
+		 * reading of the same sermon beside the first: one sermon ended up
+		 * carrying thirty-nine references, the same passages among them in
+		 * looser forms, Matthew 4 beside Matthew 4:1-11.
+		 *
+		 * So a generation now clears its own previous set and leaves
+		 * everything else alone. Anything the church added by hand stays, and
+		 * so does a passage this reading found again.
+		 */
+		$mine = get_post_meta( $post_id, self::META_FOUND_PASSAGES, true );
+		$mine = is_array( $mine ) ? array_filter( array_map( 'strval', $mine ) ) : [];
+
+		$fresh = [];
+
+		foreach ( $found as $passage ) {
+			$key = $this->normalise_passage( (string) $passage );
+
+			if ( '' !== $key ) {
+				$fresh[ $key ] = true;
+			}
+		}
+
+		$keep = [];
+		$seen = [];
 
 		foreach ( array_merge( $existing, $found ) as $passage ) {
 			$passage = sanitize_text_field( (string) $passage );
@@ -968,12 +1005,17 @@ class ProBridge {
 
 			if ( '' === $key || $key === $focus || isset( $seen[ $key ] ) ) continue;
 
+			// Ours from last time and not found again, so it goes with the
+			// reading it came from.
+			if ( in_array( $key, $mine, true ) && ! isset( $fresh[ $key ] ) ) continue;
+
 			$seen[ $key ] = true;
 			$keep[]       = $passage;
 		}
 
 		if ( $keep ) {
 			update_post_meta( $post_id, '_scsl_other_passages', $keep );
+			update_post_meta( $post_id, self::META_FOUND_PASSAGES, array_keys( $fresh ) );
 
 			// File the sermon under the passages as well as recording them.
 			// Without this the passage links on the sermon lead to pages that

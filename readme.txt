@@ -210,6 +210,7 @@ No. Sermons, series and speakers remain in the database.
 
 = 2.74.1 =
 
+* Regenerating Scripture references now replaces the passages the last generation found rather than adding a second set beside them. Passages you added yourself, and the focus passage, are untouched.
 * Generate Sermon is no longer in the menu where Sermon Library AI is running. Everything it did now happens on the sermon itself. Without the engine the page is exactly as it was.
 * Scripture passages found by a generation appear in the Scripture box while you are looking at it, already split into book, chapter and verse.
 * Scripture passages added to a sermon while you have its edit screen open are no longer lost when you press Update.
