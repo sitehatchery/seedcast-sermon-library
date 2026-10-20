@@ -270,6 +270,21 @@ class SermonMeta {
 
 	// ── SERMON: Scripture ───────────────────────────────────────────────────
 
+	/**
+	 * A fingerprint of the passages a Scripture box was drawn from.
+	 *
+	 * Compared on save to tell "this form is talking about the same list" from
+	 * "something arrived since this page was built". One function so the box
+	 * and the save cannot fingerprint the same passages differently.
+	 *
+	 * @param string   $focus    Focus passage.
+	 * @param string[] $passages Additional passages.
+	 * @return string
+	 */
+	public static function passages_stamp( string $focus, array $passages ): string {
+		return md5( (string) wp_json_encode( [ trim( $focus ), array_values( array_filter( array_map( 'strval', $passages ) ) ) ] ) );
+	}
+
 	public function sermon_scripture_cb( \WP_Post $post ): void {
 		$focus    = get_post_meta( $post->ID, '_scsl_focus_passage',  true );
 		$passages = get_post_meta( $post->ID, '_scsl_other_passages', true );
@@ -279,6 +294,35 @@ class SermonMeta {
 		sort( $books );
 		$books_json = wp_json_encode( $books );
 		?>
+		<?php
+		/*
+		 * What this box was built from.
+		 *
+		 * Saving writes the passages as the form posts them, so a page built
+		 * before passages arrived posts none and wipes them. That is not
+		 * hypothetical: a generation writes passages straight onto the sermon
+		 * while somebody has the screen open, and pressing Update then threw
+		 * away every one of them.
+		 *
+		 * The save compares this with what is stored. Unchanged means the form
+		 * is talking about the same list and may replace it; changed means
+		 * something arrived since, and the two are merged instead.
+		 */
+		?>
+		<input type="hidden" name="scsl_passages_stamp" value="<?php echo esc_attr( self::passages_stamp( (string) $focus, $passages ) ); ?>" />
+
+		<?php
+		/*
+		 * Where passages written while this screen is open arrive.
+		 *
+		 * A generation writes them straight onto the sermon, so they were on
+		 * the sermon and not in this box: it read as nothing having been
+		 * found. They come through as rows already split into book, chapter
+		 * and verse, because the splitting is this plugin's and belongs in PHP
+		 * rather than in a second copy written in JavaScript.
+		 */
+		?>
+		<textarea name="scsl_passages_incoming" id="scsl-passages-incoming" class="scsl-passages-incoming" hidden></textarea>
 		<p class="description" style="margin-bottom:1rem;">
 			<?php esc_html_e( 'Select Book, Chapter, and Verse range. This ensures Bible.com links work correctly.', 'seedcast-sermon-library' ); ?>
 		</p>
@@ -350,40 +394,70 @@ class SermonMeta {
 		( new self() )->render_passage_picker( $field_name, $value, $books, $attrs );
 	}
 
-	private function render_passage_picker( string $field_name, string $value, array $books, array $attrs = [] ): void {
-		// Parse existing value into parts
-		$book    = '';
-		$chapter = '';
-		$v_start = '';
-		$c_end   = '';
-		$v_end   = '';
+	/**
+	 * A reference split into the parts the picker's controls hold.
+	 *
+	 * One home for the splitting. The control on the page and the rows handed
+	 * to the browser after a generation are built from the same answer, so
+	 * they cannot disagree about where "Romans 1:5-2:14" divides.
+	 *
+	 * @param string $value Reference, for example "Luke 6:37-45".
+	 * @return array<string, string>
+	 */
+	public static function passage_parts( string $value ): array {
+		$parts = [
+			'value'       => $value,
+			'book'        => '',
+			'chapter'     => '',
+			'verse_start' => '',
+			'verse_end'   => '',
+			'chapter_end' => '',
+		];
 
-		if ( $value ) {
-			// Extract book
-			$book = ScriptureParser::extract_book( $value );
-			if ( $book ) {
-				/*
-				 * A passage can run into the next chapter.
-				 *
-				 * Preachers work through a paragraph, and paragraphs do not
-				 * stop where chapters do: "1:5-2:14" is an ordinary thing to
-				 * preach and could not be written here before, so the end
-				 * chapter was dropped the moment anybody saved.
-				 */
-				if ( preg_match( '/(\d+):(\d+)\s*[-\x{2013}]\s*(\d+):(\d+)/u', $value, $m ) ) {
-					$chapter = $m[1];
-					$v_start = $m[2];
-					$c_end   = $m[3];
-					$v_end   = $m[4];
-				} elseif ( preg_match( '/(\d+):(\d+)(?:\s*[-\x{2013}]\s*(\d+))?/u', $value, $m ) ) {
-					$chapter = $m[1];
-					$v_start = $m[2];
-					$v_end   = $m[3] ?? '';
-				} elseif ( preg_match( '/(\d+)$/', trim( substr( $value, strlen( $book ) ) ), $m ) ) {
-					$chapter = $m[1];
-				}
-			}
+		if ( '' === trim( $value ) ) {
+			return $parts;
 		}
+
+		$book = ScriptureParser::extract_book( $value );
+
+		if ( ! $book ) {
+			return $parts;
+		}
+
+		$parts['book'] = $book;
+
+		/*
+		 * A passage can run into the next chapter.
+		 *
+		 * Preachers work through a paragraph, and paragraphs do not stop where
+		 * chapters do: "1:5-2:14" is an ordinary thing to preach and could not
+		 * be written here before, so the end chapter was dropped the moment
+		 * anybody saved.
+		 */
+		if ( preg_match( '/(\d+):(\d+)\s*[-\x{2013}]\s*(\d+):(\d+)/u', $value, $m ) ) {
+			$parts['chapter']     = $m[1];
+			$parts['verse_start'] = $m[2];
+			$parts['chapter_end'] = $m[3];
+			$parts['verse_end']   = $m[4];
+		} elseif ( preg_match( '/(\d+):(\d+)(?:\s*[-\x{2013}]\s*(\d+))?/u', $value, $m ) ) {
+			$parts['chapter']     = $m[1];
+			$parts['verse_start'] = $m[2];
+			$parts['verse_end']   = $m[3] ?? '';
+		} elseif ( preg_match( '/(\d+)$/', trim( substr( $value, strlen( $book ) ) ), $m ) ) {
+			$parts['chapter'] = $m[1];
+		}
+
+		return $parts;
+	}
+
+	private function render_passage_picker( string $field_name, string $value, array $books, array $attrs = [] ): void {
+		$parts = self::passage_parts( $value );
+
+		$book    = $parts['book'];
+		$chapter = $parts['chapter'];
+		$v_start = $parts['verse_start'];
+		$c_end   = $parts['chapter_end'];
+		$v_end   = $parts['verse_end'];
 
 		$uid = 'sp-' . uniqid();
 		?>
@@ -927,6 +1001,19 @@ class SermonMeta {
 		// Nonce verified above: capture POST data once for safe passing to save_fields()
 		$post_data = wp_unslash( $_POST ); // Nonce verified above; all values sanitized before use
 
+		/*
+		 * The scripture on the sermon before this save touches anything.
+		 *
+		 * Read here rather than where it is used, because the generic field
+		 * loop below writes the focus passage on its way past. Read afterwards,
+		 * "what was stored" is already what this form just posted, every save
+		 * looks like a stale page, and the comparison it feeds is meaningless.
+		 */
+		$scripture_before = [
+			'focus'    => (string) get_post_meta( $post_id, '_scsl_focus_passage', true ),
+			'passages' => (array) get_post_meta( $post_id, '_scsl_other_passages', true ),
+		];
+
 		$text_fields = [
 			'_scsl_video_url'           => 'url',
 			'_scsl_audio_url'           => 'url',
@@ -1057,12 +1144,51 @@ class SermonMeta {
 				if ( $clean ) $passages[] = $clean;
 			}
 		}
-		update_post_meta( $post_id, '_scsl_other_passages', $passages );
 
 		// Focus passage: saved explicitly since field name differs from meta key
 		$focus_for_sync = isset( $post_data['scsl_focus_passage'] )
 			? sanitize_text_field( wp_unslash( $post_data['scsl_focus_passage'] ) )
 			: '';
+
+		/*
+		 * Anything that arrived after this page was drawn is kept.
+		 *
+		 * A generation writes passages straight onto the sermon, so a screen
+		 * opened before that posts a list that knows nothing about them. Taken
+		 * at face value it replaced eleven generated passages with none.
+		 *
+		 * The box carries a stamp of what it was built from. If the sermon no
+		 * longer matches it, the two lists are merged, with whatever is in the
+		 * form first because that is what somebody was looking at.
+		 */
+		$stored_passages = $scripture_before['passages'];
+		$stored_focus    = $scripture_before['focus'];
+		$stamp           = isset( $post_data['scsl_passages_stamp'] ) ? sanitize_text_field( wp_unslash( $post_data['scsl_passages_stamp'] ) ) : '';
+
+		if ( '' !== $stamp && self::passages_stamp( $stored_focus, $stored_passages ) !== $stamp ) {
+			$merged = [];
+			$seen   = [];
+
+			foreach ( array_merge( $passages, array_filter( $stored_passages ) ) as $passage ) {
+				$passage = sanitize_text_field( (string) $passage );
+				$key     = strtolower( trim( (string) preg_replace( '/\s+/', ' ', $passage ) ) );
+
+				if ( '' === $key || isset( $seen[ $key ] ) ) continue;
+
+				$seen[ $key ] = true;
+				$merged[]     = $passage;
+			}
+
+			$passages = $merged;
+
+			// A focus passage written while this page was open is kept too,
+			// rather than cleared by a box that never knew about it.
+			if ( '' === $focus_for_sync && '' !== $stored_focus ) {
+				$focus_for_sync = $stored_focus;
+			}
+		}
+
+		update_post_meta( $post_id, '_scsl_other_passages', $passages );
 		update_post_meta( $post_id, '_scsl_focus_passage', $focus_for_sync );
 
 		// Sync scripture taxonomy

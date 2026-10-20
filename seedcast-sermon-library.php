@@ -3,7 +3,7 @@
  * Plugin Name: Seedcast Sermon Library
  * Plugin URI:  https://seedcast.ai/sermon-library
  * Description: A complete sermon series and content management system for churches. Manage sermons, series, speakers, transcripts, Bible studies, and more.
- * Version:     2.74.0
+ * Version:     2.74.1
  * Author:      Seedcast
  * Author URI:  https://seedcast.ai
  * License:     GPL-2.0-or-later
@@ -20,7 +20,7 @@ namespace SeedcastSermonLibrary;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define( 'SCSL_VERSION',          '2.74.0' );
+define( 'SCSL_VERSION',          '2.74.1' );
 define( 'SCSL_PLUGIN_FILE',      __FILE__ );
 define( 'SCSL_PLUGIN_DIR',       plugin_dir_path( __FILE__ ) );
 define( 'SCSL_PLUGIN_URL',       plugin_dir_url( __FILE__ ) );
@@ -198,12 +198,37 @@ final class SermonLibrary {
 		$on_settings = false !== strpos( $hook, 'seedcast-settings' );
 
 		if ( $on_cpt || $on_sl || $on_settings ) {
-			wp_enqueue_style(  'scsl-admin', SCSL_PLUGIN_URL . 'assets/css/admin.css',   [ 'seedcast-core-admin' ], SCSL_VERSION );
-			wp_enqueue_script( 'scsl-admin', SCSL_PLUGIN_URL . 'assets/js/admin.js', [ 'jquery' ], SCSL_VERSION, true );
+			/*
+			 * Versioned by the file's own time, like every other enqueue of
+			 * these two.
+			 *
+			 * This one ran first, so its version is the one WordPress kept,
+			 * and the four elsewhere that ask for the file-time version never
+			 * got a look in. The address therefore only changed on a release:
+			 * every edit to admin.js between releases was served from the
+			 * browser's cache, and a fix could be on disk for days while the
+			 * screen went on running the old copy.
+			 */
+			wp_enqueue_style(  'scsl-admin', SCSL_PLUGIN_URL . 'assets/css/admin.css', [ 'seedcast-core-admin' ], scsl_asset_version( 'assets/css/admin.css' ) );
+			wp_enqueue_script( 'scsl-admin', SCSL_PLUGIN_URL . 'assets/js/admin.js',   [ 'jquery' ], scsl_asset_version( 'assets/js/admin.js' ), true );
 			wp_localize_script( 'scsl-admin', 'scslAdmin', [
 				'ajaxUrl'    => admin_url( 'admin-ajax.php' ),
 				'nonce'      => wp_create_nonce( 'scsl_admin_nonce' ),
 				'generating' => __( 'Generating…', 'seedcast-sermon-library' ),
+
+				/**
+				 * Whether the admin scripts should report what they did.
+				 *
+				 * WP_DEBUG alone was not enough: this site runs with it off
+				 * and the engine's own switch on, so the browser side stayed
+				 * silent while the server side talked.
+				 *
+				 * @param bool $on Whether to record what the admin scripts do.
+				 */
+				'debug'      => (bool) apply_filters(
+					'scsl_browser_log',
+					( defined( 'WP_DEBUG' ) && WP_DEBUG ) || ( defined( 'SCPRO_DEBUG' ) && SCPRO_DEBUG )
+				),
 			] );
 
 			// wp.media is not loaded on settings screens by default.

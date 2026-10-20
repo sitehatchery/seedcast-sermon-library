@@ -131,6 +131,11 @@ class FieldMap {
 	 */
 	public static function labels(): array {
 		return self::regenerable() + [
+			// Not things anybody generates, but things the engine can put on a
+			// sermon, so they need a name for the list that says what landed.
+			'_scsl_audio_url'     => __( 'Audio', 'seedcast-sermon-library' ),
+			'_scsl_other_passages' => __( 'Scripture references', 'seedcast-sermon-library' ),
+			'_scsl_video_url'     => __( 'Video', 'seedcast-sermon-library' ),
 			'_scsl_article_title' => __( 'Article Title', 'seedcast-sermon-library' ),
 			// Renameable per site, so it is read rather than assumed.
 			'_scsl_resources'     => (string) get_option( 'scsl_tab_more_label', __( 'More', 'seedcast-sermon-library' ) ),

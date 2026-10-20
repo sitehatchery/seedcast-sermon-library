@@ -55,6 +55,48 @@ class MetaBoxes {
 		add_action( 'save_post',             [ $this, 'save'              ], 10, 2 );
 		add_action( 'save_post',             [ $this, 'clear_post_cache'  ], 10, 2 );
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_scripts'   ] );
+		add_action( 'wp_ajax_scsl_log',      [ $this, 'ajax_log'         ] );
+	}
+
+	/**
+	 * Record what the admin scripts did, while WP_DEBUG is on.
+	 *
+	 * Work that happens in the browser is otherwise invisible from here: a
+	 * step can be handed exactly the right thing, do nothing with it, and
+	 * leave no trace at all. That cost several rounds of "it still does not
+	 * work" with nothing to read, so the browser gets somewhere to say so.
+	 *
+	 * Kept to the last fifty lines, and written nowhere unless WP_DEBUG.
+	 *
+	 * @return void
+	 */
+	public function ajax_log(): void {
+		$on = (bool) apply_filters(
+			'scsl_browser_log',
+			( defined( 'WP_DEBUG' ) && WP_DEBUG ) || ( defined( 'SCPRO_DEBUG' ) && SCPRO_DEBUG )
+		);
+
+		if ( ! $on ) {
+			wp_send_json_success();
+		}
+
+		if ( ! check_ajax_referer( 'scsl_admin_nonce', 'nonce', false ) || ! current_user_can( 'edit_posts' ) ) {
+			wp_send_json_error( [], 403 );
+		}
+
+		$message = isset( $_POST['message'] ) ? sanitize_text_field( wp_unslash( $_POST['message'] ) ) : '';
+
+		if ( '' === $message ) {
+			wp_send_json_success();
+		}
+
+		$log = (array) get_option( 'scsl_debug_log', [] );
+
+		$log[] = gmdate( 'H:i:s' ) . '  ' . substr( $message, 0, 300 );
+
+		update_option( 'scsl_debug_log', array_slice( $log, -50 ), false );
+
+		wp_send_json_success();
 	}
 
 	/**
@@ -109,6 +151,10 @@ class MetaBoxes {
 			'ajaxUrl'    => admin_url( 'admin-ajax.php' ),
 			'nonce'      => wp_create_nonce( 'scsl_admin_nonce' ),
 			'generating' => __( 'Generating…', 'seedcast-sermon-library' ),
+			'debug'      => (bool) apply_filters(
+				'scsl_browser_log',
+				( defined( 'WP_DEBUG' ) && WP_DEBUG ) || ( defined( 'SCPRO_DEBUG' ) && SCPRO_DEBUG )
+			),
 		] );
 	}
 
@@ -205,6 +251,16 @@ class MetaBoxes {
 
 		// Desired order for the 'normal' context
 		$order = [
+			/*
+			 * The AI Engine's panel, directly under the title.
+			 *
+			 * Named here even though it belongs to another plugin, because
+			 * anything this list does not know about is appended at the end,
+			 * and the end of a screen with a dozen boxes is where it was
+			 * invisible. Harmless when the engine is not installed: a box that
+			 * does not exist is simply not found.
+			 */
+			'scpro_regenerate',
 			'scsl_manifest_import',
 			'scsl_sermon_source',
 			'scsl_sermon_details',

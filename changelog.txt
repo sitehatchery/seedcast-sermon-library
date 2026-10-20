@@ -2,6 +2,21 @@
 
 Complete historical changelog moved out of readme.txt to keep the WordPress.org readme concise.
 
+= 2.74.1 =
+
+* Generate Sermon is no longer in the menu on sites running Sermon Library AI. Everything it did now happens on the sermon itself, which is where the recording, the details and the content already live. On sites without the engine the page is exactly as it was: it is where generation is explained and where to get it.
+* Admin styles and scripts are versioned by the file's own time everywhere, not only in most places. One enqueue still used the release version and happened to run first, so that was the version WordPress kept for all of them: between releases the address never changed, the browser went on serving the copy it already had, and a fix could sit on disk for days while the screen ran the old one.
+* Scripture passages found by a generation appear in the Scripture box while you are looking at it, rather than only on the sermon. They were merged onto the sermon as they were found, so a page already open showed none of them: eleven passages on the sermon and an empty box on the screen, which reads as a run that found nothing. They now arrive as rows, already split into book, chapter and verse by the same code that draws the box, and anything already listed is not added twice.
+* The Audio and Video fields are declared to the AI Engine, so a recording given when starting a generation lands in the box it belongs to rather than only on the sermon.
+* Passages added to a sermon while its edit screen is open are no longer thrown away by pressing Update. The screen saves the passages it was drawn with, so a page opened before a generation added eleven of them replaced all eleven with none. The Scripture box now carries a fingerprint of what it was built from: where the sermon has moved on since, the two lists are merged rather than one replacing the other, and a focus passage written meanwhile is kept. Removing a passage on purpose still removes it.
+* The AI Engine's panel is placed directly under the sermon's title. The order of the boxes on that screen is decided here, and anything this plugin did not know about was put after every one of its own, which is the least useful place for the tool somebody came to use.
+
+= 2.74.0 =
+
+* A gallery added with Add Media to a sermon's Article, Bible Study or More tab now shows as a gallery. It used to print as its shortcode text.
+* Galleries on sermon, series and speaker pages show as a grid of even tiles that follows the gallery's column setting, and open full size in a lightbox with previous and next. Themes that leave gallery styling to themselves had been stacking the photos full width.
+* Bundles version 1.27.0 of the shared Seedcast library, which provides the gallery grid and lightbox.
+
 = 2.73.1 =
 
 **Fixes**

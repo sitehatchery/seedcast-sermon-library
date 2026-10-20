@@ -2,6 +2,21 @@
 ( function( $ ) {
     'use strict';
 
+    /*
+     * Says this file is the one the page is running.
+     *
+     * Silence from the steps below could mean the code did nothing or that
+     * the browser was running an older copy of this file, and those are
+     * different problems with the same symptom. One line on load tells them
+     * apart. Written only while WP_DEBUG is on.
+     */
+    $( function() {
+        slLog(
+            'admin.js running, scripture box: ' + ( $( '#scsl-passages-wrap' ).length ? 'present' : 'absent' ) +
+            ', carrier: ' + ( $( '#scsl-passages-incoming' ).length ? 'present' : 'absent' )
+        );
+    } );
+
     // ── Tab System ────────────────────────────
     $( document ).on( 'click', '.scsl-tab', function() {
         var $btn   = $( this );
@@ -96,8 +111,17 @@
         updatePassagePicker( $( this ).closest( '.scsl-passage-picker' ) );
     } );
 
-    // ── Add Passage Row ───────────────────────
-    $( document ).on( 'click', '.scsl-add-passage', function() {
+    /**
+     * Build an empty passage row.
+     *
+     * A function rather than the body of the Add button, because passages
+     * written onto the sermon while this screen is open arrive later and need
+     * the same row. Two builders would drift, and the one nobody looked at
+     * would be the broken one.
+     *
+     * @return {jQuery} The row, not yet attached.
+     */
+    function slNewPassageRow() {
         var booksJson = $( '#scsl-books-json' ).val();
         var books = [];
         try { books = JSON.parse( booksJson ); } catch(e) {}
@@ -121,13 +145,184 @@
             .append( '<span class="scsl-pp-preview">-</span>' )
             .append( '<input type="hidden" class="scsl-pp-value" name="scsl_other_passages[]" value="" />' );
 
-        var $row = $( '<div class="scsl-passage-row sf-passage-row--extra">' )
+        return $( '<div class="scsl-passage-row sf-passage-row--extra">' )
             .append( $picker )
             .append( '<button type="button" class="button scsl-make-focus" title="Make this the focus passage, and move the current one down here">Focus</button>' )
             .append( '<button type="button" class="button scsl-remove-passage">Remove</button>' );
+    }
+
+    // ── Add Passage Row ───────────────────────
+    $( document ).on( 'click', '.scsl-add-passage', function() {
+        var $row = slNewPassageRow();
 
         $( '#scsl-passages-wrap' ).append( $row );
         $row.find( '.scsl-pp-book' ).trigger( 'focus' );
+    } );
+
+    /*
+     * Passages written onto the sermon while this screen was open.
+     *
+     * A generation merges them straight onto the sermon, so the box here knew
+     * nothing about them: the sermon had eleven passages and the screen showed
+     * none, which read as a run that found none.
+     *
+     * They arrive already split into book, chapter and verse, so nothing here
+     * has to parse a reference. The hidden field is emptied afterwards, so the
+     * rows are the only thing the save reads.
+     */
+    /**
+     * Say what happened, in the engine's log.
+     *
+     * This step runs in the browser between two things that both looked
+     * correct from the outside: the engine reported the passages handed over
+     * and placed, and the box stayed empty. Without a word from in here there
+     * was nothing to read but the silence.
+     *
+     * @param {string} reason What happened.
+     * @param {number} rows   How many arrived.
+     * @param {number} added  How many were put on the screen.
+     * @return {void}
+     */
+    function slLog( message ) {
+        if ( ! window.scslAdmin || ! window.scslAdmin.debug || ! window.scslAdmin.ajaxUrl ) {
+            return;
+        }
+
+        $.post( window.scslAdmin.ajaxUrl, {
+            action:  'scsl_log',
+            nonce:   window.scslAdmin.nonce,
+            message: message
+        } );
+    }
+
+    /**
+     * @param {string} reason What happened.
+     * @param {number} rows   How many arrived.
+     * @param {number} added  How many were put on the screen.
+     * @return {void}
+     */
+    function slLogPassages( reason, rows, added ) {
+        slLog( 'passages carrier: ' + reason + ' (arrived ' + ( rows || 0 ) + ', added ' + ( added || 0 ) + ')' );
+    }
+
+    /**
+     * Put passages that arrived into the box.
+     *
+     * @param {jQuery} $carrier The hidden field they arrive in.
+     * @return {void}
+     */
+    function slConsumeIncomingPassages( $carrier ) {
+        if ( ! $carrier || ! $carrier.length ) {
+            return;
+        }
+
+        var raw = $.trim( $carrier.val() || '' );
+
+        if ( ! raw ) {
+            return;
+        }
+
+        var rows;
+
+        try {
+            rows = JSON.parse( raw );
+        } catch ( e ) {
+            slLogPassages( 'could not be read as a list', 0, 0 );
+            return;
+        }
+
+        if ( ! Array.isArray( rows ) || ! rows.length ) {
+            slLogPassages( 'arrived empty', 0, 0 );
+            return;
+        }
+
+        var added = 0;
+
+        // What the screen already shows, including the focus passage, so
+        // nothing is listed twice.
+        var seen = {};
+
+        $( '#scsl-passages-wrap .scsl-pp-value, [name="scsl_focus_passage"]' ).each( function() {
+            var had = $.trim( $( this ).val() || '' ).toLowerCase();
+
+            if ( had ) {
+                seen[ had ] = true;
+            }
+        } );
+
+        $.each( rows, function( i, row ) {
+            var value = row && row.value ? $.trim( row.value ) : '';
+
+            if ( ! value || seen[ value.toLowerCase() ] ) {
+                return;
+            }
+
+            seen[ value.toLowerCase() ] = true;
+
+            var $row    = slNewPassageRow();
+            var $picker = $row.find( '.scsl-passage-picker' );
+
+            $picker.find( '.scsl-pp-book' ).val( row.book || '' );
+            $picker.find( '.scsl-pp-chapter' ).val( row.chapter || '' );
+            $picker.find( '.scsl-pp-verse-start' ).val( row.verse_start || '' );
+            $picker.find( '.scsl-pp-verse-end' ).val( row.verse_end || '' );
+
+            if ( row.chapter_end ) {
+                $picker.find( '.scsl-pp-chapter-end, .scsl-pp-colon-end' ).prop( 'hidden', false );
+                $picker.find( '.scsl-pp-more' ).prop( 'hidden', true );
+                $picker.find( '.scsl-pp-chapter-end' ).val( row.chapter_end );
+            }
+
+            /*
+             * The reference as the sermon has it, rather than one rebuilt from
+             * the controls. A passage the picker cannot express exactly is
+             * still the passage that was found, and rebuilding it would quietly
+             * change what the sermon says.
+             */
+            $picker.find( '.scsl-pp-value' ).val( value );
+            $picker.find( '.scsl-pp-preview' ).text( value );
+
+            $( '#scsl-passages-wrap' ).append( $row );
+            added++;
+        } );
+
+        slLogPassages(
+            $( '#scsl-passages-wrap' ).length ? 'placed in the box' : 'no passages box on this screen',
+            rows.length,
+            added
+        );
+
+        $carrier.val( '' );
+    }
+
+    /*
+     * Both events, and once on load.
+     *
+     * The engine fills the field and fires change, but a value already in it
+     * when this script starts fires nothing at all, and that is exactly the
+     * case on a screen reopened while content was waiting.
+     */
+    $( document ).on( 'change input', '#scsl-passages-incoming', function() {
+        slConsumeIncomingPassages( $( this ) );
+    } );
+
+    $( function() {
+        var $carrier = $( '#scsl-passages-incoming' );
+
+        /*
+         * Said once on load, so a run that goes quiet can be told apart.
+         *
+         * No line at all means this script is not the one the page is
+         * running, which is a different problem from one that ran and found
+         * nothing to do.
+         */
+        slLogPassages(
+            $carrier.length ? 'watching the carrier' : 'no carrier on this screen',
+            0,
+            0
+        );
+
+        slConsumeIncomingPassages( $carrier );
     } );
 
     /*

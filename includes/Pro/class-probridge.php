@@ -81,6 +81,8 @@ class ProBridge {
 		 */
 		add_action( 'seedcast_pro_imported_' . self::PRODUCT, [ $this, 'focus_from_title' ], 20, 1 );
 		add_filter( 'seedcast_pro_staged_' . self::PRODUCT, [ $this, 'stage_article_title' ], 10, 2 );
+		add_filter( 'seedcast_pro_staged_' . self::PRODUCT, [ $this, 'stage_passages' ], 10, 2 );
+		add_filter( 'seedcast_pro_stage_fields_' . self::PRODUCT, [ $this, 'stage_passages' ], 10, 2 );
 		// Late, so the article body has already been saved by its metabox.
 		add_action( 'save_post_' . self::POST_TYPE, [ $this, 'derive_article_title' ], 100, 2 );
 
@@ -276,6 +278,20 @@ class ProBridge {
 			// them. Input names are the meta key without its leading
 			// underscore; three of them are rich editors.
 			'inputs'      => [
+				/*
+				 * The source fields, so a recording given in the dialog shows
+				 * up in the box it belongs to.
+				 *
+				 * The engine writes the address onto the sermon as soon as it
+				 * is given, which left the Audio box on an open screen empty:
+				 * the sermon had the recording and the screen did not, and
+				 * pressing Update posted that empty box back over it.
+				 */
+				// Passages come through as rows already split into book,
+				// chapter and verse. See stage_passages().
+				'_scsl_other_passages'      => [ 'name' => 'scsl_passages_incoming',   'type' => 'textarea' ],
+				'_scsl_audio_url'           => [ 'name' => 'scsl_audio_url',           'type' => 'url' ],
+				'_scsl_video_url'           => [ 'name' => 'scsl_video_url',           'type' => 'url' ],
 				'_scsl_content_description' => [ 'name' => 'scsl_content_description', 'type' => 'textarea' ],
 				'_scsl_transcript_clean'    => [ 'name' => 'scsl_transcript_clean',    'type' => 'textarea' ],
 				'_scsl_article_title'       => [ 'name' => 'scsl_article_title',       'type' => 'text' ],
@@ -317,28 +333,22 @@ class ProBridge {
 	 */
 	public function add_menu(): void {
 		/**
-		 * The AI Engine swaps in the real generate form here when the site's
-		 * API key covers sermon generation. Without it, the upsell renders.
-		 *
-		 * @param callable $renderer Default renderer.
-		 * @param string   $product  Product slug.
-		 */
-		$renderer = apply_filters( 'seedcast_pro_renderer', [ $this, 'render_upsell' ], self::PRODUCT );
-
-		if ( ! is_callable( $renderer ) ) {
-			$renderer = [ $this, 'render_upsell' ];
-		}
-
-		/**
 		 * Whether to offer the page at all.
 		 *
-		 * On for everybody. The page is worth reaching without the engine
-		 * installed, because it is the one place that explains what generation
-		 * does and where to get it. Filterable so a site can still remove it.
+		 * Without the engine it is the one place that explains what generation
+		 * does and where to get it, so it stays: the page is the pitch.
+		 *
+		 * With the engine installed it is a second way to do what the sermon's
+		 * own screen now does better. The sermon is where the recording, the
+		 * details and the content already live, and the generate screen was a
+		 * separate implementation of the same job: its own form, its own
+		 * script, its own idea of what had been written. Two routes to one job
+		 * is how the two drift apart, and the one nobody uses is the one that
+		 * breaks quietly.
 		 *
 		 * @param bool $show Whether the menu item appears.
 		 */
-		if ( ! apply_filters( 'scsl_show_generate_page', true ) ) return;
+		if ( ! apply_filters( 'scsl_show_generate_page', ! defined( 'SCPRO_VERSION' ) ) ) return;
 
 		add_submenu_page(
 			'seedcast-sermon-library',
@@ -346,7 +356,7 @@ class ProBridge {
 			__( 'Generate Sermon', 'seedcast-sermon-library' ),
 			'publish_posts',
 			self::PAGE,
-			$renderer
+			[ $this, 'render_upsell' ]
 		);
 	}
 
@@ -795,6 +805,43 @@ class ProBridge {
 	 * @param int   $post_id Sermon ID.
 	 * @return array
 	 */
+	/**
+	 * Hand the sermon's passages to the screen that is open on it.
+	 *
+	 * Generated passages are merged straight onto the sermon, because they
+	 * belong to it rather than to a box somebody is typing in. That left them
+	 * invisible: the sermon had eleven and the Scripture box showed none, so a
+	 * run that found them looked like a run that had not.
+	 *
+	 * Sent already split into book, chapter and verse. Working that out is
+	 * this plugin's job and the code for it is in PHP; a second copy in the
+	 * browser would be two answers to one question.
+	 *
+	 * @param array $fields  Meta key to value.
+	 * @param int   $post_id Post ID.
+	 * @return array
+	 */
+	public function stage_passages( $fields, $post_id ) {
+		$passages = (array) get_post_meta( absint( $post_id ), '_scsl_other_passages', true );
+		$passages = array_values( array_filter( array_map( 'strval', $passages ) ) );
+
+		if ( ! $passages ) {
+			return (array) $fields;
+		}
+
+		$rows = [];
+
+		foreach ( $passages as $passage ) {
+			$rows[] = \SeedcastSermonLibrary\Admin\SermonMeta::passage_parts( $passage );
+		}
+
+		$fields = (array) $fields;
+
+		$fields['_scsl_other_passages'] = (string) wp_json_encode( $rows );
+
+		return $fields;
+	}
+
 	public function stage_article_title( $fields, $post_id ) {
 		if ( ! is_array( $fields ) || empty( $fields['_scsl_article_body'] ) ) return $fields;
 
