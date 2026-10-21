@@ -238,71 +238,6 @@ No. Sermons, series and speakers remain in the database.
 * The Generate with AI panel now sits directly under the sermon's title rather than below every other box.
 * Fixes to the admin screens are fetched rather than served from whatever your browser already had.
 
-= 2.74.0 =
-
-* A gallery added with Add Media to a sermon's Article, Bible Study or More tab now shows as a gallery. It used to print as its shortcode text.
-* Galleries on sermon, series and speaker pages show as a grid of even tiles that follows the gallery's column setting, and open full size in a lightbox with previous and next. Themes that leave gallery styling to themselves had been stacking the photos full width.
-* Bundles version 1.27.0 of the shared Seedcast library, which provides the gallery grid and lightbox.
-
-= 2.73.1 =
-
-* Generated questions that cannot be laid out as rows are now shown as they arrived rather than silently dropped.
-* Fixes to the Edit Sermon screen are fetched rather than served from the browser's cache.
-* Removed the Scripture References checklist WordPress was adding beside the sermon. Passages are managed in the Scripture box, and a checklist of every passage in the Bible is not something anyone was going to tick.
-* Any additional passage can be promoted with a new Focus button. It swaps places with the current focus passage, so nothing has to be retyped and nothing is lost.
-* The Questions box now sits under Content even if you had already rearranged your meta boxes.
-* New Scripture Summaries screen for reading, editing and approving the summary at the top of a book or chapter page. The list runs Genesis to Revelation and can be sorted by how many sermons a passage has. A rewritten summary now waits for your approval instead of replacing what is published, with a count beside the menu while any are waiting. Editing one yourself marks it as your writing and stops it being rewritten, unless you tick the box that says otherwise.
-
-= 2.73.0 =
-
-* Sermons can now carry the questions they answer, shown on the sermon page as a numbered list of questions with their answers. A sermon is largely someone answering questions people already have, and this makes those answers findable by anyone scanning the page instead of only by someone reading the whole transcript.
-* The questions are described to search engines as structured data, and give AI assistants a clean question and answer to quote rather than a point buried in a transcript.
-* Write them yourself in the new Questions box under Content on the Edit Sermon screen, a row per question with its answer, or let Sermon Library AI write them from what was preached.
-* Questions can be switched off for the whole site in Settings, and count towards a sermon's completeness score when they are on.
-* Topics are now picked rather than ticked, with a limit of three per sermon. A topic that ends up on four sermons in five is a label on the whole library rather than a way into it, and a checklist tends to produce either nothing ticked or everything ticked.
-* Sermon Library AI can choose them, but only from the topics your church already has. It cannot invent one, so your vocabulary stays yours and does not split into three near-identical terms.
-* Retiring a topic no longer leaves broken addresses behind. Point the old topic at whichever one replaced it, or at the sermon archive, and visitors and search engines are redirected instead of finding a missing page.
-
-= 2.72.1 =
-
-* Passage pages no longer queue background work on every view, which on a site being crawled could use up every available PHP process. Nothing is queued now unless a summary service is connected.
-* Building the sitemap is a single query rather than several thousand.
-* Addresses written before the site placed a separator between chapter and verse now reach the right page, so /scripture/john-844/ leads to /scripture/john-8-44/. The same applies to sermon addresses left behind by a previous plugin.
-* Passage and topic feeds are switched off. They were slow enough that crawlers recorded errors against them, and a passage archive is not something anyone subscribes to. Those addresses now lead to the page.
-* New at /llms-full.txt: a single plain text description of your whole sermon library for AI assistants, listing every sermon with its passage, speaker and a summary of what it covers. Most llms.txt files list only a handful of recent items; this one describes the library.
-* Book and chapter summaries are given more to work with, so a generated summary describes where your church's teaching actually sits rather than reading like general commentary on the book.
-
-= 2.72.0 =
-
-**Passage pages rebuilt**
-
-* Every book, chapter and passage now has a real page. One address gathers everything your church has preached from Romans, another gathers Romans 8, and a verse page leads with the sermons on that verse.
-* A passage page continues past its own sermons: the articles written from them, then the rest of your teaching in that book. A page that used to hold a single sermon card now holds a way into the whole book.
-* Sermon cards on a passage page show which passages in that book each sermon actually touches.
-* Long lists load more on request rather than paging, with the first batch in the page itself so search engines still see it.
-* Book and chapter pages can carry a short written summary of what their sermons cover. Sermon Library AI writes it; without a service connected the section simply does not appear.
-* Passages in books your church has barely preached are kept out of search results automatically, and return on their own as you preach there.
-* Passage pages load in about a second where they previously took several, after a fix to how Scripture references are parsed.
-
-= 2.71.0 =
-* Every setting the shared Seedcast library stores was renamed to a longer, more distinctive prefix, so it cannot collide with another plugin that happened to choose the same short one. Your church details, service times, theme and spam settings are carried across automatically the first time the plugin loads; nothing needs re-entering.
-* Submitted form values are cleaned once, in a single place, before any plugin sees them. A value containing a backslash is no longer damaged on its way into the database.
-* The church details published for search engines can no longer be broken by a stray tag in a setting.
-* The unlisted choice saved from Quick Edit is sanitized before it is read, and temporary files left by a manifest import are now removed through WordPress rather than by a direct file call.
-* The completeness report's own links use the new prefix. A bookmarked report URL from an earlier version opens the default view rather than the filtered one.
-
-= 2.70.2 =
-
-* Unlisted sermons are now kept out of lists that name the sermon type as a list rather than a single value, and a repeated error-log warning is gone.
-
-= 2.70.1 =
-
-* Bulletin Library sermon sections now render at full page width above the two-column body area.
-
-= 2.70.0 =
-
-* Updated the Bulletin Library integration and internal bridge naming.
-
 Complete historical changelog: see `changelog.txt`.
 
 == Upgrade Notice ==
@@ -310,31 +245,3 @@ Complete historical changelog: see `changelog.txt`.
 = 2.75.0 =
 
 Topic pages are rebuilt: all the sermons on a subject, what your church has taught about it, and a way through to the subjects it sits beside.
-
-= 2.74.0 =
-
-Galleries added with Add Media now show on sermons, as a grid that opens in a lightbox.
-
-= 2.73.1 =
-
-Fixes a problem where generated questions were handed to the Edit Sermon screen and silently dropped. Recommended for anyone running 2.73.0.
-
-= 2.73.0 =
-
-Adds Questions: the questions a sermon answers, shown on the sermon page and described to search engines. Write them in the new Questions box under Content, or let Sermon Library AI write them. Switch the section off in Settings if you do not want it.
-
-= 2.72.1 =
-
-Fixes a problem where passage pages queued background work on every view, which on a busy or heavily crawled site could exhaust available PHP processes. Recommended for every site running 2.72.0.
-
-= 2.72.0 =
-
-Books, chapters and passages each become a real page, with related articles and the rest of the book beneath. Visit Settings > Permalinks and save once after upgrading so the new addresses take effect.
-
-= 2.71.0 =
-
-Settings stored by the shared Seedcast library move to a new, longer prefix. They are carried across for you on the first page load after upgrading, so nothing needs re-entering. Includes input handling improvements.
-
-= 2.70.2 =
-
-Fixes unlisted sermons still showing in some lists, and stops a repeated warning being written to the error log.

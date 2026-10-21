@@ -31,6 +31,12 @@ Complete historical changelog moved out of readme.txt to keep the WordPress.org 
 * A topic page with fewer than two sermons is left out of the index and the sitemap, and starts being indexed by itself once the church has preached the subject again. Follow stays on: the sermon it links to is worth crawling even when the page listing it is not worth listing.
 * Everything a summary page does apart from describing itself now lives in one place, shared by scripture and topic pages: the caching, serving a stale copy while a new one is written, holding a rewrite of a church's own words for review, and backing off when no service is connected. Two copies of that would have drifted.
 * The count beside the menu is counted per kind, so a topic waiting to be looked at is not counted on the scripture screen, where it could not be looked at.
+* A heading names up to five of the topics beneath it rather than three, ordered by how often that set returns to them, and calls them "Most used topics" only where there were more than five to choose from. Three of twenty is a sample; five of five is the whole list, and a label claiming otherwise is a claim about nothing. Both rows on a passage page are drawn by one partial, so the two cannot drift.
+* A topic chip is shaped like the View Sermon button beside it: the theme's own outline, its button ink at the weight a small label needs, and the accent fill on hover. A chip in a sermon card was taking that row's link treatment, which came out as brown text inside a gold pill with a line under the word on hover, so the card's rule now leaves chips alone rather than being outweighed further down the stylesheet.
+* The rule under "Explore Other Sermons Relating to {book}" belongs to the heading and its topics together. Left on the heading it stopped at the end of the words and ran between the two, so the chips read as the first line of the list below.
+* The related sections on a topic page stand clear of the sermons above them. They had no styles of their own, so each heading sat on the card above it and read as that card's caption, and the line saying why a topic is listed is now a quiet note beside its name rather than more heading.
+* "Other Passages" is only other than a focus passage. A sermon without one was showing that heading over its entire list of references, so the label is left out there and the panel's own heading names the list.
+* The Scripture heading stands above its box, level with Topics and Share. Inside the box it started a line lower than its neighbours, which made the same kind of thing look like a different one.
 
 * A generation of Scripture references replaces its own previous set rather than piling a second reading on top of the first. Passages are added to a sermon rather than swapped in, because a list somebody typed is theirs and a run asked for references is a request for the rest, but run twice that left one sermon carrying thirty-nine references with the same passages among them in looser forms, Matthew 4 beside Matthew 4:1-11. A generation now clears what its last reading found and leaves everything else alone: anything added by hand stays, the focus passage stays, and so does a passage this reading found again.
 * Generate Sermon is no longer in the menu on sites running Sermon Library AI. Everything it did now happens on the sermon itself, which is where the recording, the details and the content already live. On sites without the engine the page is exactly as it was: it is where generation is explained and where to get it.
@@ -148,6 +154,13 @@ Complete historical changelog moved out of readme.txt to keep the WordPress.org 
 * `scsl_sermon_card_meta_rows` adds rows to a sermon card's detail column, so a page can put context on a card without the card knowing anything about that page.
 * `[scsl_content]` gained `include`, `offset` and `wrapper`, so a caller that has already worked out which sermons belong in a list can ask for exactly those, continue a list it has already drawn, and receive bare cards to append rather than a second section nested inside the first.
 * Bundled CSS and JavaScript are versioned by the file's own timestamp as well as the plugin version. A stylesheet edited between releases kept the same URL before, so browsers and page caches went on serving the old file and the change looked as though it had not worked.
+
+= 2.71.0 =
+* Every setting the shared Seedcast library stores was renamed to a longer, more distinctive prefix, so it cannot collide with another plugin that happened to choose the same short one. Your church details, service times, theme and spam settings are carried across automatically the first time the plugin loads; nothing needs re-entering.
+* Submitted form values are cleaned once, in a single place, before any plugin sees them. A value containing a backslash is no longer damaged on its way into the database.
+* The church details published for search engines can no longer be broken by a stray tag in a setting.
+* The unlisted choice saved from Quick Edit is sanitized before it is read, and temporary files left by a manifest import are now removed through WordPress rather than by a direct file call.
+* The completeness report's own links use the new prefix. A bookmarked report URL from an earlier version opens the default view rather than the filtered one.
 
 = 2.70.2 =
 
