@@ -138,7 +138,7 @@ class CardTopics {
 		return $rows . sprintf(
 			'<p class="scsl-service-sermon-card__meta-row scsl-card-topics">'
 			. '<span class="scsl-service-sermon-card__meta-label">%s</span>%s</p>',
-			esc_html__( 'Topics', 'seedcast-sermon-library' ),
+			esc_html__( 'Topics:', 'seedcast-sermon-library' ),
 			implode( ' ', $chips )
 		);
 	}

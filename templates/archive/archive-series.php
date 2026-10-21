@@ -32,14 +32,23 @@ $scsl_topics = '1' === (string) get_option( 'scsl_show_topics_on_series_archive'
 
 	<!-- Topic Filter -->
 	<?php if ( $scsl_topics && ! is_wp_error( $scsl_topics ) ) : ?>
-	<nav class="sc-filter-bar" aria-label="<?php esc_attr_e( 'Filter by topic', 'seedcast-sermon-library' ); ?>">
+	<?php
+	/*
+	 * The same chip a topic wears everywhere else on the site.
+	 *
+	 * These were the theme's filter pills, which a warm theme paints gold:
+	 * the same topic then looked like one thing above the series grid, another
+	 * on a sermon, and another on a passage page. A topic is a topic.
+	 */
+	?>
+	<nav class="scsl-topic-chips scsl-topic-chips--bar" aria-label="<?php esc_attr_e( 'Browse by topic', 'seedcast-sermon-library' ); ?>">
 		<a href="<?php echo esc_url( get_post_type_archive_link( 'scsl_series' ) ); ?>"
-		   class="sc-filter-btn <?php echo esc_attr( ! $scsl_current_topic ? 'is-active' : '' ); ?>">
+		   class="scsl-topic-tag <?php echo esc_attr( ! $scsl_current_topic ? 'is-active' : '' ); ?>">
 			<?php esc_html_e( 'All', 'seedcast-sermon-library' ); ?>
 		</a>
 		<?php foreach ( $scsl_topics as $scsl_topic ) : ?>
 			<a href="<?php echo esc_url( get_term_link( $scsl_topic ) ); ?>"
-			   class="sc-filter-btn <?php echo esc_attr( ( $scsl_current_topic === $scsl_topic->slug ) ? 'is-active' : '' ); ?>">
+			   class="scsl-topic-tag <?php echo esc_attr( ( $scsl_current_topic === $scsl_topic->slug ) ? 'is-active' : '' ); ?>">
 				<?php echo esc_html( $scsl_topic->name ); ?>
 			</a>
 		<?php endforeach; ?>

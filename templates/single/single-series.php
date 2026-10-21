@@ -166,7 +166,7 @@ while ( have_posts() ) :
 
 			<!-- Topics -->
 			<?php if ( '1' === (string) get_option( 'scsl_show_topics_on_series', '1' ) && $scsl_series_topics ) : ?>
-			<div class="scsl-series-topics">
+			<div class="scsl-series-topics scsl-topic-chips">
 				<?php foreach ( $scsl_series_topics as $scsl_topic ) : ?>
 					<a href="<?php echo esc_url( get_term_link( $scsl_topic ) ); ?>" class="scsl-topic-tag">
 						<?php echo esc_html( $scsl_topic->name ); ?>

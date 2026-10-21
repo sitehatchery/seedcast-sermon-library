@@ -130,7 +130,8 @@ wp_enqueue_style( 'scsl-frontend' );
 		</ol>
 	</nav>
 
-	<header class="scsl-archive-header">
+	<header class="scsl-archive-header scsl-archive-header--split">
+		<div class="scsl-archive-header__main">
 		<h1 class="scsl-archive-title"><?php echo esc_html( $scsl_term->name ); ?></h1>
 
 		<?php if ( $scsl_term->description ) : ?>
@@ -181,17 +182,21 @@ wp_enqueue_style( 'scsl-frontend' );
 			);
 			?>
 		</p>
-	</header>
+		</div><!-- /.scsl-archive-header__main -->
 
-	<?php if ( $scsl_page_topics ) : ?>
-		<div class="scsl-series-topics scsl-scripture-topics">
-			<?php foreach ( $scsl_page_topics as $scsl_page_topic ) : ?>
-				<a href="<?php echo esc_url( get_term_link( $scsl_page_topic ) ); ?>" class="scsl-topic-tag">
-					<?php echo esc_html( $scsl_page_topic->name ); ?>
-				</a>
-			<?php endforeach; ?>
-		</div>
-	<?php endif; ?>
+		<?php if ( $scsl_page_topics ) : ?>
+			<div class="scsl-archive-header__topics">
+				<p class="scsl-archive-header__topics-label"><?php esc_html_e( 'Topics:', 'seedcast-sermon-library' ); ?></p>
+				<div class="scsl-topic-chips">
+					<?php foreach ( $scsl_page_topics as $scsl_page_topic ) : ?>
+						<a href="<?php echo esc_url( get_term_link( $scsl_page_topic ) ); ?>" class="scsl-topic-tag">
+							<?php echo esc_html( $scsl_page_topic->name ); ?>
+						</a>
+					<?php endforeach; ?>
+				</div>
+			</div>
+		<?php endif; ?>
+	</header>
 
 	<?php if ( '' !== $scsl_summary ) : ?>
 		<div class="scsl-scripture-summary">

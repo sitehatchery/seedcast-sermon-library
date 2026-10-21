@@ -6,6 +6,10 @@ Complete historical changelog moved out of readme.txt to keep the WordPress.org 
 
 **Topic pages are pages now**
 
+* One chip for a topic, wherever a topic appears. The row above the library page's series grid was the theme's filter pills, which a warm theme paints gold, so the same subject looked like one thing there, another on a sermon and another on a passage page. The current one is marked rather than coloured differently.
+* A passage page's topics sit beside its heading rather than above the summary, under a Topics heading of their own, and stack under the title on a narrow screen.
+* A card's topics row is labelled "Topics:", the way the speaker, series and passage rows beside it are.
+* A series' topics are clear of its description. Three quarters of a rem under a block of prose read as part of the last line.
 * Topics, Scripture and Share in a sermon's sidebar are one heading rather than three. They sat at different sizes with different letter spacing, which is three decisions where nobody made one, and Topics had no spacing above it at all.
 * Topic tags are chips rather than a bulleted list, and dark enough to read: muted grey on a tinted fill came to about four to one, and these are links.
 * A topic page lists its sermons one card per row, the way a passage page does. Both pages draw the same card, and the difference was a wrapper class that inherited the two-up service grid; the two now share one class, so a page added later cannot drift from them either.

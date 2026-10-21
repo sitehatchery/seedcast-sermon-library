@@ -23,6 +23,51 @@
   padding-bottom: 1.5rem;
   border-bottom: 2px solid var(--sc-color-border);
 }
+
+/* A header with something beside the title: the subjects a passage's sermons
+   are about sit to its right, where they are a way out of the page rather
+   than something between the reader and the sermons. */
+.scsl-archive-header--split {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem 2rem;
+}
+.scsl-archive-header__main {
+  flex: 1 1 22rem;
+  min-width: 0;
+}
+.scsl-archive-header__topics {
+  flex: 0 1 auto;
+  max-width: 24rem;
+}
+.scsl-archive-header__topics .scsl-topic-chips {
+  justify-content: flex-end;
+}
+.scsl-archive-header__topics-label {
+  font-size: .85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--sc-color-muted);
+  margin: 0 0 .5rem;
+  text-align: right;
+}
+
+/* Stacked on a narrow screen, where a right-hand column is a column of one
+   chip per line. */
+@media (max-width: 640px) {
+  .scsl-archive-header__topics {
+    max-width: none;
+  }
+  .scsl-archive-header__topics .scsl-topic-chips {
+    justify-content: flex-start;
+  }
+  .scsl-archive-header__topics-label {
+    text-align: left;
+  }
+}
 .scsl-archive-title {
   font-size: clamp(1.75rem, 4vw, 2.5rem);
   font-weight: 700;
@@ -1063,11 +1108,32 @@
   font-weight: 600;
 }
 
-.scsl-series-topics {
+/* One row of topic chips, used on a series, a passage page, the library page
+   and anywhere else a set of them is listed. */
+.scsl-topic-chips {
   display: flex;
   flex-wrap: wrap;
-  gap: .35rem;
-  margin-top: .75rem;
+  gap: .4rem;
+  margin: 0;
+}
+
+/* On a series the chips follow its description, which is a block of prose:
+   three quarters of a rem read as part of the last line. */
+.scsl-series-topics {
+  margin-top: 1.5rem;
+}
+
+/* The row above the library page's series grid is a navigation bar, so it
+   carries the space a bar needs below it. */
+.scsl-topic-chips--bar {
+  margin-bottom: 2rem;
+}
+
+/* The one that is current, on the library page. */
+.scsl-topic-tag.is-active {
+  background: var(--sc-color-text);
+  border-color: var(--sc-color-text);
+  color: var(--sc-color-bg, #fff);
 }
 .scsl-topic-tag {
   display: inline-block;

@@ -210,6 +210,8 @@ No. Sermons, series and speakers remain in the database.
 
 = 2.75.0 =
 
+* A topic looks the same wherever it appears: on a sermon, a series, a passage page and above the series grid.
+* A passage page's topics sit beside its heading, labeled, rather than above the summary.
 * Topics, Scripture and Share headings match in a sermon's sidebar, and topic tags read as chips rather than a bulleted list.
 * Topic pages list sermons one card per row, like passage pages, and both carry each sermon's topics on its card.
 * Passage pages show what their sermons are about as topic chips under the heading. Both of these can be switched off in settings.
