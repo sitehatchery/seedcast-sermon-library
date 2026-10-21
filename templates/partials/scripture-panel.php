@@ -40,8 +40,18 @@ if ( ! $scsl_focus && ! $scsl_passages ) return;
 $scsl_passages = ScriptureParser::tidy( $scsl_passages );
 ?>
 
-<aside class="scsl-scripture-panel" aria-label="<?php esc_attr_e( 'Scripture References', 'seedcast-sermon-library' ); ?>">
+<?php
+/*
+ * The heading stands above the box rather than inside it, level with Topics
+ * and Share. The three are the same kind of thing in the same column, and one
+ * of them starting a line lower because its heading is boxed made it look
+ * like a different kind of thing.
+ */
+?>
+<aside class="scsl-scripture-block" aria-labelledby="scsl-scripture-label">
 	<h2 class="scsl-scripture-panel__title" id="scsl-scripture-label"><?php esc_html_e( 'Scripture', 'seedcast-sermon-library' ); ?></h2>
+
+	<div class="scsl-scripture-panel">
 
 	<?php if ( $scsl_focus ) : ?>
 	<div class="scsl-scripture-panel__section">
@@ -114,8 +124,9 @@ $scsl_passages = ScriptureParser::tidy( $scsl_passages );
 	</div>
 	<?php endif; ?>
 
-	<!-- Screen reader notice for external links -->
-	<p id="scsl-external-notice" class="scsl-sr-only">
-		<?php esc_html_e( 'Opens in a new tab', 'seedcast-sermon-library' ); ?>
-	</p>
+		<!-- Screen reader notice for external links -->
+		<p id="scsl-external-notice" class="scsl-sr-only">
+			<?php esc_html_e( 'Opens in a new tab', 'seedcast-sermon-library' ); ?>
+		</p>
+	</div>
 </aside>

@@ -557,12 +557,16 @@
 }
 
 /* ── Scripture Panel ─────────────────────── */
+/* The heading sits above the box, so the spacing belongs to the pair. */
+.scsl-scripture-block {
+  display: block;
+  margin-top: 1.5rem;
+}
 .scsl-scripture-panel {
   background: var(--sc-color-bg-subtle);
   border: 1px solid var(--sc-color-border);
   border-radius: var(--sc-radius);
   padding: 1.1rem;
-  margin-top: 1rem;
 }
 .scsl-scripture-panel__title,
 .scsl-topics-panel__title,
