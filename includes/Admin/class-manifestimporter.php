@@ -770,7 +770,7 @@ class ManifestImporter {
 	}
 
 	/**
-	 * WP_Filesystem, initialised on first use.
+	 * WP_Filesystem, initialized on first use.
 	 *
 	 * Reading and deleting go through it rather than PHP's own functions so
 	 * this works on hosts where WordPress writes over FTP or SSH instead of
@@ -824,7 +824,7 @@ class ManifestImporter {
 			return;
 		}
 
-		// WP_Filesystem could not be initialised, which happens when
+		// WP_Filesystem could not be initialized, which happens when
 		// credentials are needed and none are available. Fall back to removing
 		// the files we can, so a temp directory full of an uploaded zip is not
 		// left behind.

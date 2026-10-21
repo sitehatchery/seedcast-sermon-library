@@ -87,7 +87,7 @@ if ( $scsl_book_term instanceof \WP_Term && ! $scsl_is_book ) {
  *
  * Almost every translation a church might choose is under copyright, and only
  * the reader's own Bible site is licensed to show it. Printing the words here
- * would put every church running this plugin in breach of a licence they never
+ * would put every church running this plugin in breach of a license they never
  * agreed to and do not know exists, on the strength of picking a translation
  * from a dropdown. So this links out, in whichever translation the church has
  * configured, exactly as the panel on a sermon page already does.

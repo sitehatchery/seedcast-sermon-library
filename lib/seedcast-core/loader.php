@@ -5,7 +5,7 @@
  * GENERATED FILE. DO NOT EDIT.
  * Source of truth lives in the seedcast-core repository. Any edit made to a
  * vendored copy is silently discarded on the next sync and, worse, makes the
- * copies non-identical so runtime behaviour starts depending on which one wins.
+ * copies non-identical so runtime behavior starts depending on which one wins.
  *
  * FROZEN. Don't change the public surface of this file.
  *

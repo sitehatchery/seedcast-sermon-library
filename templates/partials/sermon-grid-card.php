@@ -28,7 +28,7 @@ if ( ! empty( $tab ) ) $scsl_link .= '#' . $tab;
 
 $scsl_series_id = absint( get_post_meta( $scsl_post_id, '_scsl_series_id', true ) );
 /*
- * An article is summarised by itself, not by the sermon.
+ * An article is summarized by itself, not by the sermon.
  *
  * The description belongs to the sermon and says what was preached that
  * Sunday. Under a list of articles that is the wrong promise: every card

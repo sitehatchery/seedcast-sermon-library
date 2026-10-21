@@ -480,7 +480,7 @@
 	pointer-events: none;
 }
 
-/* Sermon list: the completeness score, above the content list it summarises.
+/* Sermon list: the completeness score, above the content list it summarizes.
    Sized to read as a status chip rather than as body text, because it is the
    thing being scanned down the column. */
 .scsl-score {

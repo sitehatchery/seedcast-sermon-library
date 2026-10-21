@@ -128,9 +128,9 @@ class Shortcodes {
 		$total_found      = $this->last_query ? $this->last_query->found_posts   : 0;
 		$per_page_int     = absint( $atts['per_page'] );
 
-		// Smart filter suppression: analyse the full result set
+		// Smart filter suppression: analyze the full result set
 		$smart = $total_found > $per_page_int
-			? $this->analyse_filter_set( $this->last_query )
+			? $this->analyze_filter_set( $this->last_query )
 			: [ 'hide_all' => true ];
 
 		// Also use episode-card results container
@@ -282,10 +282,10 @@ class Shortcodes {
 	}
 
 	/**
-	 * Analyse the full result set to determine which filter dropdowns add value.
+	 * Analyze the full result set to determine which filter dropdowns add value.
 	 * Returns array of flags: hide_all, hide_speaker, hide_year, hide_book.
 	 */
-	private function analyse_filter_set( \WP_Query $query ): array {
+	private function analyze_filter_set( \WP_Query $query ): array {
 		$flags    = [];
 		$post_ids = $query->posts ? wp_list_pluck( $query->posts, 'ID' ) : [];
 
@@ -984,7 +984,7 @@ class Shortcodes {
 		$show_count = 'false' !== $atts['show_count'];
 
 		// Canonical order, so Genesis comes before Exodus rather than before
-		// Habakkuk. Anything unrecognised is kept and put at the end, because
+		// Habakkuk. Anything unrecognized is kept and put at the end, because
 		// a church's own wording is not a reason to hide its sermons.
 		$order  = array_flip( ScriptureParser::all_books() );
 		$books  = [];

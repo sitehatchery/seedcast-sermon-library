@@ -110,7 +110,7 @@ class CardPassages {
 	}
 
 	/**
-	 * One labelled row of passages, each linking out to the reader's Bible.
+	 * One labeled row of passages, each linking out to the reader's Bible.
 	 *
 	 * @param string   $label
 	 * @param string[] $passages

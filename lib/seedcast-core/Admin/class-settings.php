@@ -306,7 +306,7 @@ final class Settings {
 					/*
 					 * options.php redirects to _wp_http_referer after saving.
 					 * That is this page's URL including the section, so the
-					 * default behaviour is already right, but set it explicitly
+					 * default behavior is already right, but set it explicitly
 					 * rather than depending on how the person arrived.
 					 */
 					$return_url = add_query_arg( 'settings-updated', 'true', self::url( $active ) );

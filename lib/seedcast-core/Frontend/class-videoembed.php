@@ -27,7 +27,7 @@ final class VideoEmbed {
 	 * Detect the platform for a URL.
 	 *
 	 * @param string $url Video URL.
-	 * @return string 'youtube', 'vimeo', 'file', or '' when unrecognised.
+	 * @return string 'youtube', 'vimeo', 'file', or '' when unrecognized.
 	 */
 	public static function platform( string $url ): string {
 		if ( '' === trim( $url ) ) {

@@ -107,7 +107,7 @@ class Completeness {
 		 * The score goes inside the existing Content cell rather than into a
 		 * column of its own. Two columns saying overlapping things about the
 		 * same sermon is how a list screen becomes unreadable, and the number
-		 * only makes sense next to the list it summarises.
+		 * only makes sense next to the list it summarizes.
 		 *
 		 * Priority 5 puts the badge above AdminColumns' output at 20, and 25
 		 * puts the detail gaps below it. Those gaps have to be shown here:
@@ -341,7 +341,7 @@ class Completeness {
 	 * Record the first date a sermon reached fully complete.
 	 *
 	 * Elapsed time from the sermon's own date to this is what the report shows
-	 * as the completion gap. It is not a measure of effort, and is not labelled
+	 * as the completion gap. It is not a measure of effort, and is not labeled
 	 * as one: a pastor who drafts in a word processor and pastes in still shows
 	 * correctly here, which is exactly why it is preferred over timing editor
 	 * sessions.

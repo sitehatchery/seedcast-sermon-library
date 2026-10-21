@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  * self-hosted audio/video. The value stored is always the file URL, so it
  * works equally for pasted embed links (YouTube, Vimeo, …) and uploads.
  *
- * The behaviour is powered by the shared handlers in Seedcast's admin.js
+ * The behavior is powered by the shared handlers in Seedcast's admin.js
  * (.sc-media-select / .sc-media-clear), so any suite plugin can render one of
  * these fields without shipping its own uploader JS. The calling screen is
  * responsible for wp_enqueue_media() and for enqueuing the seedcast-core-admin

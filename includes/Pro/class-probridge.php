@@ -53,7 +53,7 @@ class ProBridge {
 	const PAGE = 'seedcast-sermon-library-generate';
 
 	/**
-	 * The passages the last generation found, as normalised keys.
+	 * The passages the last generation found, as normalized keys.
 	 *
 	 * Kept so the next one can clear its own set and leave a church's own
 	 * references, and the focus passage, where they are.
@@ -123,7 +123,7 @@ class ProBridge {
 		wp_enqueue_style( 'scsl-admin', SCSL_PLUGIN_URL . 'assets/css/admin.css', [], scsl_asset_version( 'assets/css/admin.css' ) );
 
 		/*
-		 * The passage picker's own behaviour.
+		 * The passage picker's own behavior.
 		 *
 		 * It is the sermon screen's control, and what makes it more than four
 		 * boxes -- the end chapter appearing when a passage needs one, the
@@ -519,7 +519,7 @@ class ProBridge {
 				 * This screen had a simpler one of its own: it could not
 				 * express a passage that crosses a chapter, and it called the
 				 * field "Primary scripture" while the sermon screen called the
-				 * very same field "Focus Passage". Two names and two behaviours
+				 * very same field "Focus Passage". Two names and two behaviors
 				 * for one thing is a difference somebody has to learn for no
 				 * reason.
 				 *
@@ -993,7 +993,7 @@ class ProBridge {
 
 		if ( ! $found ) return;
 
-		$focus = $this->normalise_passage( (string) get_post_meta( $post_id, '_scsl_focus_passage', true ) );
+		$focus = $this->normalize_passage( (string) get_post_meta( $post_id, '_scsl_focus_passage', true ) );
 
 		$existing = (array) get_post_meta( $post_id, '_scsl_other_passages', true );
 
@@ -1018,7 +1018,7 @@ class ProBridge {
 		$fresh = [];
 
 		foreach ( $found as $passage ) {
-			$key = $this->normalise_passage( (string) $passage );
+			$key = $this->normalize_passage( (string) $passage );
 
 			if ( '' !== $key ) {
 				$fresh[ $key ] = true;
@@ -1030,7 +1030,7 @@ class ProBridge {
 
 		foreach ( array_merge( $existing, $found ) as $passage ) {
 			$passage = sanitize_text_field( (string) $passage );
-			$key     = $this->normalise_passage( $passage );
+			$key     = $this->normalize_passage( $passage );
 
 			if ( '' === $key || $key === $focus || isset( $seen[ $key ] ) ) continue;
 
@@ -1186,7 +1186,7 @@ class ProBridge {
 	 * @param string $passage Reference.
 	 * @return string
 	 */
-	private function normalise_passage( string $passage ): string {
+	private function normalize_passage( string $passage ): string {
 		return strtolower( preg_replace( '/\s+/', '', $passage ) );
 	}
 

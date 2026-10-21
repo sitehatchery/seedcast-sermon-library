@@ -72,7 +72,7 @@ class Assignment {
 	 * "Fear & Anxiety" may reasonably return the name it was shown.
 	 *
 	 * Order is kept: the picks arrive ranked, and the cap should keep the best
-	 * three rather than three at random. Anything unrecognised is dropped
+	 * three rather than three at random. Anything unrecognized is dropped
 	 * without comment, which is the whole point of a closed list.
 	 *
 	 * @param string[] $picked

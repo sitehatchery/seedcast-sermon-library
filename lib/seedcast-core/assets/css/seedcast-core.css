@@ -8,7 +8,7 @@
    items, sliders, pagination, filter bars, badges, buttons, share
    buttons, and submission forms. Plugins style only what is genuinely
    unique to them on top of this, and reference var(--sc-*) rather than
-   hardcoding a colour anywhere.
+   hardcoding a color anywhere.
 
    Whichever bundled copy of core wins version negotiation is the one
    that emits the :root block below, so a plugin installed later picks

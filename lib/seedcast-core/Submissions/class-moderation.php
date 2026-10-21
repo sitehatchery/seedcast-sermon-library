@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  *
  * Provides data access (query/count/get/update status/link) plus the AJAX
  * endpoints the admin queue uses. The actual per-plugin queue *screens*
- * live in each child plugin, but they all call these methods so behaviour
+ * live in each child plugin, but they all call these methods so behavior
  * (statuses, notes, linking) stays consistent across the suite.
  *
  * Canonical statuses: pending, approved, published, rejected, needs_edit, archived.

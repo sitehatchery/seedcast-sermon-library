@@ -5,7 +5,7 @@
    ------------------------------------------
    Design tokens come from the Seedcast core stylesheet, which is
    enqueued as a dependency of this file. Reference var(--sc-*) and
-   never hardcode a colour, so a church that sets a theme once gets it
+   never hardcode a color, so a church that sets a theme once gets it
    everywhere. */
 
 
@@ -2406,7 +2406,7 @@ button.scsl-btn--platform:hover {
 	/* The same accent the tabs use, so it belongs to them. */
 	/* The plugin's own accent, which is what the active tab uses. Reaching
 	   for the theme's variable instead picked up whatever Elementor had set,
-	   which on a given site is any colour at all. */
+	   which on a given site is any color at all. */
 	color: var(--sc-color-accent);
 	text-decoration: none;
 	white-space: nowrap;
@@ -2493,7 +2493,7 @@ button.scsl-btn--platform:hover {
  * they start.
  *
  * The counter is drawn rather than using the list marker, so it can sit in the
- * accent colour and hold its shape next to a question that wraps to two lines.
+ * accent color and hold its shape next to a question that wraps to two lines.
  */
 .scsl-faq {
 	counter-reset: scsl-faq;
@@ -2512,7 +2512,7 @@ button.scsl-btn--platform:hover {
 	background: var(--sc-color-bg-subtle, #f7f7f8);
 	border-radius: var(--sc-radius, 8px);
 
-	/* A quiet edge in the accent colour, so a run of these reads as one set. */
+	/* A quiet edge in the accent color, so a run of these reads as one set. */
 	border-left: 3px solid var(--sc-color-accent, #c9975a);
 }
 

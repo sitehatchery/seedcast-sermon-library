@@ -549,7 +549,7 @@ class AdminColumns {
 	}
 
 	/**
-	 * Add a column summarising what has been written.
+	 * Add a column summarizing what has been written.
 	 *
 	 * @param array $columns Existing columns.
 	 * @return array

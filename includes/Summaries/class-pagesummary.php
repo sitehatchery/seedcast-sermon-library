@@ -87,7 +87,7 @@ abstract class PageSummary {
 	protected const TTL = 7 * DAY_IN_SECONDS;
 
 	/**
-	 * Fewest sermons worth summarising.
+	 * Fewest sermons worth summarizing.
 	 *
 	 * Below this there is no set to describe, only a single sermon that already
 	 * has its own page. Generating here would republish one sermon's substance
@@ -342,7 +342,7 @@ abstract class PageSummary {
 		 * Replacing something that is already public is somebody's decision.
 		 *
 		 * The hash and the time are written either way, so a set that has been
-		 * summarised once is not queued again while its rewrite sits waiting.
+		 * summarized once is not queued again while its rewrite sits waiting.
 		 * The page goes on showing what it was showing.
 		 */
 		if ( '' !== (string) get_term_meta( $term_id, static::META_TEXT, true ) ) {

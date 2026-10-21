@@ -3,13 +3,13 @@
  * The church, described to search engines as a place.
  *
  * A church is three things at once and search engines want all three: an
- * organisation, a place with an address, and a church specifically. Saying only
+ * organization, a place with an address, and a church specifically. Saying only
  * one of them leaves the entity half described, which is why the type is a list
  * rather than a single word. Dropping Organization in particular would break
  * anything already pointing at this node as a publisher.
  *
- * Where an SEO plugin already publishes an organisation node, this adds to it
- * rather than publishing a second one. Two organisation nodes with different
+ * Where an SEO plugin already publishes an organization node, this adds to it
+ * rather than publishing a second one. Two organization nodes with different
  * identifiers on one page is a contradiction, and a search engine resolving it
  * will pick one, which may not be the one with the address in it.
  *
@@ -41,7 +41,7 @@ class ChurchSchema {
 	const FRAGMENT = '#church';
 
 	public function init(): void {
-		// Yoast and Rank Math each publish an organisation of their own. Added
+		// Yoast and Rank Math each publish an organization of their own. Added
 		// to rather than duplicated.
 		add_filter( 'wpseo_schema_organization', [ $this, 'extend_node' ], 20 );
 		add_filter( 'rank_math/json_ld', [ $this, 'extend_rank_math' ], 20, 2 );
@@ -161,14 +161,14 @@ class ChurchSchema {
 	}
 
 	/**
-	 * Add the church to the organisation Yoast is already publishing.
+	 * Add the church to the organization Yoast is already publishing.
 	 *
 	 * Yoast's own guidance is that a local entity carries Organization, Place
 	 * and its particular kind together, so its type is extended rather than
 	 * replaced: a node that stopped being an Organization would break every
 	 * reference already pointing at it as a publisher.
 	 *
-	 * @param array $node Yoast's organisation node.
+	 * @param array $node Yoast's organization node.
 	 * @return array
 	 */
 	public function extend_node( $node ) {
@@ -227,7 +227,7 @@ class ChurchSchema {
 
 			$data[ $key ] = $this->extend_node( $piece );
 
-			// One organisation is the church. A second would be somebody else.
+			// One organization is the church. A second would be somebody else.
 			break;
 		}
 
@@ -242,7 +242,7 @@ class ChurchSchema {
 	public function maybe_print(): void {
 		if ( ! self::ready() ) return;
 
-		// Somebody else's organisation is already on the page and has been
+		// Somebody else's organization is already on the page and has been
 		// added to above. A second one here would contradict it.
 		if ( self::seo_plugin_active() ) return;
 
@@ -263,7 +263,7 @@ class ChurchSchema {
 	}
 
 	/**
-	 * Whether something else is describing this site's organisation.
+	 * Whether something else is describing this site's organization.
 	 *
 	 * @return bool
 	 */

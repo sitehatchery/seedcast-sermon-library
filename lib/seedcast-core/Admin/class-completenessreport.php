@@ -575,7 +575,7 @@ final class CompletenessReport {
 	}
 
 	/**
-	 * One labelled progress bar.
+	 * One labeled progress bar.
 	 *
 	 * @param string $label Bar label.
 	 * @param int    $value Percentage.

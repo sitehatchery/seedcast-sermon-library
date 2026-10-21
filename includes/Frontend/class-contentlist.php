@@ -434,7 +434,7 @@ class ContentList {
 		}
 
 		/*
-		 * An article is summarised by itself, not by the sermon.
+		 * An article is summarized by itself, not by the sermon.
 		 *
 		 * The description belongs to the sermon: it says what was preached
 		 * that Sunday. Under a list of articles that is the wrong promise,

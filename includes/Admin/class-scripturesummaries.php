@@ -588,7 +588,7 @@ class ScriptureSummaries {
 
 		$book = (string) \SeedcastSermonLibrary\Scripture\ScriptureParser::extract_book( $name );
 
-		// An unrecognised book sorts after every real one rather than before,
+		// An unrecognized book sorts after every real one rather than before,
 		// so oddities collect at the end instead of heading the list.
 		$rank = isset( $order[ $book ] ) ? (int) $order[ $book ] : 999;
 		$rest = trim( substr( $name, strlen( $book ) ) );

@@ -37,7 +37,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * Not through a helper of your own that wraps both. This class used to offer a
  * section() method that did exactly that, and it had to go: WordPress.org's
- * Plugin Check runs WordPress.Security.EscapeOutput, which recognises escaping
+ * Plugin Check runs WordPress.Security.EscapeOutput, which recognizes escaping
  * by function name against a fixed list. wp_kses() is on that list; anything
  * wrapping it is not, so a wrapper reads as unescaped output and fails the
  * check - four errors in one template, on code that was already safe. Keeping

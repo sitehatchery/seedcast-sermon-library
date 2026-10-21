@@ -397,7 +397,7 @@ class SeriesEngineRunner {
 			if ( ! $line ) continue;
 			// Escape character passed explicitly. Its default changes in a future
 			// PHP version, and the parameter has existed since 5.3, so stating it
-			// is safe on 7.4 and keeps the behaviour fixed either way.
+			// is safe on 7.4 and keeps the behavior fixed either way.
 			$row  = str_getcsv( $line, ',', '"', '\\' );
 			$type = $row[0] ?? '';
 			if ( isset( $data[ $type ] ) ) {

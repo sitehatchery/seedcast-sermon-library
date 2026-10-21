@@ -206,7 +206,7 @@ class SermonManagerImporter {
 	 * @return array Groups of two or more term IDs.
 	 */
 	private function find_duplicates( array $rows ): array {
-		$normalise = static function ( string $name ): string {
+		$normalize = static function ( string $name ): string {
 			$name = strtolower( $name );
 			$name = preg_replace( '/\b(pastor|rev\.?|reverend|dr\.?|ps|fr\.?|bishop|elder)\b/', '', $name );
 			$name = preg_replace( '/[^a-z0-9 ]/', '', $name );
@@ -220,14 +220,14 @@ class SermonManagerImporter {
 			if ( isset( $used[ $a['id'] ] ) ) {
 				continue;
 			}
-			$na    = $normalise( $a['name'] );
+			$na    = $normalize( $a['name'] );
 			$group = [ $a ];
 
 			foreach ( array_slice( $rows, $i + 1 ) as $b ) {
 				if ( isset( $used[ $b['id'] ] ) ) {
 					continue;
 				}
-				$nb = $normalise( $b['name'] );
+				$nb = $normalize( $b['name'] );
 				if ( '' === $na || '' === $nb ) {
 					continue;
 				}
@@ -640,7 +640,7 @@ class SermonManagerImporter {
 		}
 
 		// A bulletin describes the whole service rather than the sermon, but a
-		// church that attached one wants it available, and an unlabelled file
+		// church that attached one wants it available, and an unlabeled file
 		// nobody can find is worse than a slightly loose category.
 		$add(
 			get_post_meta( $source_id, 'sermon_bulletin_id', true ),

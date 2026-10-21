@@ -1351,7 +1351,7 @@ final class Completeness {
 	}
 
 	/**
-	 * Band a score falls into, for colouring.
+	 * Band a score falls into, for coloring.
 	 *
 	 * @param int $score Score out of 100.
 	 * @return string good, fair, or poor.

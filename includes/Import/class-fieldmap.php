@@ -121,7 +121,7 @@ class FieldMap {
 	}
 
 	/**
-	 * Every field a generation touches, labelled as the Content tabs label it.
+	 * Every field a generation touches, labeled as the Content tabs label it.
 	 *
 	 * Somebody reading "Study guide" in one place and "Bible Study" in another
 	 * has to work out that they are the same thing. These are the names on the

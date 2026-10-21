@@ -188,14 +188,14 @@ class LegacyRedirects {
 	/**
 	 * Where a term that no longer exists should send somebody.
 	 *
-	 * A church that reorganises its topics leaves the old addresses behind,
+	 * A church that reorganizes its topics leaves the old addresses behind,
 	 * and those are the ones search engines already know. Deleting a term
 	 * turns them into 404s, which is a worse outcome than the untidy
 	 * vocabulary that prompted the tidying.
 	 *
 	 * The map is the site's to supply, because only the site knows that its
 	 * old "Hope & Encouragement" is now "Hope". Values may be a slug in the
-	 * same taxonomy or a full address; anything unrecognised is ignored and
+	 * same taxonomy or a full address; anything unrecognized is ignored and
 	 * the 404 stands, which is correct for a topic that had no successor and
 	 * was not worth keeping.
 	 *
@@ -205,7 +205,7 @@ class LegacyRedirects {
 		/*
 		 * Kept as an option rather than in code, because the site that retires
 		 * a term is the site that knows where it went, and the person doing it
-		 * is reorganising a vocabulary rather than editing a plugin.
+		 * is reorganizing a vocabulary rather than editing a plugin.
 		 */
 		$stored = get_option( 'scsl_retired_terms', [] );
 		$stored = is_array( $stored ) && isset( $stored[ $taxonomy ] ) && is_array( $stored[ $taxonomy ] )
