@@ -41,7 +41,7 @@ $scsl_passages = ScriptureParser::tidy( $scsl_passages );
 ?>
 
 <aside class="scsl-scripture-panel" aria-label="<?php esc_attr_e( 'Scripture References', 'seedcast-sermon-library' ); ?>">
-	<h2 class="scsl-scripture-panel__title"><?php esc_html_e( 'Scripture', 'seedcast-sermon-library' ); ?></h2>
+	<h2 class="scsl-scripture-panel__title" id="scsl-scripture-label"><?php esc_html_e( 'Scripture', 'seedcast-sermon-library' ); ?></h2>
 
 	<?php if ( $scsl_focus ) : ?>
 	<div class="scsl-scripture-panel__section">
@@ -73,10 +73,21 @@ $scsl_passages = ScriptureParser::tidy( $scsl_passages );
 
 	<?php if ( $scsl_passages ) : ?>
 	<div class="scsl-scripture-panel__section">
+		<?php
+		/*
+		 * "Other" is only other than something. Where the sermon has no focus
+		 * passage this is the whole list, so the panel's own heading names it
+		 * and a second heading saying "Other Passages" is a distinction the
+		 * page is not making.
+		 */
+		?>
+		<?php if ( $scsl_focus ) : ?>
 		<p class="scsl-scripture-panel__label" id="scsl-passages-label">
 			<?php esc_html_e( 'Other Passages', 'seedcast-sermon-library' ); ?>
 		</p>
-		<ul class="scsl-scripture-panel__list" aria-labelledby="scsl-passages-label">
+		<?php endif; ?>
+
+		<ul class="scsl-scripture-panel__list" aria-labelledby="<?php echo $scsl_focus ? 'scsl-passages-label' : 'scsl-scripture-label'; ?>">
 			<?php foreach ( $scsl_passages as $scsl_passage ) : ?>
 			<li>
 				<?php $scsl_passage_term = ScriptureParser::term_url( $scsl_passage ); ?>

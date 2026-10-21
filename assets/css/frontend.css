@@ -2657,6 +2657,38 @@ button.scsl-btn--platform:hover {
 }
 
 /*
+ * Topics taught alongside this one, each with its own run of sermons.
+ *
+ * Spaced like the book section on a passage page, because it is the same move:
+ * a new section opening under a run of cards. Without it the heading sat on
+ * the card above and read as that card's caption rather than as the start of
+ * something else.
+ */
+.scsl-topic-related {
+	margin-top: 3.5rem;
+}
+.scsl-topic-related__group {
+	margin-top: 3rem;
+}
+.scsl-topic-related__name {
+	font-size: clamp(1.5rem, 2.6vw, 1.9rem);
+	font-weight: 700;
+	line-height: 1.2;
+	margin: 0 0 1.5rem;
+}
+
+/*
+ * Why this topic is here, said in the heading's own line. Quieter and lighter
+ * than the topic's name: it is the reason rather than the subject, and at the
+ * heading's weight the two ran together as one long title.
+ */
+.scsl-topic-related__shared {
+	font-size: .95rem;
+	font-weight: 400;
+	color: var(--sc-color-muted);
+}
+
+/*
  * The book list is capped rather than paginated, so this link is the way
  * through to the rest. Shown even when nothing was cut off, because the book
  * page is a fuller view either way: it includes the sermons listed at the top

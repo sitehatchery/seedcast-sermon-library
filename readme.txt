@@ -214,6 +214,8 @@ No. Sermons, series and speakers remain in the database.
 * A passage page's topics sit beside its heading, labeled, rather than above the summary, and the "Explore Other Sermons" section below carries the topics of its own wider set.
 * A heading names up to five topics, the ones its sermons return to most, and says "Most used topics" only where there were more than five to choose from.
 * Topic chips carry the same outline, weight and hover as a View Sermon button, and a section heading rules off below its topics rather than above them.
+* A topic page's related sections stand clear of the sermons above them, and each related topic's reason for being there reads as a note beside its name rather than as part of the heading.
+* A sermon with no focus passage lists its Scripture under the panel's own heading, without a second heading calling them other passages.
 * Topics, Scripture and Share headings match in a sermon's sidebar, and topic tags read as chips rather than a bulleted list.
 * Topic pages list sermons one card per row, like passage pages, and both carry each sermon's topics on its card.
 * Passage pages show what their sermons are about as topic chips under the heading. Both of these can be switched off in settings.
