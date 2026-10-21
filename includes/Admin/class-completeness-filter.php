@@ -20,7 +20,7 @@ class CompletenessFilter {
 	/**
 	 * Where the scored library is kept between page loads.
 	 */
-	const CACHE = 'scsl_completeness_map';
+	const CACHE = 'scsl_completeness_map_v2';
 
 	/**
 	 * How long a scored library is trusted.
@@ -56,13 +56,24 @@ class CompletenessFilter {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Reading a filter to draw it back, not acting on it.
 		$current = isset( $_GET['scsl_completeness'] ) ? sanitize_key( wp_unslash( $_GET['scsl_completeness'] ) ) : '';
 
-		$options = [
-			'complete' => __( 'Complete', 'seedcast-sermon-library' ),
-			'almost'   => __( 'Almost there', 'seedcast-sermon-library' ),
-			'needs'    => __( 'Needs work', 'seedcast-sermon-library' ),
-			'started'  => __( 'Just started', 'seedcast-sermon-library' ),
-			'unlisted' => __( 'Unlisted', 'seedcast-sermon-library' ),
-		];
+		/*
+		 * The tiers themselves, rather than a list of them written out here.
+		 *
+		 * Written out, this offered "Needs work" as 'needs' while the tier it
+		 * meant is keyed 'needs_work', so that option matched nothing and the
+		 * list came back empty on a library with plenty in that tier. Asking
+		 * the tiers for their own keys is the only version of this that cannot
+		 * drift from them.
+		 */
+		$options = [];
+
+		foreach ( \Seedcast\Core\Completeness::tiers() as $tier ) {
+			$options[ (string) $tier['key'] ] = (string) $tier['label'];
+		}
+
+		// Not a tier: a flag on the sermon, offered in the same place because
+		// it is the same question being asked of the list.
+		$options['unlisted'] = __( 'Unlisted', 'seedcast-sermon-library' );
 
 		echo '<select name="scsl_completeness">';
 		printf(
@@ -165,10 +176,15 @@ class CompletenessFilter {
 		foreach ( $ids as $id ) {
 			$score = \Seedcast\Core\Completeness::score_item( Completeness::SOURCE, (int) $id );
 
-			// The comprehensive figure, so the filter agrees with the number
-			// shown beside each sermon rather than quietly using a different
-			// one and looking wrong.
-			$percent = (int) ( $score['comprehensive'] ?? 0 );
+			/*
+			 * The configured score, which is the one the rest of the plugin
+			 * shows: the percentage in this list's own column, the tier on the
+			 * sermon, and the tier counts on the Completeness screen all come
+			 * from it. This filter used the comprehensive figure instead, which
+			 * counts fields a church has switched off, so a sermon could be
+			 * filed under one tier everywhere it was named and another here.
+			 */
+			$percent = (int) ( $score['overall'] ?? 0 );
 			$tier    = \Seedcast\Core\Completeness::tier( $percent );
 
 			$map[ (int) $id ] = (string) ( $tier['key'] ?? '' );
