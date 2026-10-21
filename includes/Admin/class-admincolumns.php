@@ -576,6 +576,49 @@ class AdminColumns {
 	}
 
 	/**
+	 * Whether a content section has anything in it.
+	 *
+	 * Two of them are lists rather than text: the scripture references, and
+	 * the questions, which are question and answer pairs. Scripture was named
+	 * here and handled; questions were not, so they went through the string
+	 * cast, which both warned in the log and answered wrongly. Casting an array
+	 * gives the word "Array", which is not empty, so a sermon carrying an empty
+	 * list of questions was reported as having them.
+	 *
+	 * Asked by shape rather than by name, so a section added later that holds a
+	 * list is answered correctly without anybody remembering this function.
+	 *
+	 * @param int    $post_id  Sermon ID.
+	 * @param string $meta_key Section meta key.
+	 * @return bool
+	 */
+	private static function section_filled( int $post_id, string $meta_key ): bool {
+		$value = get_post_meta( $post_id, $meta_key, true );
+
+		if ( is_array( $value ) ) {
+			// A row of empty strings is an empty list: the editor keeps a blank
+			// pair on the screen for the next one to be typed into.
+			foreach ( $value as $row ) {
+				if ( is_array( $row ) ) {
+					if ( array_filter( array_map( 'trim', array_map( 'strval', $row ) ) ) ) {
+						return true;
+					}
+
+					continue;
+				}
+
+				if ( '' !== trim( (string) $row ) ) {
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		return '' !== trim( (string) $value );
+	}
+
+	/**
 	 * Which parts of a sermon are written, and whether it could be filled in.
 	 *
 	 * Useful on its own, and the thing to look at before asking for content to
@@ -606,21 +649,7 @@ class AdminColumns {
 		unset( $sections['_scsl_resources'] );
 
 		foreach ( $sections as $meta_key => $label ) {
-			// A list, not a string. Trimming an array would say nothing useful
-			// about whether there is anything in it.
-			if ( '_scsl_other_passages' === $meta_key ) {
-				$passages = get_post_meta( $post_id, $meta_key, true );
-
-				if ( is_array( $passages ) && array_filter( $passages ) ) {
-					$present[] = $label;
-				} else {
-					$missing[] = $label;
-				}
-
-				continue;
-			}
-
-			if ( '' !== trim( (string) get_post_meta( $post_id, $meta_key, true ) ) ) {
+			if ( self::section_filled( $post_id, $meta_key ) ) {
 				$present[] = $label;
 			} else {
 				$missing[] = $label;

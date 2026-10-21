@@ -234,6 +234,7 @@ No. Sermons, series and speakers remain in the database.
 * The Topics box on a sermon reads as a list, one per line, like the Categories box beside it, and the three it allows are held in the browser rather than quietly trimmed on save.
 * A topic page names the subjects it is taught alongside beside its title, under a Related topics heading, with a setting of its own. Its sermon cards say Related topics too, since the page's own subject is left off them.
 * Filtering the sermon list by "Needs work" returns the sermons that need work. It returned none, whatever the library held, and the filter now agrees with the Completeness screen and the percentage in the list's own column.
+* The Content column tells the truth about Questions. They are stored as question and answer pairs rather than as text, so a sermon with an empty list was listed as having them, and every sermon list wrote a warning to the error log.
 * Topics, Scripture and Share headings match in a sermon's sidebar, and topic tags read as chips rather than a bulleted list.
 * Topic pages list sermons one card per row, like passage pages, and both carry each sermon's topics on its card.
 * Passage pages show what their sermons are about as topic chips under the heading. Both of these can be switched off in settings.
