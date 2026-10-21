@@ -363,6 +363,7 @@ wp_enqueue_style( 'scsl-frontend' );
 				while ( $scsl_book_sermons->have_posts() ) :
 					$scsl_book_sermons->the_post();
 
+					// The service page's card, escaped by the component that built it.
 					echo BulletinLibraryBridge::card( get_post() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				endwhile;
 

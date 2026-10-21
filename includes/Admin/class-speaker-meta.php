@@ -137,7 +137,14 @@ class SpeakerMeta {
 		foreach ( $text_fields as $meta_key => $type ) {
 			$post_key = ltrim( $meta_key, '_' );
 			if ( ! isset( $_POST[ $post_key ] ) ) continue;
-			$raw   = wp_unslash( $_POST[ $post_key ] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- sanitized below
+			$raw = wp_unslash( $_POST[ $post_key ] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized by type below.
+
+			// One value per field. A posted array would reach absint() or
+			// esc_url_raw() as an array and stop the save with a type error.
+			if ( ! is_scalar( $raw ) ) {
+				continue;
+			}
+
 			switch ( $type ) {
 				case 'url':   $val = esc_url_raw( $raw ); break;
 				case 'email': $val = sanitize_email( $raw ); break;

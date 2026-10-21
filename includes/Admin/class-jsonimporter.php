@@ -124,7 +124,7 @@ class JsonImporter {
 			wp_die( esc_html__( 'No file uploaded.', 'seedcast-sermon-library' ) );
 		}
 
-		$file     = $_FILES['scsl_json_file']; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+		$file     = $_FILES['scsl_json_file']; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput -- An upload, not a value: the path is confirmed with is_uploaded_file() below and nothing here is printed or stored.
 		$tmp_path = $file['tmp_name'];
 
 		if ( ! is_uploaded_file( $tmp_path ) ) {

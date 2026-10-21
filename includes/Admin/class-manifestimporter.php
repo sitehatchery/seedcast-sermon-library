@@ -338,7 +338,7 @@ class ManifestImporter {
 		}
 
 		// Validate it's a zip
-		$file     = $_FILES['zip']; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+		$file     = $_FILES['zip']; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput -- An upload, not a value: the file's own type is checked with finfo below and nothing here is printed or stored.
 		$tmp_path = $file['tmp_name'];
 		$finfo    = new \finfo( FILEINFO_MIME_TYPE );
 		$mime     = $finfo->file( $tmp_path );

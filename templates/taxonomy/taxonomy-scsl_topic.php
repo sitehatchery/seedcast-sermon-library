@@ -276,6 +276,7 @@ CardTopics::begin( (int) $scsl_term->term_id );
 						while ( $scsl_near_sermons->have_posts() ) :
 							$scsl_near_sermons->the_post();
 
+							// Escaped by the component that built it.
 							echo BulletinLibraryBridge::card( get_post() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 						endwhile;
 

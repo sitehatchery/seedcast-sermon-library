@@ -97,6 +97,8 @@ class Shortcodes {
 
 		$instance_id = 'scsl-list-' . uniqid();
 
+		// Which page of the list to draw. A page number in a link, read and
+		// cast to an integer; nothing is written or decided by it.
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$scsl_page_raw = get_query_var( 'scsl_page' ) ?: ( isset( $_GET['scsl_page'] ) ? absint( wp_unslash( $_GET['scsl_page'] ) ) : 1 );
 		$paged = max( 1, absint( $scsl_page_raw ) );
@@ -432,7 +434,7 @@ class Shortcodes {
 				<?php if ( ! $lock_topic   ) $this->render_topic_filter(   $topic, $uid ); ?>
 				<?php if ( ! $lock_book    ) $this->render_book_filter( $book, $uid ); ?>
 
-				<?php foreach ( $extra as $html ) echo $html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- filter output, responsibility of filter callbacks ?>
+				<?php foreach ( $extra as $html ) echo $html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Select markup built by this plugin's own templates, which escape every value; see single-series.php. ?>
 
 				<?php if ( $show_year ) $this->render_year_filter( $uid ); ?>
 
@@ -471,6 +473,8 @@ class Shortcodes {
 	public function ajax_filter(): void {
 		check_ajax_referer( 'scsl_list_nonce', 'nonce' );
 
+		// The nonce is checked on the line above, which the sniff cannot see
+		// from here.
 		// phpcs:disable WordPress.Security.NonceVerification.Missing
 		$atts = [
 			'per_page'   => absint( wp_unslash( $_POST['per_page']   ?? 10 ) ),

@@ -188,7 +188,9 @@ final class BulletinLibraryBridge {
 		 * about. A scripture archive uses this to say which passages in the
 		 * book being viewed a sermon actually touches.
 		 *
-		 * Must return escaped HTML, since it is echoed as-is.
+		 * Returns HTML, which is run through wp_kses_post() before it is
+		 * printed: a contributor is trusted to build a row, not to be the
+		 * last word on what may be printed on the page.
 		 *
 		 * @param string $rows      Empty by default.
 		 * @param int    $sermon_id The sermon being drawn.
@@ -265,9 +267,9 @@ final class BulletinLibraryBridge {
 					<?php endif; ?>
 
 					<?php
-					// Contributed by whatever page is drawing this card. Escaped
-					// by the contributor; see the filter above.
-					echo $extra_rows; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+					// Contributed by whatever page is drawing this card, and
+					// filtered here rather than trusted: see the filter above.
+					echo wp_kses_post( $extra_rows );
 					?>
 				</aside>
 			<?php endif; ?>

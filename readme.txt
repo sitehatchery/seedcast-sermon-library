@@ -155,6 +155,17 @@ Details and pricing: [seedcast.ai](https://seedcast.ai/sermon-library/)
 
 **Your church is already creating the teaching. Seedcast helps make sure people can actually find, understand and use it.**
 
+= External services =
+
+The plugin itself does not call any external service to work. These are the only cases where a request leaves your site or a visitor's browser, and each one happens because somebody chose it:
+
+* **Spam checking on submitted forms.** If you turn on Google reCAPTCHA, hCaptcha or Cloudflare Turnstile in Settings, each submitted form sends that provider the token their widget produced, along with your site's IP address, so the provider can confirm the sender is not a bot. Nothing is sent when no provider is configured, which is the default. Google: [terms](https://policies.google.com/terms), [privacy](https://policies.google.com/privacy). hCaptcha: [terms](https://www.hcaptcha.com/terms), [privacy](https://www.hcaptcha.com/privacy). Cloudflare: [terms](https://www.cloudflare.com/website-terms/), [privacy](https://www.cloudflare.com/privacypolicy/).
+* **Embedded video and audio.** A sermon given a YouTube or Vimeo address embeds that player, so a visitor's browser loads it from YouTube (through youtube-nocookie.com) or Vimeo when they open the sermon. No video is embedded unless you give a sermon one. YouTube: [terms](https://www.youtube.com/t/terms), [privacy](https://policies.google.com/privacy). Vimeo: [terms](https://vimeo.com/terms), [privacy](https://vimeo.com/privacy).
+* **Copying your audio back from Seedcast.** Churches whose sermon audio is hosted on media.seedcast.ai can copy those files into their own media library from Sermon Library > Reclaim Audio. Your site downloads its own files when you press the button; nothing is sent, and nothing happens unless you use that screen. [Terms](https://seedcast.ai/terms/), [privacy](https://seedcast.ai/privacy/).
+* **Links out to a Bible.** The "Read it" links beside a passage open Bible.com or BibleGateway in a new tab. These are ordinary links: your site sends them nothing, and nothing loads until a visitor clicks.
+
+Sermon Library AI, the optional paid add-on, is a separate plugin with its own readme, and it is the only part that sends your sermon recordings anywhere.
+
 == Installation ==
 
 1. Upload the `seedcast-sermon-library` folder to `/wp-content/plugins/`
@@ -217,6 +228,9 @@ No. Sermons, series and speakers remain in the database.
 * A topic page's related sections stand clear of the sermons above them, and each related topic's reason for being there reads as a note beside its name rather than as part of the heading.
 * A sermon with no focus passage lists its Scripture under the panel's own heading, without a second heading calling them other passages.
 * The Scripture heading stands above its box, level with Topics and Share.
+* The readme now lists every external service the plugin can reach, what is sent and when, and nothing is reached unless you switch it on.
+* Leftover code from the old Generate Sermon screen has been removed. It read submitted fields for a form that no longer exists.
+* Rows a page contributes to a sermon card are filtered before they are printed rather than trusted.
 * Topics, Scripture and Share headings match in a sermon's sidebar, and topic tags read as chips rather than a bulleted list.
 * Topic pages list sermons one card per row, like passage pages, and both carry each sermon's topics on its card.
 * Passage pages show what their sermons are about as topic chips under the heading. Both of these can be switched off in settings.
