@@ -1136,16 +1136,25 @@
 }
 
 /* A section heading with its topics beside it: what that set of sermons is
-   about, where the set is a different one from the page's own. */
+   about, where the set is a different one from the page's own.
+
+   The rule belongs to the pair, not to the heading. Left on the heading it
+   stopped at the end of the words and ran above the chips, so the chips read
+   as the first line of the list below rather than as part of the heading. */
 .scsl-section-head {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
   justify-content: space-between;
   gap: .5rem 1.5rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: .9rem;
+  border-bottom: 2px solid var(--sc-color-border);
 }
 .scsl-section-head > h2 {
   margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: 0;
 }
 .scsl-section-head .scsl-topic-block {
   flex: 0 1 auto;
@@ -1166,24 +1175,45 @@
   border-color: var(--sc-color-text);
   color: var(--sc-color-bg, #fff);
 }
+/* Shaped like the View Sermon button beside it: the theme's own outline, the
+   ink it uses for button text, and the weight that makes a small label read as
+   something to press rather than as a caption. A pill rather than a rounded
+   rectangle, because a topic is a label you may follow and the button is the
+   one thing on the card to do. */
 .scsl-topic-tag {
   display: inline-block;
   padding: .2rem .6rem;
-  background: var(--sc-color-bg-subtle);
-  border: 1px solid var(--sc-color-border);
+  background: transparent;
+  border: 1px solid var(--sc-color-accent);
   border-radius: 999px;
   font-size: .75rem;
+  font-weight: 600;
 
-  /* The text colour, not the muted one: these are links on a tinted fill, and
-     muted grey on subtle grey reads at about four to one. */
+  /* The text color, not the muted one: muted grey against these surfaces
+     reads at about four to one. */
   color: var(--sc-color-text);
+
+  /* A chip is a shape already. The theme underlines links on hover, which on
+     a pill reads as a line drawn through the bottom of the border. */
+  text-decoration: none;
   text-decoration: none;
 }
+/* Hovered the way a View Sermon button is hovered, because that is the other
+   thing on these pages shaped like this and a reader should not have to learn
+   two answers to "is this clickable". */
 a.scsl-topic-tag:hover,
 a.scsl-topic-tag:focus {
-  background: var(--sc-color-bg);
-  border-color: var(--sc-color-text);
-  color: var(--sc-color-text);
+  background: var(--sc-color-accent);
+  border-color: var(--sc-color-accent);
+  color: #fff;
+  text-decoration: none;
+}
+
+/* Warm's accent is a light gold, so white on it is unreadable: the theme
+   answers the same hover with its own dark ink, as it does for buttons. */
+.sc-theme-warm a.scsl-topic-tag:hover,
+.sc-theme-warm a.scsl-topic-tag:focus {
+  color: var(--sc-color-primary);
 }
 
 /* ── Episode card enhancements ───────────── */
