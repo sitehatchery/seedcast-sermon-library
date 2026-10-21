@@ -179,6 +179,39 @@ class ListLoader {
 	 *
 	 * @return array
 	 */
+	/**
+	 * Every sermon the rest-of-the-book section offers, as ids.
+	 *
+	 * Ids rather than posts, because the caller wants to know what the whole
+	 * section is about rather than to draw it: the section itself draws a
+	 * batch at a time, and loading fifty posts to count their topics would be
+	 * fifty posts loaded twice.
+	 *
+	 * @param \WP_Term $book    The book term.
+	 * @param int[]    $exclude Sermons already listed above.
+	 * @return int[]
+	 */
+	public static function rest_of_book_ids( \WP_Term $book, array $exclude ): array {
+		$query = new \WP_Query( array_merge(
+			self::base_args( -1, 0 ),
+			[
+				'fields'       => 'ids',
+				'post__not_in' => array_map( 'intval', $exclude ),
+				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
+				'tax_query'    => [
+					[
+						'taxonomy'         => 'scsl_scripture',
+						'field'            => 'term_id',
+						'terms'            => [ (int) $book->term_id ],
+						'include_children' => true,
+					],
+				],
+			]
+		) );
+
+		return array_map( 'intval', $query->posts );
+	}
+
 	private static function base_args( int $per_page, int $offset ): array {
 		return [
 			'post_type'      => 'scsl_sermon',

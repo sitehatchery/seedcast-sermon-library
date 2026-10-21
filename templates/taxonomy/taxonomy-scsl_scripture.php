@@ -311,16 +311,43 @@ wp_enqueue_style( 'scsl-frontend' );
 
 	<?php if ( $scsl_book_sermons instanceof \WP_Query && $scsl_book_sermons->have_posts() ) : ?>
 
+		<?php
+		/*
+		 * What that wider set is about, beside its own heading.
+		 *
+		 * The topics at the top of the page describe this passage, which is a
+		 * smaller claim than the section below makes: a single-sermon passage
+		 * offers two subjects while the book behind it covers twenty. Reading
+		 * the page, the cards in this section carried topics the header did
+		 * not, which looks like a mistake rather than a change of scope.
+		 */
+		$scsl_book_topics = '1' === (string) get_option( 'scsl_show_topics_on_scripture', '1' )
+			? TopicList::for_set( ListLoader::rest_of_book_ids( $scsl_book_term, $scsl_listed ), 3 )
+			: [];
+		?>
+
 		<section class="scsl-scripture-book">
-			<h2 class="sc-content-section-heading scsl-scripture-book__title">
-				<?php
-				printf(
-					/* translators: %s: a book of the Bible, for example Romans. */
-					esc_html__( 'Explore Other Sermons Relating to %s', 'seedcast-sermon-library' ),
-					esc_html( $scsl_book_term->name )
-				);
-				?>
-			</h2>
+			<div class="scsl-section-head">
+				<h2 class="sc-content-section-heading scsl-scripture-book__title">
+					<?php
+					printf(
+						/* translators: %s: a book of the Bible, for example Romans. */
+						esc_html__( 'Explore Other Sermons Relating to %s', 'seedcast-sermon-library' ),
+						esc_html( $scsl_book_term->name )
+					);
+					?>
+				</h2>
+
+				<?php if ( $scsl_book_topics ) : ?>
+					<div class="scsl-topic-chips">
+						<?php foreach ( $scsl_book_topics as $scsl_book_topic ) : ?>
+							<a href="<?php echo esc_url( get_term_link( $scsl_book_topic ) ); ?>" class="scsl-topic-tag">
+								<?php echo esc_html( $scsl_book_topic->name ); ?>
+							</a>
+						<?php endforeach; ?>
+					</div>
+				<?php endif; ?>
+			</div>
 
 			<div class="scsl-service-sermons scsl-scripture-sermons">
 				<?php

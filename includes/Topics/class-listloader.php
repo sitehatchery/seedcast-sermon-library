@@ -127,6 +127,14 @@ class ListLoader {
 		$weight = [];
 		$terms  = [];
 
+		/*
+		 * One query for the lot.
+		 *
+		 * A book page runs this over seventy sermons, and get_the_terms() asks
+		 * the database per post until something has primed the cache.
+		 */
+		update_object_term_cache( array_map( 'intval', $sermon_ids ), 'scsl_sermon' );
+
 		foreach ( $sermon_ids as $sermon_id ) {
 			foreach ( (array) get_the_terms( (int) $sermon_id, 'scsl_topic' ) as $term ) {
 				if ( ! $term instanceof \WP_Term ) {

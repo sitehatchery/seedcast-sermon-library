@@ -1129,6 +1129,19 @@
   margin-bottom: 2rem;
 }
 
+/* A section heading with its topics beside it: what that set of sermons is
+   about, where the set is a different one from the page's own. */
+.scsl-section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: .5rem 1.5rem;
+}
+.scsl-section-head > h2 {
+  margin-bottom: 0;
+}
+
 /* The one that is current, on the library page. */
 .scsl-topic-tag.is-active {
   background: var(--sc-color-text);
