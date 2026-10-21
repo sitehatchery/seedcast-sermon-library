@@ -513,13 +513,39 @@
   padding: 1.1rem;
   margin-top: 1rem;
 }
-.scsl-scripture-panel__title {
+.scsl-scripture-panel__title,
+.scsl-topics-panel__title,
+.scsl-sermon-actions__label {
   font-size: .85rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: .06em;
   color: var(--sc-color-muted);
   margin: 0 0 .85rem;
+}
+
+/* ── Topics Panel ────────────────────────── */
+
+/* Sits between the share row and the scripture panel, so it carries the same
+   gap above it that the panel below it has. */
+.scsl-topics-panel {
+  margin-top: 1.5rem;
+}
+
+/* Chips, not a list. The markup is a list because that is what it is, which
+   is no reason to draw a bullet beside every topic. */
+.scsl-topics-panel__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.scsl-topics-panel__list li {
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 .scsl-scripture-panel__section { margin-bottom: 1rem; }
 .scsl-scripture-panel__section:last-child { margin-bottom: 0; }
@@ -1050,7 +1076,17 @@
   border: 1px solid var(--sc-color-border);
   border-radius: 999px;
   font-size: .75rem;
-  color: var(--sc-color-muted);
+
+  /* The text colour, not the muted one: these are links on a tinted fill, and
+     muted grey on subtle grey reads at about four to one. */
+  color: var(--sc-color-text);
+  text-decoration: none;
+}
+a.scsl-topic-tag:hover,
+a.scsl-topic-tag:focus {
+  background: var(--sc-color-bg);
+  border-color: var(--sc-color-text);
+  color: var(--sc-color-text);
 }
 
 /* ── Episode card enhancements ───────────── */
@@ -1370,13 +1406,10 @@ button.scsl-btn--platform:hover {
 }
 
 /* "Share" label above social buttons */
+/* Typography is shared with the other two sidebar headings, above. What is
+   here is only the spacing around the row it labels. */
 .scsl-sermon-actions__label {
-  font-size: .7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .07em;
-  color: var(--sc-color-muted);
-  margin: 0;
+  margin: 0 0 .5rem;
 }
 
 /* Social share brand hover colors */
@@ -2294,6 +2327,18 @@ button.scsl-btn--platform:hover {
 	font-weight: 600;
 }
 
+/* Topics on a card read as chips rather than as a sentence of links, so they
+   are told apart from the passage row above them at a glance. */
+.scsl-card-topics {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: .3rem;
+}
+.scsl-card-topics .scsl-service-sermon-card__meta-label {
+	margin-right: .15rem;
+}
+
 /* Stack everything on narrow viewports. The separator becomes a top
    border since the aside is now above the fold of the card. */
 @media (max-width: 640px) {
@@ -2365,7 +2410,13 @@ button.scsl-btn--platform:hover {
 /* Passage pages list one card per row rather than side by side. A passage
    usually has a handful of sermons, and two narrow columns of a card built
    for a wide one leaves the text cramped against the image. */
-.scsl-scripture-sermons {
+/* One card per row, on every page that lists a set of sermons this way: a
+   passage, a topic, anything later. The service grid behind it is two up,
+   which is right for a service and wrong for a list somebody is reading
+   through. */
+.scsl-scripture-sermons,
+.scsl-topic-sermons,
+.scsl-page-sermons {
 	grid-template-columns: 1fr;
 }
 

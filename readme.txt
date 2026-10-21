@@ -210,6 +210,9 @@ No. Sermons, series and speakers remain in the database.
 
 = 2.75.0 =
 
+* Topics, Scripture and Share headings match in a sermon's sidebar, and topic tags read as chips rather than a bulleted list.
+* Topic pages list sermons one card per row, like passage pages, and both carry each sermon's topics on its card.
+* Passage pages show what their sermons are about as topic chips under the heading. Both of these can be switched off in settings.
 * A Topics box on the sermon screen, so a sermon can be filed under your own topics by hand. Three at most.
 * Topics can be generated with the rest of the content: tick Topics in the list of what to write. Seedcast chooses from your topics and never invents one, and never overrules a choice you made yourself.
 * A View link on the Topics screen, beside Edit and Delete.

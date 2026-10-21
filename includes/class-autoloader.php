@@ -40,6 +40,7 @@ class Autoloader {
 		'BulletinLibraryBridge' => 'class-bulletinlibrarybridge.php',
 		'ScriptureParser'       => 'class-scriptureparser.php',
 		'CardPassages'          => 'class-cardpassages.php',
+		'CardTopics'            => 'class-cardtopics.php',
 		'ListLoader'            => 'class-listloader.php',
 		'LegacyRedirects'       => 'class-legacyredirects.php',
 		'LlmsIndex'             => 'class-llmsindex.php',

@@ -6,6 +6,12 @@ Complete historical changelog moved out of readme.txt to keep the WordPress.org 
 
 **Topic pages are pages now**
 
+* Topics, Scripture and Share in a sermon's sidebar are one heading rather than three. They sat at different sizes with different letter spacing, which is three decisions where nobody made one, and Topics had no spacing above it at all.
+* Topic tags are chips rather than a bulleted list, and dark enough to read: muted grey on a tinted fill came to about four to one, and these are links.
+* A topic page lists its sermons one card per row, the way a passage page does. Both pages draw the same card, and the difference was a wrapper class that inherited the two-up service grid; the two now share one class, so a page added later cannot drift from them either.
+* Sermon cards carry their topics, beside the passages row, on passage and topic pages. On a topic page the page's own subject is left off every card, since it is the one thing the reader already knows.
+* A passage page says what its sermons are about, as topic chips under the heading. A reader who arrived from Ephesians 6 and finds Spiritual Warfare and Prayer has somewhere to go that a list of passages does not offer.
+* Two more settings, for topics on a passage page and on sermon cards.
 * A sermon can be filed under topics from its own screen. WordPress's checklist for the taxonomy was taken off that screen in favor of a box of this plugin's own, and the box was never built, so for a while there was no way to file a sermon under a subject at all: hence a library where a third of the sermons carry none. The box offers the church's own list, three at most, and saves through the same rule the generator works under, so there is one place that enforces the cap and the closed list. Unticking everything is an answer and takes the sermon out of its topics.
 * Topics can be generated. They are offered as a tick in the list of what to write, beside Scripture references, and the church's own vocabulary travels with the job so the service chooses from it instead of inventing one. Whatever comes back is checked against that list again at this end, capped, and never written over a choice the church made itself.
 * A View link on the Topics screen, beside Edit and Delete, now that a topic page is worth looking at.

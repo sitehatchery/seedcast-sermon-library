@@ -112,6 +112,44 @@ class ListLoader {
 	}
 
 	/**
+	 * The subjects a given set of sermons is filed under, most first.
+	 *
+	 * For a page that is about something else and wants to say what its
+	 * sermons are about: a passage page, a series, anywhere a set has already
+	 * been worked out. Counted rather than listed, so the subject this church
+	 * keeps returning to out of a passage comes first.
+	 *
+	 * @param int[] $sermon_ids The set.
+	 * @param int   $most       How many to return.
+	 * @return \WP_Term[]
+	 */
+	public static function for_set( array $sermon_ids, int $most = 3 ): array {
+		$weight = [];
+		$terms  = [];
+
+		foreach ( $sermon_ids as $sermon_id ) {
+			foreach ( (array) get_the_terms( (int) $sermon_id, 'scsl_topic' ) as $term ) {
+				if ( ! $term instanceof \WP_Term ) {
+					continue;
+				}
+
+				$terms[ $term->term_id ]  = $term;
+				$weight[ $term->term_id ] = ( $weight[ $term->term_id ] ?? 0 ) + 1;
+			}
+		}
+
+		arsort( $weight );
+
+		$out = [];
+
+		foreach ( array_slice( array_keys( $weight ), 0, max( 1, $most ) ) as $id ) {
+			$out[] = $terms[ $id ];
+		}
+
+		return $out;
+	}
+
+	/**
 	 * The subjects this one is taught alongside, most shared sermons first.
 	 *
 	 * Counted over the set the page is already showing, so the number beside a

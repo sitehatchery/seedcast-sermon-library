@@ -29,6 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 use SeedcastSermonLibrary\Frontend\BulletinLibraryBridge;
 use SeedcastSermonLibrary\Scripture\ListLoader as ScriptureList;
+use SeedcastSermonLibrary\Topics\CardTopics;
 use SeedcastSermonLibrary\Topics\ListLoader;
 use SeedcastSermonLibrary\Topics\Summary;
 
@@ -61,6 +62,14 @@ $scsl_summary = Summary::get( (int) $scsl_term->term_id, $scsl_listed );
 
 // The subjects these same sermons are also filed under, strongest first.
 $scsl_related = ListLoader::related( $scsl_term, $scsl_listed );
+
+/*
+ * Each card says which other subjects its sermon carries.
+ *
+ * Not this one: it is true of every card on the page, so it is the one thing
+ * the reader already knows.
+ */
+CardTopics::begin( (int) $scsl_term->term_id );
 ?>
 
 <div class="sc-wrap">
@@ -99,7 +108,7 @@ $scsl_related = ListLoader::related( $scsl_term, $scsl_listed );
 
 	<?php if ( $scsl_visible ) : ?>
 
-		<div class="scsl-service-sermons scsl-topic-sermons">
+		<div class="scsl-service-sermons scsl-page-sermons">
 			<?php
 			foreach ( $scsl_visible as $scsl_id ) {
 				// The service page's card, unchanged. Already escaped by the
@@ -262,7 +271,7 @@ $scsl_related = ListLoader::related( $scsl_term, $scsl_listed );
 						</span>
 					</h3>
 
-					<div class="scsl-service-sermons scsl-topic-sermons">
+					<div class="scsl-service-sermons scsl-page-sermons">
 						<?php
 						while ( $scsl_near_sermons->have_posts() ) :
 							$scsl_near_sermons->the_post();
@@ -283,4 +292,7 @@ $scsl_related = ListLoader::related( $scsl_term, $scsl_listed );
 
 </div>
 
-<?php get_footer();
+<?php
+CardTopics::end();
+
+get_footer();

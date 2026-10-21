@@ -270,6 +270,8 @@ class SettingsPage {
 			'scsl_show_topics_on_sermon',
 			'scsl_show_topics_on_series',
 			'scsl_show_topics_on_series_archive',
+			'scsl_show_topics_on_scripture',
+			'scsl_show_topics_on_cards',
 			'scsl_show_search_filter',
 			'scsl_show_year_filter',
 			'scsl_show_completeness',
@@ -453,6 +455,28 @@ class SettingsPage {
 									<?php esc_html_e( 'Show topic tags in the series hero', 'seedcast-sermon-library' ); ?>
 								</label>
 								<p class="description"><?php esc_html_e( 'Taken from the sermons in the series, most often preached first. Topics belong to sermons, so a series is never filed under one itself.', 'seedcast-sermon-library' ); ?></p>
+							</td>
+						</tr>
+						<tr>
+							<th><?php esc_html_e( 'Show topics on a passage page', 'seedcast-sermon-library' ); ?></th>
+							<td>
+								<label>
+									<input type="hidden" name="scsl_show_topics_on_scripture" value="0" />
+									<input type="checkbox" name="scsl_show_topics_on_scripture" value="1"
+										   <?php checked( get_option( 'scsl_show_topics_on_scripture', '1' ), '1' ); ?> />
+									<?php esc_html_e( 'Show what the sermons on a passage are about, under its heading', 'seedcast-sermon-library' ); ?>
+								</label>
+							</td>
+						</tr>
+						<tr>
+							<th><?php esc_html_e( 'Show topics on sermon cards', 'seedcast-sermon-library' ); ?></th>
+							<td>
+								<label>
+									<input type="hidden" name="scsl_show_topics_on_cards" value="0" />
+									<input type="checkbox" name="scsl_show_topics_on_cards" value="1"
+										   <?php checked( get_option( 'scsl_show_topics_on_cards', '1' ), '1' ); ?> />
+									<?php esc_html_e( 'List the topics on each sermon card, on passage and topic pages', 'seedcast-sermon-library' ); ?>
+								</label>
 							</td>
 						</tr>
 						<tr>

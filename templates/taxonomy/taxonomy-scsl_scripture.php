@@ -31,6 +31,8 @@ use SeedcastSermonLibrary\Scripture\ScriptureParser;
 use SeedcastSermonLibrary\Scripture\Summary;
 use SeedcastSermonLibrary\Scripture\CardPassages;
 use SeedcastSermonLibrary\Scripture\ListLoader;
+use SeedcastSermonLibrary\Topics\CardTopics;
+use SeedcastSermonLibrary\Topics\ListLoader as TopicList;
 
 get_header();
 
@@ -106,6 +108,7 @@ $scsl_translation = (string) get_option( 'scsl_bible_translation', 'NIV' );
  */
 if ( $scsl_book ) {
 	CardPassages::begin( (string) $scsl_book );
+	CardTopics::begin();
 }
 
 wp_enqueue_style( 'scsl-frontend' );
@@ -153,6 +156,20 @@ wp_enqueue_style( 'scsl-frontend' );
 			</p>
 		<?php endif; ?>
 
+		<?php
+		/*
+		 * What this church teaches out of the passage, as subjects.
+		 *
+		 * The same chips a sermon carries, counted across the set so the
+		 * strongest come first. A reader who arrived from Ephesians 6 and
+		 * finds Spiritual Warfare and Prayer here has somewhere to go that
+		 * the passage list alone does not offer.
+		 */
+		$scsl_page_topics = '1' === (string) get_option( 'scsl_show_topics_on_scripture', '1' )
+			? TopicList::for_set( $scsl_listed, 3 )
+			: [];
+		?>
+
 		<p class="scsl-archive-count">
 			<?php
 			printf(
@@ -165,6 +182,16 @@ wp_enqueue_style( 'scsl-frontend' );
 			?>
 		</p>
 	</header>
+
+	<?php if ( $scsl_page_topics ) : ?>
+		<div class="scsl-series-topics scsl-scripture-topics">
+			<?php foreach ( $scsl_page_topics as $scsl_page_topic ) : ?>
+				<a href="<?php echo esc_url( get_term_link( $scsl_page_topic ) ); ?>" class="scsl-topic-tag">
+					<?php echo esc_html( $scsl_page_topic->name ); ?>
+				</a>
+			<?php endforeach; ?>
+		</div>
+	<?php endif; ?>
 
 	<?php if ( '' !== $scsl_summary ) : ?>
 		<div class="scsl-scripture-summary">
@@ -339,5 +366,6 @@ wp_enqueue_style( 'scsl-frontend' );
 
 <?php
 CardPassages::end();
+CardTopics::end();
 
 get_footer();
