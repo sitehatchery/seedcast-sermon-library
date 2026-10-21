@@ -120,10 +120,12 @@ class ListLoader {
 	 * keeps returning to out of a passage comes first.
 	 *
 	 * @param int[] $sermon_ids The set.
-	 * @param int   $most       How many to return.
+	 * @param int   $most       How many to return, or 0 for all of them. A
+	 *                          caller that trims the list itself can then say
+	 *                          whether anything was left out.
 	 * @return \WP_Term[]
 	 */
-	public static function for_set( array $sermon_ids, int $most = 3 ): array {
+	public static function for_set( array $sermon_ids, int $most = 0 ): array {
 		$weight = [];
 		$terms  = [];
 
@@ -150,7 +152,9 @@ class ListLoader {
 
 		$out = [];
 
-		foreach ( array_slice( array_keys( $weight ), 0, max( 1, $most ) ) as $id ) {
+		$keys = array_keys( $weight );
+
+		foreach ( $most > 0 ? array_slice( $keys, 0, $most ) : $keys as $id ) {
 			$out[] = $terms[ $id ];
 		}
 

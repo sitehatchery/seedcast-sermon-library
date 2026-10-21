@@ -42,30 +42,36 @@
   flex: 0 1 auto;
   max-width: 24rem;
 }
-.scsl-archive-header__topics .scsl-topic-chips {
-  justify-content: flex-end;
-}
-.scsl-archive-header__topics-label {
+
+/* A labelled row of chips, wherever one sits beside a heading. The label is
+   the same small capital as the sidebar headings, so a reader meets one kind
+   of label on the page rather than three. */
+.scsl-topic-block__label {
   font-size: .85rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: .06em;
   color: var(--sc-color-muted);
   margin: 0 0 .5rem;
+}
+.scsl-topic-block--end .scsl-topic-block__label {
   text-align: right;
+}
+.scsl-topic-block--end .scsl-topic-chips {
+  justify-content: flex-end;
 }
 
 /* Stacked on a narrow screen, where a right-hand column is a column of one
-   chip per line. */
+   chip per line, so it reads from the left like everything else. */
 @media (max-width: 640px) {
   .scsl-archive-header__topics {
     max-width: none;
   }
-  .scsl-archive-header__topics .scsl-topic-chips {
-    justify-content: flex-start;
-  }
-  .scsl-archive-header__topics-label {
+  .scsl-archive-header__topics .scsl-topic-block--end .scsl-topic-block__label {
     text-align: left;
+  }
+  .scsl-archive-header__topics .scsl-topic-block--end .scsl-topic-chips {
+    justify-content: flex-start;
   }
 }
 .scsl-archive-title {
@@ -1140,6 +1146,18 @@
 }
 .scsl-section-head > h2 {
   margin-bottom: 0;
+}
+.scsl-section-head .scsl-topic-block {
+  flex: 0 1 auto;
+  max-width: 26rem;
+}
+@media (max-width: 640px) {
+  .scsl-section-head .scsl-topic-block--end .scsl-topic-block__label {
+    text-align: left;
+  }
+  .scsl-section-head .scsl-topic-block--end .scsl-topic-chips {
+    justify-content: flex-start;
+  }
 }
 
 /* The one that is current, on the library page. */

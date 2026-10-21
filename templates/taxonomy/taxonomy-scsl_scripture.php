@@ -32,6 +32,7 @@ use SeedcastSermonLibrary\Scripture\Summary;
 use SeedcastSermonLibrary\Scripture\CardPassages;
 use SeedcastSermonLibrary\Scripture\ListLoader;
 use SeedcastSermonLibrary\Topics\CardTopics;
+use SeedcastSermonLibrary\Frontend\TemplateLoader;
 use SeedcastSermonLibrary\Topics\ListLoader as TopicList;
 
 get_header();
@@ -167,8 +168,19 @@ wp_enqueue_style( 'scsl-frontend' );
 		 * the passage list alone does not offer.
 		 */
 		$scsl_page_topics = '1' === (string) get_option( 'scsl_show_topics_on_scripture', '1' )
-			? TopicList::for_set( $scsl_listed, 3 )
+			? TopicList::for_set( $scsl_listed )
 			: [];
+
+		/**
+		 * How many topics to name beside a heading.
+		 *
+		 * Five. Enough to say what a book is returned to, few enough to read
+		 * at a glance: this library's larger books carry twenty-odd subjects
+		 * between them, which is a tag cloud rather than a description.
+		 *
+		 * @param int $count How many.
+		 */
+		$scsl_topic_chip_limit = (int) apply_filters( 'scsl_topic_chip_limit', 5 );
 		?>
 
 		<p class="scsl-archive-count">
@@ -186,14 +198,13 @@ wp_enqueue_style( 'scsl-frontend' );
 
 		<?php if ( $scsl_page_topics ) : ?>
 			<div class="scsl-archive-header__topics">
-				<p class="scsl-archive-header__topics-label"><?php esc_html_e( 'Topics:', 'seedcast-sermon-library' ); ?></p>
-				<div class="scsl-topic-chips">
-					<?php foreach ( $scsl_page_topics as $scsl_page_topic ) : ?>
-						<a href="<?php echo esc_url( get_term_link( $scsl_page_topic ) ); ?>" class="scsl-topic-tag">
-							<?php echo esc_html( $scsl_page_topic->name ); ?>
-						</a>
-					<?php endforeach; ?>
-				</div>
+				<?php
+				TemplateLoader::partial( 'topic-chips', [
+					'scsl_terms' => $scsl_page_topics,
+					'scsl_limit' => $scsl_topic_chip_limit,
+					'scsl_align' => 'end',
+				] );
+				?>
 			</div>
 		<?php endif; ?>
 	</header>
@@ -322,7 +333,7 @@ wp_enqueue_style( 'scsl-frontend' );
 		 * not, which looks like a mistake rather than a change of scope.
 		 */
 		$scsl_book_topics = '1' === (string) get_option( 'scsl_show_topics_on_scripture', '1' )
-			? TopicList::for_set( ListLoader::rest_of_book_ids( $scsl_book_term, $scsl_listed ), 3 )
+			? TopicList::for_set( ListLoader::rest_of_book_ids( $scsl_book_term, $scsl_listed ) )
 			: [];
 		?>
 
@@ -338,15 +349,13 @@ wp_enqueue_style( 'scsl-frontend' );
 					?>
 				</h2>
 
-				<?php if ( $scsl_book_topics ) : ?>
-					<div class="scsl-topic-chips">
-						<?php foreach ( $scsl_book_topics as $scsl_book_topic ) : ?>
-							<a href="<?php echo esc_url( get_term_link( $scsl_book_topic ) ); ?>" class="scsl-topic-tag">
-								<?php echo esc_html( $scsl_book_topic->name ); ?>
-							</a>
-						<?php endforeach; ?>
-					</div>
-				<?php endif; ?>
+				<?php
+				TemplateLoader::partial( 'topic-chips', [
+					'scsl_terms' => $scsl_book_topics,
+					'scsl_limit' => $scsl_topic_chip_limit,
+					'scsl_align' => 'end',
+				] );
+				?>
 			</div>
 
 			<div class="scsl-service-sermons scsl-scripture-sermons">
