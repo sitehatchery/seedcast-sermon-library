@@ -880,7 +880,7 @@ class SermonMeta {
 				<label class="scsl-topic-picker__item">
 					<input type="checkbox" name="scsl_topics[]" value="<?php echo esc_attr( $slug ); ?>"
 						   <?php checked( in_array( $slug, $current, true ) ); ?> />
-					<?php echo esc_html( $name ); ?>
+					<span><?php echo esc_html( $name ); ?></span>
 				</label>
 			<?php endforeach; ?>
 		</div>

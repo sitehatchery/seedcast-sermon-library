@@ -969,4 +969,36 @@
 		$( '#scsl-wpfc-progress' ).text( 'Starting…' );
 		batch( 0 );
 	} );
+
+	// ── Topics box ────────────────────────────
+	/*
+	 * Holds the sermon to its three.
+	 *
+	 * The cap is enforced on save, which on its own means a fourth tick looks
+	 * accepted and is gone when the page comes back. The rest of the list goes
+	 * quiet at the limit instead, with the note under the box saying why, and
+	 * nothing is disabled that is already ticked: untick one and the list
+	 * comes back.
+	 */
+	$( function () {
+		var $picker = $( '.scsl-topic-picker' );
+
+		if ( ! $picker.length ) {
+			return;
+		}
+
+		var max  = parseInt( $picker.attr( 'data-max' ), 10 ) || 0;
+		var $note = $( '.scsl-topic-picker__full' );
+
+		function settle() {
+			var $boxes = $picker.find( 'input[type="checkbox"]' );
+			var full   = max > 0 && $boxes.filter( ':checked' ).length >= max;
+
+			$boxes.not( ':checked' ).prop( 'disabled', full );
+			$note.prop( 'hidden', ! full );
+		}
+
+		$picker.on( 'change', 'input[type="checkbox"]', settle );
+		settle();
+	} );
 }( jQuery ) );

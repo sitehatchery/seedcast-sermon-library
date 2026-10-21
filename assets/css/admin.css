@@ -715,3 +715,38 @@ a.scsl-score:focus {
 .scsl-list-summary__dot--good { background: #00a32a; }
 .scsl-list-summary__dot--fair { background: #dba617; }
 .scsl-list-summary__dot--poor { background: #d63638; }
+
+/* ── Topics box on a sermon ───────────────────────────────────────────────
+   A list, read down, the way the Categories box beside it is read. Left to
+   flow as inline labels, two dozen topics wrapped mid-phrase and a checkbox
+   ended up nearer the name after it than the one it belonged to. */
+.scsl-topic-picker {
+	max-height: 220px;
+	overflow-y: auto;
+	padding: .35rem .5rem;
+	border: 1px solid #dcdcde;
+	background: #fff;
+	border-radius: 2px;
+}
+
+.scsl-topic-picker__item {
+	display: flex;
+	align-items: flex-start;
+	gap: .4rem;
+	padding: .18rem 0;
+	line-height: 1.5;
+}
+
+/* The box is the scrolling region, so nothing inside it holds a margin that
+   would show as a gap at either end of the scroll. */
+.scsl-topic-picker__item input[type="checkbox"] {
+	margin: .2rem 0 0;
+	flex: 0 0 auto;
+}
+
+/* A sermon at its limit: the rest go quiet rather than disappearing, so the
+   list does not reshuffle under the cursor. */
+.scsl-topic-picker__item input[type="checkbox"]:disabled + span,
+.scsl-topic-picker__item input[type="checkbox"]:disabled {
+	opacity: .5;
+}

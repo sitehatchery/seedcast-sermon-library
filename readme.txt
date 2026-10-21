@@ -231,6 +231,7 @@ No. Sermons, series and speakers remain in the database.
 * The readme now lists every external service the plugin can reach, what is sent and when, and nothing is reached unless you switch it on.
 * Leftover code from the old Generate Sermon screen has been removed. It read submitted fields for a form that no longer exists.
 * Rows a page contributes to a sermon card are filtered before they are printed rather than trusted.
+* The Topics box on a sermon reads as a list, one per line, like the Categories box beside it, and the three it allows are held in the browser rather than quietly trimmed on save.
 * Topics, Scripture and Share headings match in a sermon's sidebar, and topic tags read as chips rather than a bulleted list.
 * Topic pages list sermons one card per row, like passage pages, and both carry each sermon's topics on its card.
 * Passage pages show what their sermons are about as topic chips under the heading. Both of these can be switched off in settings.
