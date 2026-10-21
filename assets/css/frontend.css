@@ -2439,11 +2439,18 @@ button.scsl-btn--platform:hover {
 .scsl-service-sermon-card__meta-value {
 	display: inline;
 }
-.scsl-service-sermon-card__meta a {
+/*
+ * The meta rows are links in running text: the theme's link color, underlined
+ * on hover. A topic chip in those rows is not that. It is a button shape with
+ * its own outline, ink and fill, and taking the link treatment left it brown
+ * inside a gold pill with a line under the word on hover, so it is excluded
+ * here rather than argued with further down.
+ */
+.scsl-service-sermon-card__meta a:not(.scsl-topic-tag) {
 	color: var(--sc-color-link, #1e40af);
 	text-decoration: none;
 }
-.scsl-service-sermon-card__meta a:hover {
+.scsl-service-sermon-card__meta a:not(.scsl-topic-tag):hover {
 	color: var(--sc-color-link-hover, #1e3a8a);
 	text-decoration: underline;
 }
