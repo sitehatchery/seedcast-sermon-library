@@ -129,7 +129,7 @@ class Indexing {
 		/** This filter is documented in includes/Topics/class-indexing.php */
 		$min = (int) apply_filters( 'scsl_min_topic_sermons_for_index', self::MIN_SERMONS, null );
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- One query against term counts; no API answers "every term under this count".
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- One indexed query against term counts, in place of asking every term in turn; no API answers "every term under this count". Caching it would hold a topic out of the sitemap after it had earned its place, for a query a sitemap build runs once.
 		$ids = $wpdb->get_col( $wpdb->prepare(
 			"SELECT tt.term_id
 			   FROM {$wpdb->term_taxonomy} tt

@@ -321,6 +321,7 @@ abstract class PageSummary {
 		 * @param array    $previous { text: what the page says now, source: generated or church }.
 		 */
 		$summary = (string) apply_filters(
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound -- Each page kind names its own filter and every one of them is prefixed: scsl_scripture_summary_generate, scsl_topic_summary_generate.
 			static::generate_filter(),
 			'',
 			$term,

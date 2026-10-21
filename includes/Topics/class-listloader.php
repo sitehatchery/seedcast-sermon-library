@@ -412,6 +412,7 @@ class ListLoader {
 		return new \WP_Query( array_merge(
 			self::base_args( $per_page, $offset ),
 			[
+				// phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_post__not_in -- The handful of sermons already drawn above this section. The section is paginated, so they have to come out in the query: excluded afterwards, a page of ten could arrive as a page of three.
 				'post__not_in' => array_map( 'intval', $exclude ),
 				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
 				'tax_query'    => [

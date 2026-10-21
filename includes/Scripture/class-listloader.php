@@ -192,11 +192,16 @@ class ListLoader {
 	 * @return int[]
 	 */
 	public static function rest_of_book_ids( \WP_Term $book, array $exclude ): array {
+		/*
+		 * Everything in the book, with what is already listed taken out here
+		 * rather than in the query. This asks for ids and no page of them, so
+		 * the two give the same answer, and a growing exclusion list is the
+		 * one thing that makes a query of this shape expensive.
+		 */
 		$query = new \WP_Query( array_merge(
 			self::base_args( -1, 0 ),
 			[
 				'fields'       => 'ids',
-				'post__not_in' => array_map( 'intval', $exclude ),
 				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
 				'tax_query'    => [
 					[
@@ -209,7 +214,9 @@ class ListLoader {
 			]
 		) );
 
-		return array_map( 'intval', $query->posts );
+		$ids = array_map( 'intval', $query->posts );
+
+		return array_values( array_diff( $ids, array_map( 'intval', $exclude ) ) );
 	}
 
 	private static function base_args( int $per_page, int $offset ): array {
