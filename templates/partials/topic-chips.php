@@ -15,6 +15,9 @@
  *   $scsl_terms (WP_Term[]) every topic in the set, most used first
  *   $scsl_limit (int)       how many to show
  *   $scsl_align (string)    'end' to align against the right edge
+ *   $scsl_label (string)    a label of the caller's own, where the set is not
+ *                           simply "the topics here": a related set is related
+ *                           whether or not all of it fits
  *
  * @package SeedcastSermonLibrary
  */
@@ -27,6 +30,7 @@ if ( ! $scsl_terms ) return;
 
 $scsl_limit = isset( $scsl_limit ) ? (int) $scsl_limit : 5;
 $scsl_align = isset( $scsl_align ) ? (string) $scsl_align : '';
+$scsl_label = isset( $scsl_label ) ? (string) $scsl_label : '';
 
 $scsl_shown     = array_slice( $scsl_terms, 0, max( 1, $scsl_limit ) );
 $scsl_truncated = count( $scsl_terms ) > count( $scsl_shown );
@@ -35,7 +39,9 @@ $scsl_truncated = count( $scsl_terms ) > count( $scsl_shown );
 <div class="scsl-topic-block<?php echo 'end' === $scsl_align ? ' scsl-topic-block--end' : ''; ?>">
 	<p class="scsl-topic-block__label">
 		<?php
-		if ( $scsl_truncated ) {
+		if ( '' !== $scsl_label ) {
+			echo esc_html( $scsl_label );
+		} elseif ( $scsl_truncated ) {
 			esc_html_e( 'Most used topics:', 'seedcast-sermon-library' );
 		} else {
 			esc_html_e( 'Topics:', 'seedcast-sermon-library' );

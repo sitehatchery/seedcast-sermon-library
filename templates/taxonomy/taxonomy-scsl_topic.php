@@ -28,6 +28,7 @@
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 use SeedcastSermonLibrary\Frontend\BulletinLibraryBridge;
+use SeedcastSermonLibrary\Frontend\TemplateLoader;
 use SeedcastSermonLibrary\Scripture\ListLoader as ScriptureList;
 use SeedcastSermonLibrary\Topics\CardTopics;
 use SeedcastSermonLibrary\Topics\ListLoader;
@@ -64,6 +65,23 @@ $scsl_summary = Summary::get( (int) $scsl_term->term_id, $scsl_listed );
 $scsl_related = ListLoader::related( $scsl_term, $scsl_listed );
 
 /*
+ * The same subjects named beside the title, as a way out of the page.
+ *
+ * Already worked out for the sections below, so this costs the markup and
+ * nothing else. Those sections say why each subject is here and carry its
+ * sermons; this is for the reader who wants the next page rather than the
+ * reasoning behind it.
+ */
+$scsl_header_related = '1' === (string) get_option( 'scsl_show_related_on_topic', '1' )
+	? array_values( array_filter( array_map(
+		static function ( $scsl_near ) {
+			return $scsl_near['term'] ?? null;
+		},
+		$scsl_related
+	) ) )
+	: [];
+
+/*
  * Each card says which other subjects its sermon carries.
  *
  * Not this one: it is true of every card on the page, so it is the one thing
@@ -82,22 +100,40 @@ CardTopics::begin( (int) $scsl_term->term_id );
 		</ol>
 	</nav>
 
-	<header class="scsl-archive-header">
-		<h1 class="scsl-archive-title"><?php echo esc_html( $scsl_term->name ); ?></h1>
+	<header class="scsl-archive-header<?php echo $scsl_header_related ? ' scsl-archive-header--split' : ''; ?>">
+		<div class="scsl-archive-header__main">
+			<h1 class="scsl-archive-title"><?php echo esc_html( $scsl_term->name ); ?></h1>
 
-		<?php if ( $scsl_term->description ) : ?>
-			<p class="scsl-archive-desc"><?php echo esc_html( $scsl_term->description ); ?></p>
+			<?php if ( $scsl_term->description ) : ?>
+				<p class="scsl-archive-desc"><?php echo esc_html( $scsl_term->description ); ?></p>
+			<?php endif; ?>
+
+			<p class="scsl-archive-count">
+				<?php
+				printf(
+					/* translators: %s: number of sermons. */
+					esc_html( _n( '%s sermon', '%s sermons', $scsl_total, 'seedcast-sermon-library' ) ),
+					esc_html( number_format_i18n( $scsl_total ) )
+				);
+				?>
+			</p>
+		</div>
+
+		<?php if ( $scsl_header_related ) : ?>
+			<div class="scsl-archive-header__topics">
+				<?php
+				/** This filter is documented in templates/taxonomy/taxonomy-scsl_scripture.php */
+				$scsl_header_limit = (int) apply_filters( 'scsl_topic_chip_limit', 5 );
+
+				TemplateLoader::partial( 'topic-chips', [
+					'scsl_terms' => $scsl_header_related,
+					'scsl_limit' => $scsl_header_limit,
+					'scsl_align' => 'end',
+					'scsl_label' => __( 'Related topics:', 'seedcast-sermon-library' ),
+				] );
+				?>
+			</div>
 		<?php endif; ?>
-
-		<p class="scsl-archive-count">
-			<?php
-			printf(
-				/* translators: %s: number of sermons. */
-				esc_html( _n( '%s sermon', '%s sermons', $scsl_total, 'seedcast-sermon-library' ) ),
-				esc_html( number_format_i18n( $scsl_total ) )
-			);
-			?>
-		</p>
 	</header>
 
 	<?php if ( '' !== $scsl_summary ) : ?>

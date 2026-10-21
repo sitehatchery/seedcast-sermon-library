@@ -14,7 +14,9 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  *
  * On a topic page the page's own subject is left off every card. It is true of
  * all of them, which makes it the one piece of information the reader already
- * has, and repeating it down the page crowds out the ones they do not.
+ * has, and repeating it down the page crowds out the ones they do not. What
+ * is left is what else that sermon was about, so the row is labelled for what
+ * it lists: related topics, in the same words the page uses beside its title.
  *
  * Contributes through the card's own filter and stops when the list ends, so
  * cards drawn elsewhere on the page are untouched.
@@ -135,10 +137,17 @@ class CardTopics {
 			return $rows;
 		}
 
+		// Named for the set it actually lists. Where a page's own subject has
+		// been taken out of every card, what is left is the rest of what each
+		// sermon was about.
+		$label = self::$skip
+			? esc_html__( 'Related topics:', 'seedcast-sermon-library' )
+			: esc_html__( 'Topics:', 'seedcast-sermon-library' );
+
 		return $rows . sprintf(
 			'<p class="scsl-service-sermon-card__meta-row scsl-card-topics">'
 			. '<span class="scsl-service-sermon-card__meta-label">%s</span>%s</p>',
-			esc_html__( 'Topics:', 'seedcast-sermon-library' ),
+			$label,
 			implode( ' ', $chips )
 		);
 	}

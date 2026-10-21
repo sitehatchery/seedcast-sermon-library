@@ -31,6 +31,7 @@ $scsl_options = [
 	'scsl_tab_more_label',
 	'scsl_series_per_page',
 	'scsl_show_topics_on_series',
+	'scsl_show_related_on_topic',
 	'scsl_show_search_filter',
 	'scsl_show_year_filter',
 	'scsl_bible_provider',

@@ -271,6 +271,7 @@ class SettingsPage {
 			'scsl_show_topics_on_series',
 			'scsl_show_topics_on_series_archive',
 			'scsl_show_topics_on_scripture',
+			'scsl_show_related_on_topic',
 			'scsl_show_topics_on_cards',
 			'scsl_show_search_filter',
 			'scsl_show_year_filter',
@@ -466,6 +467,18 @@ class SettingsPage {
 										   <?php checked( get_option( 'scsl_show_topics_on_scripture', '1' ), '1' ); ?> />
 									<?php esc_html_e( 'Show what the sermons on a passage are about, under its heading', 'seedcast-sermon-library' ); ?>
 								</label>
+							</td>
+						</tr>
+						<tr>
+							<th><?php esc_html_e( 'Show related topics on a topic page', 'seedcast-sermon-library' ); ?></th>
+							<td>
+								<label>
+									<input type="hidden" name="scsl_show_related_on_topic" value="0" />
+									<input type="checkbox" name="scsl_show_related_on_topic" value="1"
+										   <?php checked( get_option( 'scsl_show_related_on_topic', '1' ), '1' ); ?> />
+									<?php esc_html_e( 'Name the subjects this one is taught alongside, beside its title', 'seedcast-sermon-library' ); ?>
+								</label>
+								<p class="description"><?php esc_html_e( 'The same subjects the sections further down the page carry, as a way through to them. Counted from your own sermons, so there is no second list to keep.', 'seedcast-sermon-library' ); ?></p>
 							</td>
 						</tr>
 						<tr>
