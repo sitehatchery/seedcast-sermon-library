@@ -105,6 +105,10 @@ final class SermonLibrary {
 		( new Frontend\ImageFallback() )->init();
 		( new Frontend\PodcastFeed() )->init();
 		( new Frontend\BulletinLibraryBridge() )->init();
+
+		// Offers to start a bulletin from a sermon, where Bulletin Library is
+		// running. It asks that question itself and costs nothing otherwise.
+		( new Admin\ServiceBulletin() )->init();
 		( new PDF\PDFGenerator() )->init();
 		( new Admin\SeriesEngineImporter() )->init();
 		( new Admin\SermonManagerImporter() )->init();

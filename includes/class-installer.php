@@ -101,6 +101,8 @@ class Installer {
 			'scsl_sermons_per_page'      => '10',
 			'scsl_series_per_page'       => '12',
 			'scsl_show_topics_on_series' => '1',
+			'scsl_bulletin_on_publish'   => '1',
+			'scsl_bulletin_publish'      => '0',
 			'scsl_show_related_on_topic' => '1',
 			'scsl_show_search_filter'    => '1',
 			'scsl_show_year_filter'      => '1',

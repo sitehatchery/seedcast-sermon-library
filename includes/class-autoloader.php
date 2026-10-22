@@ -28,6 +28,7 @@ class Autoloader {
 		'ProBridge'             => 'class-probridge.php',
 		'PodcastScreen'         => 'class-podcastscreen.php',
 		'AudioReclaim'          => 'class-audioreclaim.php',
+		'ServiceBulletin'       => 'class-servicebulletin.php',
 		'ContentList'           => 'class-contentlist.php',
 		'Revisions'             => 'class-revisions.php',
 		'JsonImporter'          => 'class-jsonimporter.php',

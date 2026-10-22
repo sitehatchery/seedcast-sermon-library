@@ -272,6 +272,8 @@ class SettingsPage {
 			'scsl_show_topics_on_series_archive',
 			'scsl_show_topics_on_scripture',
 			'scsl_show_related_on_topic',
+			'scsl_bulletin_on_publish',
+			'scsl_bulletin_publish',
 			'scsl_show_topics_on_cards',
 			'scsl_show_search_filter',
 			'scsl_show_year_filter',
@@ -503,6 +505,40 @@ class SettingsPage {
 								</label>
 							</td>
 						</tr>
+						<?php if ( ServiceBulletin::available() ) : ?>
+						<?php
+						/*
+						 * Only where Bulletin Library is running. A setting for
+						 * a plugin a church has not got is a question about
+						 * nothing, and the answer would sit in the database
+						 * being wrong about a feature they cannot see.
+						 */
+						?>
+						<tr>
+							<th><?php esc_html_e( 'Service bulletin from a sermon', 'seedcast-sermon-library' ); ?></th>
+							<td>
+								<label>
+									<input type="hidden" name="scsl_bulletin_on_publish" value="0" />
+									<input type="checkbox" name="scsl_bulletin_on_publish" value="1"
+										   <?php checked( get_option( 'scsl_bulletin_on_publish', '1' ), '1' ); ?> />
+									<?php esc_html_e( 'Tick "Create service bulletin automatically" on a new sermon by default', 'seedcast-sermon-library' ); ?>
+								</label>
+								<p class="description"><?php esc_html_e( 'The box is on the sermon while it is being written, so it can be unticked for any one sermon whatever this setting says. A bulletin is started for the week the sermon was preached, carrying the overview and image from that sermon, and is never started twice for the same week.', 'seedcast-sermon-library' ); ?></p>
+							</td>
+						</tr>
+						<tr>
+							<th><?php esc_html_e( 'Publish that bulletin', 'seedcast-sermon-library' ); ?></th>
+							<td>
+								<label>
+									<input type="hidden" name="scsl_bulletin_publish" value="0" />
+									<input type="checkbox" name="scsl_bulletin_publish" value="1"
+										   <?php checked( get_option( 'scsl_bulletin_publish', '0' ), '1' ); ?> />
+									<?php esc_html_e( 'Publish it rather than leaving it as a draft', 'seedcast-sermon-library' ); ?>
+								</label>
+								<p class="description"><?php esc_html_e( 'For a church whose announcements and programs are already set up, so a bulletin needs nothing added before anybody reads it.', 'seedcast-sermon-library' ); ?></p>
+							</td>
+						</tr>
+						<?php endif; ?>
 						<tr>
 							<th><?php esc_html_e( 'Show search in filter bar', 'seedcast-sermon-library' ); ?></th>
 							<td>
