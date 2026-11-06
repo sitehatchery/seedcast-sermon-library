@@ -222,6 +222,19 @@ class ProBridge {
 					'kind'   => 'topic',
 					'args'   => 5,
 				],
+
+				/*
+				 * The opening paragraph of a service bulletin, written from
+				 * the sermon preached at it: not a description of the sermon
+				 * but the emphasis of the morning, something encouraging
+				 * about what it was about. Two arguments, the summary and the
+				 * sermon as Summaries\ServiceSummary gathers it.
+				 */
+				'service_summary' => [
+					'filter' => 'scsl_service_summary_generate',
+					'kind'   => 'service',
+					'args'   => 2,
+				],
 			],
 			'append'      => [
 				'meta'   => '_scsl_resources',

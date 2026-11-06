@@ -109,6 +109,10 @@ final class SermonLibrary {
 		// Offers to start a bulletin from a sermon, where Bulletin Library is
 		// running. It asks that question itself and costs nothing otherwise.
 		( new Admin\ServiceBulletin() )->init();
+
+		// And writes its opening paragraph, there or from Bulletin Library's
+		// own screen, where an engine is connected to write it.
+		Summaries\ServiceSummary::init();
 		( new PDF\PDFGenerator() )->init();
 		( new Admin\SeriesEngineImporter() )->init();
 		( new Admin\SermonManagerImporter() )->init();

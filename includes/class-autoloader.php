@@ -48,6 +48,7 @@ class Autoloader {
 		'Faq'                   => 'class-faq.php',
 		'ScriptureSummaries'    => 'class-scripturesummaries.php',
 		'PageSummary'           => 'class-pagesummary.php',
+		'ServiceSummary'        => 'class-servicesummary.php',
 	];
 
 	public function load( string $class ): void {

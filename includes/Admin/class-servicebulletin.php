@@ -13,9 +13,9 @@
  * announcements, programs and the rest are already set up in Bulletin Library
  * and are not this plugin's business.
  *
- * The overview is the sermon's own description for now. A paragraph about the
- * whole morning is the better answer, and it arrives through the filter below
- * without this class changing.
+ * The overview opens as the sermon's own description, because that is there
+ * at once. Where an engine is connected, Summaries\ServiceSummary replaces it a
+ * moment later with a paragraph about the morning rather than the sermon.
  *
  * Offered only where Bulletin Library is running, and only on a sermon that has
  * not been saved yet: it is an offer to start something, which stops making
@@ -118,8 +118,14 @@ class ServiceBulletin {
 
 		<p class="description">
 			<?php
-			if ( $publish ) {
+			$written = \SeedcastSermonLibrary\Summaries\ServiceSummary::connected();
+
+			if ( $publish && $written ) {
+				esc_html_e( 'When this sermon is published, a bulletin for its week is published with it, carrying this sermon&#8217;s image and an overview written from it.', 'seedcast-sermon-library' );
+			} elseif ( $publish ) {
 				esc_html_e( 'When this sermon is published, a bulletin for its week is published with it, carrying this sermon&#8217;s overview and image.', 'seedcast-sermon-library' );
+			} elseif ( $written ) {
+				esc_html_e( 'When this sermon is published, a draft bulletin for its week is started, carrying this sermon&#8217;s image and an overview written from it.', 'seedcast-sermon-library' );
 			} else {
 				esc_html_e( 'When this sermon is published, a draft bulletin for its week is started, carrying this sermon&#8217;s overview and image.', 'seedcast-sermon-library' );
 			}
