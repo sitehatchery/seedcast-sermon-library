@@ -102,6 +102,17 @@ final class SermonLibrary {
 		Frontend\LegacyRedirects::init();
 		( new Frontend\LlmsIndex() )->init();
 		( new Frontend\ViewCounter() )->init();
+
+		// The public assistant. Each part costs nothing until the engine says
+		// this site is entitled: the box and the page check before doing
+		// anything, and retrieval only runs when the engine asks.
+		Ask\Questions::init();
+		Ask\Retrieval::init();
+		Ask\Page::init();
+		Ask\Box::init();
+		Ask\TopicFaq::init();
+		( new Admin\QuestionsScreen() )->init();
+		( new Admin\TopicCoverage() )->init();
 		( new Frontend\ImageFallback() )->init();
 		( new Frontend\PodcastFeed() )->init();
 		( new Frontend\BulletinLibraryBridge() )->init();

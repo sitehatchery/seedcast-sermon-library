@@ -61,6 +61,11 @@ class ProBridge {
 	const META_FOUND_PASSAGES = '_scsl_passages_found';
 
 	/**
+	 * When the model last said none of the church's topics fit this sermon.
+	 */
+	const META_TOPICS_DECLINED = '_scsl_topics_declined';
+
+	/**
 	 * Register hooks.
 	 *
 	 * @return void
@@ -278,7 +283,26 @@ class ProBridge {
 				'topics' => [
 					'label'    => __( 'Topics', 'seedcast-sermon-library' ),
 					'taxonomy' => 'scsl_topic',
+
+					// Where "none of these fit" is recorded, so a sermon the
+					// model declined to file is not asked about again and the
+					// coverage report can tell declined from never asked.
+					'declined_meta' => self::META_TOPICS_DECLINED,
 				],
+			],
+
+			/*
+			 * What the public assistant may answer from.
+			 *
+			 * Public, said in as many words: sermons, the questions they and
+			 * the topic pages answer, topic and passage pages. Nothing here is
+			 * anything a visitor could not already read on the site. The
+			 * filter is this plugin's own, so the engine asks without knowing
+			 * what a sermon is.
+			 */
+			'corpus'      => [
+				'sensitivity' => 'public',
+				'retrieve'    => \SeedcastSermonLibrary\Ask\Retrieval::FILTER,
 			],
 
 			// The sections this church uses. Anything left out is not written
@@ -801,7 +825,15 @@ class ProBridge {
 
 		$picked = $this->topic_list( $field['value'] ?? '' );
 
-		if ( ! $picked ) return;
+		// Asked, answered, and nothing fitted. Remembered, so the sermon is
+		// not asked again and does not look like one nobody ever asked about.
+		if ( ! $picked ) {
+			if ( ! wp_get_object_terms( $post_id, 'scsl_topic', [ 'fields' => 'ids' ] ) ) {
+				update_post_meta( $post_id, self::META_TOPICS_DECLINED, current_time( 'mysql' ) );
+			}
+
+			return;
+		}
 
 		$assigned = Assignment::assign( $post_id, $picked, false );
 

@@ -142,6 +142,16 @@ CardTopics::begin( (int) $scsl_term->term_id );
 		</div>
 	<?php endif; ?>
 
+	<?php
+	/*
+	 * Questions visitors asked about this subject, answered and filed here by
+	 * the church. Under the summary because they are about the subject rather
+	 * than any one sermon, and above the sermons because they are often the
+	 * quickest way into them. Nothing is shown until a church has filed one.
+	 */
+	echo \SeedcastSermonLibrary\Ask\TopicFaq::render( (int) $scsl_term->term_id ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- TopicFaq::render() escapes everything it prints.
+	?>
+
 	<?php if ( $scsl_visible ) : ?>
 
 		<div class="scsl-service-sermons scsl-page-sermons">
