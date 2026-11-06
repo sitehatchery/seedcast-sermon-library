@@ -3,7 +3,7 @@ Contributors: seedcast
 Tags: sermons, church, preaching, bible, audio
 Requires at least: 6.2
 Tested up to: 7.1
-Stable tag: 2.75.0
+Stable tag: 2.76.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -162,6 +162,7 @@ The plugin itself does not call any external service to work. These are the only
 * **Spam checking on submitted forms.** If you turn on Google reCAPTCHA, hCaptcha or Cloudflare Turnstile in Settings, each submitted form sends that provider the token their widget produced, along with your site's IP address, so the provider can confirm the sender is not a bot. Nothing is sent when no provider is configured, which is the default. Google: [terms](https://policies.google.com/terms), [privacy](https://policies.google.com/privacy). hCaptcha: [terms](https://www.hcaptcha.com/terms), [privacy](https://www.hcaptcha.com/privacy). Cloudflare: [terms](https://www.cloudflare.com/website-terms/), [privacy](https://www.cloudflare.com/privacypolicy/).
 * **Embedded video and audio.** A sermon given a YouTube or Vimeo address embeds that player, so a visitor's browser loads it from YouTube (through youtube-nocookie.com) or Vimeo when they open the sermon. No video is embedded unless you give a sermon one. YouTube: [terms](https://www.youtube.com/t/terms), [privacy](https://policies.google.com/privacy). Vimeo: [terms](https://vimeo.com/terms), [privacy](https://vimeo.com/privacy).
 * **Copying your audio back from Seedcast.** Churches whose sermon audio is hosted on media.seedcast.ai can copy those files into their own media library from Sermon Library > Reclaim Audio. Your site downloads its own files when you press the button; nothing is sent, and nothing happens unless you use that screen. [Terms](https://seedcast.ai/terms/), [privacy](https://seedcast.ai/privacy/).
+* **Questions visitors ask, when the assistant is on.** Only where Seedcast AI Engine is installed and the assistant is switched on for your site. A visitor's question, the title of the page they asked from, and the parts of your published sermons and pages found for it are sent through the engine to api.seedcast.ai to be answered. Nothing identifying the visitor is sent, and the questions themselves are kept on your site. [Terms](https://seedcast.ai/terms/), [privacy](https://seedcast.ai/privacy/).
 * **Links out to a Bible.** The "Read it" links beside a passage open Bible.com or BibleGateway in a new tab. These are ordinary links: your site sends them nothing, and nothing loads until a visitor clicks.
 
 Sermon Library AI, the optional paid add-on, is a separate plugin with its own readme, and it is the only part that sends your sermon recordings anywhere.
@@ -219,48 +220,27 @@ No. Sermons, series and speakers remain in the database.
 
 == Changelog ==
 
-= 2.75.0 =
+= 2.76.0 =
 
-* A topic looks the same wherever it appears: on a sermon, a series, a passage page and above the series grid.
-* A passage page's topics sit beside its heading, labeled, rather than above the summary, and the "Explore Other Sermons" section below carries the topics of its own wider set.
-* A heading names up to five topics, the ones its sermons return to most, and says "Most used topics" only where there were more than five to choose from.
-* Topic chips carry the same outline, weight and hover as a View Sermon button, and a section heading rules off below its topics rather than above them.
-* A topic page's related sections stand clear of the sermons above them, and each related topic's reason for being there reads as a note beside its name rather than as part of the heading.
-* A sermon with no focus passage lists its Scripture under the panel's own heading, without a second heading calling them other passages.
-* The Scripture heading stands above its box, level with Topics and Share.
-* The readme now lists every external service the plugin can reach, what is sent and when, and nothing is reached unless you switch it on.
-* Leftover code from the old Generate Sermon screen has been removed. It read submitted fields for a form that no longer exists.
-* Rows a page contributes to a sermon card are filtered before they are printed rather than trusted.
-* The Topics box on a sermon reads as a list, one per line, like the Categories box beside it, and the three it allows are held in the browser rather than quietly trimmed on save.
-* A topic page names the subjects it is taught alongside beside its title, under a Related topics heading, with a setting of its own. Its sermon cards say Related topics too, since the page's own subject is left off them.
-* Filtering the sermon list by "Needs work" returns the sermons that need work. It returned none, whatever the library held, and the filter now agrees with the Completeness screen and the percentage in the list's own column.
-* The Content column tells the truth about Questions. They are stored as question and answer pairs rather than as text, so a sermon with an empty list was listed as having them, and every sermon list wrote a warning to the error log.
-* A new sermon can start its service bulletin for you. Tick "Create service bulletin automatically" while writing it, and publishing the sermon starts a bulletin for the week it was preached, carrying the sermon overview and its image, or the series image where the sermon has none. A draft by default, publishable by setting, and never started twice for the same week. Needs Bulletin Library; the box and the settings only appear when it is running.
-* Topics, Scripture and Share headings match in a sermon's sidebar, and topic tags read as chips rather than a bulleted list.
-* Topic pages list sermons one card per row, like passage pages, and both carry each sermon's topics on its card.
-* Passage pages show what their sermons are about as topic chips under the heading. Both of these can be switched off in settings.
-* A Topics box on the sermon screen, so a sermon can be filed under your own topics by hand. Three at most.
-* Topics can be generated with the rest of the content: tick Topics in the list of what to write. Seedcast chooses from your topics and never invents one, and never overrules a choice you made yourself.
-* A View link on the Topics screen, beside Edit and Delete.
-* Topics are shown on a sermon again, in the sidebar above Scripture, three at most. Each one is a link to the topic's page.
-* A series shows what its sermons are about. Topics belong to sermons, so a series was never filed under one itself and the section never appeared.
-* New settings to show or hide topics in each of the three places they appear: a sermon, a series, and the row above the series grid.
-* Topic pages are rebuilt the way scripture pages were: every sermon on the subject with no pagination, what your church has taught about it in prose, the articles written out of those sermons, and the subjects it is taught alongside. A topic page used to be a list of cards with a heading over it.
-* The paragraph at the top needs Sermon Library AI and is written from the shape of the set: the passages the teaching comes out of, the series that carried it, what it is taught alongside, and how far back it goes.
-* Where your sermons carry one topic each there is nothing taught alongside to show, so those pages offer the subjects preached from the same books instead, and say which books.
-* A topic page with fewer than two sermons stays out of search results and the sitemap until the subject is preached again. The sermons it links to are still crawled.
-
-* Regenerating Scripture references now replaces the passages the last generation found rather than adding a second set beside them. Passages you added yourself, and the focus passage, are untouched.
-* Generate Sermon is no longer in the menu where Sermon Library AI is running. Everything it did now happens on the sermon itself. Without the engine the page is exactly as it was.
-* Scripture passages found by a generation appear in the Scripture box while you are looking at it, already split into book, chapter and verse.
-* Scripture passages added to a sermon while you have its edit screen open are no longer lost when you press Update.
-* The Generate with AI panel now sits directly under the sermon's title rather than below every other box.
-* Fixes to the admin screens are fetched rather than served from whatever your browser already had.
+* Ask: a visitor asks a question in their own words and gets an answer drawn only from your sermons, their questions, your topic and passage pages and your church details, with links to where it came from. Needs Seedcast AI Engine with the assistant on for your site, invite-only for now. Without it nothing changes.
+* The ask box takes the place of your search box, and ordinary search results still appear under every answer. You can leave search alone and place [seedcast_ask] yourself instead.
+* Answers are never pages of their own: one address, kept out of search engines and never cached.
+* A Questions screen lists what visitors asked, most asked and unanswered first. Add a question and its answer to a sermon or under your topics, ignore it for good, or block whoever asked.
+* Topic pages show the questions filed under them, under "Questions people have asked".
+* Questions stay on your site for ninety days unless you act on them. Visitors are recorded as a changing hash, never an address.
+* Visitors are limited to a few questions a minute, and your site stops itself at a daily limit you set.
+* A Topic Coverage screen shows how much of your library carries topics, and can file every unfiled sermon in one run with Seedcast AI Engine.
+* Sermon views are counted. They never were: the counter never reached the page. Topic and passage pages are counted too, a cached page still counts, and crawlers do not.
+* A service bulletin's opening paragraph is written from its sermon, as the emphasis of the morning, where Seedcast AI Engine is connected.
+* A new sermon can start its service bulletin for you. Tick "Create service bulletin automatically" while writing it, and publishing the sermon starts a bulletin for the week it was preached. Needs Bulletin Library.
+* A topic page names the subjects it is taught alongside beside its title, under a Related topics heading, with a setting of its own.
+* Filtering the sermon list by "Needs work" returns the sermons that need work, and agrees with the Completeness screen.
+* The Content column tells the truth about Questions, and the sermon list no longer writes a warning to the error log for each sermon with an empty list.
 
 Complete historical changelog: see `changelog.txt`.
 
 == Upgrade Notice ==
 
-= 2.75.0 =
+= 2.76.0 =
 
-Topic pages are rebuilt: all the sermons on a subject, what your church has taught about it, and a way through to the subjects it sits beside.
+Visitors can ask your library a question, for churches in the Ask beta, and sermon views are counted at last.

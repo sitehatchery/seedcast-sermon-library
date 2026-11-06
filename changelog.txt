@@ -2,6 +2,52 @@
 
 Complete historical changelog moved out of readme.txt to keep the WordPress.org readme concise.
 
+= 2.76.0 =
+
+**Ask: a visitor's question, answered from your own library**
+
+* A visitor can ask a question in their own words and get an answer drawn only from this church's sermons, the questions they already answer, its topic and passage pages, and the church's own details, with links to each sermon and page the answer came from. Needs the Seedcast AI Engine with the assistant switched on for the site, which is invite-only for now. Without it nothing changes.
+* The box goes where search already is. Where the assistant is on, the theme's search form (the classic one and the search block alike) becomes the ask box, and the answer page runs ordinary search for the same words underneath the answer, so nobody loses post search. A church can leave search alone instead and place [seedcast_ask] wherever it wants the box.
+* The answer is never a page of its own. One address shows whatever was just asked, the way a search results page does: kept out of search engines, never cached, and in no sitemap. A page per question would be thin content by definition, and a few hundred of them is the pattern search engines penalize, on a church's own domain, written by strangers.
+* The page a question was asked from travels with it. "What does this mean?" asked from a sermon on baptism is a question about that sermon, and that is also usually where it belongs if the church keeps it.
+* Finding what a question is about uses the structure the library already has: passages it names, topics from the church's own list, questions a sermon already answers, and words in titles and descriptions. A sermon found two ways, under a topic and from a passage say, counts for more. Only published, listed sermons are ever cited.
+* Questions are kept on this site and nowhere else, for ninety days unless somebody acts on them. Who asked is a salted hash that changes monthly, never an address, so a church has nothing to declare. An address is kept only for a visitor the church has blocked, and only once they try again.
+* A visitor may ask four questions a minute and twenty five a day, and the site stops itself at a daily limit the church sets. Whatever stops a visitor, they read an ordinary sentence rather than an error.
+
+**Questions into content**
+
+* A Questions screen under Sermon Library lists what visitors asked, short enough to read: questions more than one person asked first, then the ones the library had nothing for, with the same question in different words grouped as one. Everything else is a click away. The month's allowance and today's count are at the top.
+* Add to a page turns a question into a real question and answer, editable first, on the sermon it was asked from or any sermon found by search, and under any of the church's existing topics. On a sermon it joins that sermon's questions, and its completeness score sees it exactly as it sees one typed in.
+* Topic pages show the questions filed under them, under "Questions people have asked", with the structured data search engines read. They can be edited or removed on the topic's own edit screen.
+* Ignore takes a question off the list for good, including every later time somebody asks it. Block stops whoever asked from asking again. Both are listed further down the screen and can be undone.
+
+**Topic coverage**
+
+* A Topic Coverage screen says how much of the library carries topics, and tells a sermon nobody has filed apart from one checked and found to fit none of the church's topics. A sermon with no topics is invisible to anything that finds sermons by topic, the assistant included.
+* Every sermon never filed can be handed to the AI Engine's Content Queue as one run, topics only, chosen from the church's own list. A sermon none of them fit is remembered and not asked about again.
+
+**Views are counted**
+
+* Sermon views were never counted on this site. The counter's script was attached before the script it rides on was registered, which WordPress ignores without a word, so no sermon page ever carried it, and the view counts in the sermon list came from an import. It now runs.
+* Topic and passage pages are counted as well, and every view is kept as a daily count in the shared Seedcast library, which is what any report later reads from. Counting happens in the browser, so a page served from a cache still counts. Crawlers are recognized by how they identify themselves and are not counted, and what they send is never stored.
+
+**The service bulletin**
+
+* A sermon offers to start the service bulletin for its week. A church that preaches every Sunday publishes a bulletin every Sunday, and the two describe the same morning: the week, the overview and the picture are all things the sermon already knows, so somebody was building the same page by hand a month at a time. The box is on the sermon while it is being written, ticked by default, and the question is asked once: it is an offer to start something, which stops making sense once the answer would be "another one".
+* What it starts is deliberately a beginning. The week it was preached, the sermon's own overview, and the sermon's image or the series artwork behind it, as a draft. The announcements and programs are already set up in Bulletin Library and are not this plugin's business.
+* Two settings, shown only where Bulletin Library is running: whether the box arrives ticked, and whether the bulletin is published rather than left as a draft. A church whose announcements and programs are already in place has nothing to add before anybody reads it.
+* Never twice for the same week. A second sermon from the same Sunday finds the bulletin already there and says so rather than starting a second one.
+* The overview is the sermon's description for now, which describes the sermon rather than the morning. A summary written about the whole service is the better answer; it arrives through the `scsl_service_bulletin_overview` filter without the rest of this changing.
+* The bulletin's opening paragraph is written from the sermon rather than copied from it, where the AI Engine is connected: something encouraging about what the sermon was about, as the emphasis of the morning it was preached at. A bulletin created as a sermon publishes keeps the sermon's description at first and has it replaced a minute later, only if nobody has edited it in between. One open in Bulletin Library can ask for it from a button there.
+
+**Topic pages and fixes**
+
+* A topic page names the subjects it is taught alongside beside its title, the way a passage page names what its sermons are about. The sections further down carry those subjects with their sermons and the reason each one is there; this is the reader who wants the next page rather than the reasoning. Already counted for those sections, so it costs the markup and nothing else, and it has a setting of its own.
+* Sermon cards on a topic page say "Related topics" rather than "Topics". The page's own subject is taken off every card, so what is left is the rest of what that sermon was about, and the row now says so. On a passage page, where nothing is taken out, it still says Topics.
+* Filtering the sermon list by "Needs work" came back empty however many sermons were in that tier. The option offered 'needs' and the tier it meant is keyed 'needs_work', so the two never met. The dropdown is now built from the tiers themselves, which is the only version of this that cannot drift from them.
+* The same filter was bucketing sermons by the comprehensive score while the Completeness screen, the list's own column and the sermon's own box all use the configured one. The two agree on a site using every field and part company the moment a church switches one off, so a sermon could sit in one tier everywhere it was named and another in the filter. It now uses the configured score like everything else.
+* The Content column in the sermon list asks each section whether it has anything in it, rather than asking most of them and naming the one exception. Two sections hold lists rather than text: the scripture references, which were named and handled, and the questions, which were not. Casting a list to text gives the word "Array", which is not empty, so a sermon carrying an empty set of questions was listed as having them, and every page of the sermon list wrote a PHP warning to the error log for each one.
+
 = 2.75.0 =
 
 **Topic pages are pages now**
@@ -45,20 +91,6 @@ Complete historical changelog moved out of readme.txt to keep the WordPress.org 
 * Every remaining place where a checker is told to stand down now says why in the same breath, so the reasoning can be read beside the code rather than taken on trust.
 * The Topics box on a sermon reads as a list, one topic per line in a scrolling panel, the way the Categories box beside it reads. Left to flow as inline labels, two dozen topics wrapped mid-phrase and a checkbox could sit nearer the name after it than the one it belonged to.
 * The cap of three is now held while you are ticking rather than only on save. The rest of the list goes quiet at the limit with the note underneath saying why, and nothing already ticked is disabled, so unticking one brings the list back. A fourth tick used to look accepted and be gone when the page came back.
-* A topic page names the subjects it is taught alongside beside its title, the way a passage page names what its sermons are about. The sections further down carry those subjects with their sermons and the reason each one is there; this is the reader who wants the next page rather than the reasoning. Already counted for those sections, so it costs the markup and nothing else, and it has a setting of its own.
-* Sermon cards on a topic page say "Related topics" rather than "Topics". The page's own subject is taken off every card, so what is left is the rest of what that sermon was about, and the row now says so. On a passage page, where nothing is taken out, it still says Topics.
-* Filtering the sermon list by "Needs work" came back empty however many sermons were in that tier. The option offered 'needs' and the tier it meant is keyed 'needs_work', so the two never met. The dropdown is now built from the tiers themselves, which is the only version of this that cannot drift from them.
-* The same filter was bucketing sermons by the comprehensive score while the Completeness screen, the list's own column and the sermon's own box all use the configured one. The two agree on a site using every field and part company the moment a church switches one off, so a sermon could sit in one tier everywhere it was named and another in the filter. It now uses the configured score like everything else.
-* The Content column in the sermon list asks each section whether it has anything in it, rather than asking most of them and naming the one exception. Two sections hold lists rather than text: the scripture references, which were named and handled, and the questions, which were not. Casting a list to text gives the word "Array", which is not empty, so a sermon carrying an empty set of questions was listed as having them, and every page of the sermon list wrote a PHP warning to the error log for each one.
-
-**A bulletin that starts itself**
-
-* A sermon offers to start the service bulletin for its week. A church that preaches every Sunday publishes a bulletin every Sunday, and the two describe the same morning: the week, the overview and the picture are all things the sermon already knows, so somebody was building the same page by hand a month at a time. The box is on the sermon while it is being written, ticked by default, and the question is asked once: it is an offer to start something, which stops making sense once the answer would be "another one".
-* What it starts is deliberately a beginning. The week it was preached, the sermon's own overview, and the sermon's image or the series artwork behind it, as a draft. The announcements and programs are already set up in Bulletin Library and are not this plugin's business.
-* Two settings, shown only where Bulletin Library is running: whether the box arrives ticked, and whether the bulletin is published rather than left as a draft. A church whose announcements and programs are already in place has nothing to add before anybody reads it.
-* Never twice for the same week. A second sermon from the same Sunday finds the bulletin already there and says so rather than starting a second one.
-* The overview is the sermon's description for now, which describes the sermon rather than the morning. A summary written about the whole service is the better answer; it arrives through the `scsl_service_bulletin_overview` filter without the rest of this changing.
-
 * A generation of Scripture references replaces its own previous set rather than piling a second reading on top of the first. Passages are added to a sermon rather than swapped in, because a list somebody typed is theirs and a run asked for references is a request for the rest, but run twice that left one sermon carrying thirty-nine references with the same passages among them in looser forms, Matthew 4 beside Matthew 4:1-11. A generation now clears what its last reading found and leaves everything else alone: anything added by hand stays, the focus passage stays, and so does a passage this reading found again.
 * Generate Sermon is no longer in the menu on sites running Sermon Library AI. Everything it did now happens on the sermon itself, which is where the recording, the details and the content already live. On sites without the engine the page is exactly as it was: it is where generation is explained and where to get it.
 * Admin styles and scripts are versioned by the file's own time everywhere, not only in most places. One enqueue still used the release version and happened to run first, so that was the version WordPress kept for all of them: between releases the address never changed, the browser went on serving the copy it already had, and a fix could sit on disk for days while the screen ran the old one.
