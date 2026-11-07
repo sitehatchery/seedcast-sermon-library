@@ -165,8 +165,12 @@ class QuestionsScreen {
 		} else {
 			$url = Page::url();
 			echo '<p>';
-			/* translators: %s: link to the ask page. */
-			echo wp_kses_post( sprintf( __( 'Visitors ask at %s, or from the search box.', 'seedcast-sermon-library' ), '<a href="' . esc_url( $url ) . '" target="_blank" rel="noopener">' . esc_html( $url ) . '</a>' ) );
+			$where = Box::MODE_SEARCH === Box::mode()
+				/* translators: %s: link to the ask page. */
+				? __( 'Visitors ask at %s, from your site\'s search box, or wherever you place [seedcast_ask].', 'seedcast-sermon-library' )
+				/* translators: %s: link to the ask page. */
+				: __( 'Visitors ask at %s, or wherever you place [seedcast_ask]. In a page builder header, that is a Shortcode widget.', 'seedcast-sermon-library' );
+			echo wp_kses_post( sprintf( $where, '<a href="' . esc_url( $url ) . '" target="_blank" rel="noopener">' . esc_html( $url ) . '</a>' ) );
 			echo '</p>';
 		}
 
@@ -319,8 +323,9 @@ class QuestionsScreen {
 				<tr>
 					<th scope="row"><?php esc_html_e( 'Ask box', 'seedcast-sermon-library' ); ?></th>
 					<td>
-						<label><input type="radio" name="scsl_ask_box" value="<?php echo esc_attr( Box::MODE_SEARCH ); ?>" <?php checked( Box::MODE_SEARCH, $mode ); ?> /> <?php esc_html_e( 'Use the site\'s search box. Ordinary search results still appear under every answer.', 'seedcast-sermon-library' ); ?></label><br />
-						<label><input type="radio" name="scsl_ask_box" value="<?php echo esc_attr( Box::MODE_MANUAL ); ?>" <?php checked( Box::MODE_MANUAL, $mode ); ?> /> <?php esc_html_e( 'Leave search alone. I will place the box with [seedcast_ask].', 'seedcast-sermon-library' ); ?></label>
+						<label><input type="radio" name="scsl_ask_box" value="<?php echo esc_attr( Box::MODE_MANUAL ); ?>" <?php checked( Box::MODE_MANUAL, $mode ); ?> /> <?php esc_html_e( 'Only where I place [seedcast_ask]. The site\'s search box is left alone.', 'seedcast-sermon-library' ); ?></label><br />
+						<label><input type="radio" name="scsl_ask_box" value="<?php echo esc_attr( Box::MODE_SEARCH ); ?>" <?php checked( Box::MODE_SEARCH, $mode ); ?> /> <?php esc_html_e( 'Also use it in place of the site\'s search box. Ordinary search results still appear under every answer.', 'seedcast-sermon-library' ); ?></label>
+						<p class="description"><?php esc_html_e( 'Add fallback="none" to the shortcode to show nothing at all when the assistant is off, rather than an ordinary search box.', 'seedcast-sermon-library' ); ?></p>
 					</td>
 				</tr>
 				<tr>
@@ -526,8 +531,8 @@ class QuestionsScreen {
 	public function do_settings(): void {
 		$this->guard( 'scsl_q_settings', 'manage_options' );
 
-		$mode = isset( $_POST['scsl_ask_box'] ) ? sanitize_key( wp_unslash( $_POST['scsl_ask_box'] ) ) : Box::MODE_SEARCH;
-		update_option( Box::MODE_OPTION, Box::MODE_MANUAL === $mode ? Box::MODE_MANUAL : Box::MODE_SEARCH );
+		$mode = isset( $_POST['scsl_ask_box'] ) ? sanitize_key( wp_unslash( $_POST['scsl_ask_box'] ) ) : Box::MODE_MANUAL;
+		update_option( Box::MODE_OPTION, Box::MODE_SEARCH === $mode ? Box::MODE_SEARCH : Box::MODE_MANUAL );
 
 		$limit = isset( $_POST['scsl_ask_daily_limit'] ) ? absint( $_POST['scsl_ask_daily_limit'] ) : Guard::DAILY_DEFAULT;
 		update_option( Guard::DAILY_OPTION, max( 1, min( 10000, $limit ) ) );

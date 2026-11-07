@@ -13,15 +13,17 @@ if ( ! defined( 'ABSPATH' ) ) {
  * person, and it covers content on a phone. A box where search lives is
  * understood at once and sets the right expectation: you ask, you get a page.
  *
- * REPLACING THE THEME'S SEARCH, BY DEFAULT. The open question was whether
- * replacing it would cost a church ordinary post search. It does not, because
- * the ask page runs that search for the same words underneath the answer, so
- * the box gives everything search gave and an answer on top. A church that
- * wants search left exactly as it was can switch the takeover off and place
- * the box with [seedcast_ask] instead.
+ * PLACED BY THE CHURCH, NOT TAKEN OVER. The box goes wherever the site owner
+ * puts [seedcast_ask], which in a page builder header is a shortcode widget,
+ * because plenty of church sites have no search box to take over and the
+ * owner knows their header better than any guess. Taking over the theme's own
+ * search form, classic and block alike, is a setting they can turn on. It
+ * costs nobody post search when they do, because the ask page runs that
+ * search for the same words underneath the answer.
  *
- * Not entitled, it never takes anything over, and the shortcode prints the
- * theme's ordinary search form. A site without the assistant notices nothing.
+ * Not entitled, nothing is taken over and the shortcode prints the theme's
+ * ordinary search form, or nothing with fallback="none". A site without the
+ * assistant notices nothing.
  */
 class Box {
 
@@ -36,8 +38,12 @@ class Box {
 		add_action( 'wp_enqueue_scripts', [ __CLASS__, 'styles' ], 20 );
 	}
 
+	/**
+	 * Whether the box also stands in for the theme's search. Off unless the
+	 * church turned it on: only the shortcode places it otherwise.
+	 */
 	public static function mode(): string {
-		return self::MODE_MANUAL === get_option( self::MODE_OPTION, self::MODE_SEARCH ) ? self::MODE_MANUAL : self::MODE_SEARCH;
+		return self::MODE_SEARCH === get_option( self::MODE_OPTION, self::MODE_MANUAL ) ? self::MODE_SEARCH : self::MODE_MANUAL;
 	}
 
 	private static function takes_over(): bool {
@@ -54,13 +60,18 @@ class Box {
 
 	public static function shortcode( $atts = [] ): string {
 		$atts = shortcode_atts(
-			[ 'placeholder' => '' ],
+			[
+				'placeholder' => '',
+				// What to show where the assistant is not on: the theme's
+				// search form, or nothing, for a header that had no search.
+				'fallback'    => 'search',
+			],
 			is_array( $atts ) ? $atts : [],
 			'seedcast_ask'
 		);
 
 		if ( ! Page::available() ) {
-			return get_search_form( [ 'echo' => false ] );
+			return 'none' === $atts['fallback'] ? '' : get_search_form( [ 'echo' => false ] );
 		}
 
 		return self::form( [ 'placeholder' => (string) $atts['placeholder'] ] );
