@@ -23,11 +23,19 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Guard {
 
-	/** Questions one visitor may ask in a minute. */
-	public const PER_MINUTE = 4;
+	/**
+	 * Questions one visitor may ask in a minute. Enough for somebody tapping
+	 * through suggested questions; a script asking in a loop still stops
+	 * within seconds.
+	 */
+	public const PER_MINUTE = 8;
 
-	/** Questions one visitor may ask in a day. */
-	public const PER_DAY = 25;
+	/**
+	 * Questions one visitor may ask in a day. Generous on purpose: this stops
+	 * scripts, while the cost is held by the site's daily ceiling and the
+	 * monthly allowance behind it.
+	 */
+	public const PER_DAY = 60;
 
 	/** The church's own daily ceiling, option and default. */
 	public const DAILY_OPTION  = 'scsl_ask_daily_limit';
@@ -49,13 +57,21 @@ class Guard {
 			return self::BLOCKED;
 		}
 
+		/*
+		 * Staff trying the assistant out are not who the per-visitor limit
+		 * is for, and asking forty questions while checking the answers is
+		 * exactly what they should be doing. The site's daily ceiling still
+		 * holds for them.
+		 */
+		$staff = is_user_logged_in() && current_user_can( 'edit_posts' );
+
 		[ $minute, $day ] = self::visitor_keys();
 
-		if ( (int) get_transient( $minute ) >= self::PER_MINUTE ) {
+		if ( ! $staff && (int) get_transient( $minute ) >= self::PER_MINUTE ) {
 			return self::LIMITED;
 		}
 
-		if ( (int) get_transient( $day ) >= self::PER_DAY ) {
+		if ( ! $staff && (int) get_transient( $day ) >= self::PER_DAY ) {
 			return self::LIMITED;
 		}
 

@@ -108,6 +108,7 @@ final class SermonLibrary {
 		// anything, and retrieval only runs when the engine asks.
 		Ask\Questions::init();
 		Ask\Retrieval::init();
+		Ask\SitePages::init();
 		Ask\Page::init();
 		Ask\Box::init();
 		Ask\TopicFaq::init();

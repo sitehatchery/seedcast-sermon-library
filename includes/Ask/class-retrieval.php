@@ -62,7 +62,27 @@ class Retrieval {
 		$terms   = [];
 
 		// 1. Passages the question names.
-		foreach ( self::passages_in( $question ) as $term ) {
+		foreach ( self::passages_in( $question ) as $found_passage ) {
+			$term   = $found_passage['term'];
+			$narrow = $found_passage['narrow'];
+
+			/*
+			 * A chapter the library has no page for ("Romans 8" where only
+			 * "Romans" exists). The book's page is not about it, and every
+			 * sermon touching the book is not either: only those whose own
+			 * passages fall in that chapter are.
+			 */
+			if ( '' !== $narrow ) {
+				foreach ( self::sermons_in( 'scsl_scripture', (int) $term->term_id, 200 ) as $id ) {
+					if ( self::touches( $id, $narrow ) ) {
+						/* translators: %s: a passage of scripture. */
+						self::add( $sermons, $id, 6, sprintf( __( 'preached from %s', 'seedcast-sermon-library' ), $narrow ), 'passage:' . $term->term_id );
+					}
+				}
+
+				continue;
+			}
+
 			$terms[ 'passage:' . $term->term_id ] = [
 				'term'   => $term,
 				'type'   => 'passage',
@@ -75,6 +95,37 @@ class Retrieval {
 				/* translators: %s: a passage of scripture. */
 				self::add( $sermons, $id, 5, sprintf( __( 'preached from %s', 'seedcast-sermon-library' ), $term->name ), 'passage:' . $term->term_id );
 			}
+		}
+
+		// 1b. The newest sermons, and the series they belong to, when the
+		// question asks what is recent: "last Sunday", "the latest sermon",
+		// "the series you are in now". Read from the unfiltered words, since
+		// "preach" and "teach" are dropped from the rest.
+		if ( array_intersect( $all, self::RECENT_WORDS ) ) {
+			$rank = 0;
+
+			foreach ( self::latest_sermons( 3 ) as $id ) {
+				/* translators: %s: date. */
+				self::add( $sermons, $id, 9 - $rank * 2, sprintf( __( 'our most recent sermon, %s', 'seedcast-sermon-library' ), get_the_date( 'F j, Y', $id ) ), 'recent' );
+				$rank++;
+			}
+
+			$newest = self::latest_sermons( 1 );
+			$series = $newest ? absint( get_post_meta( $newest[0], '_scsl_series_id', true ) ) : 0;
+
+			if ( $series && 'publish' === get_post_status( $series ) ) {
+				$terms[ 'series:' . $series ] = [
+					'post'   => get_post( $series ),
+					'type'   => 'series',
+					'score'  => 8,
+					'reason' => __( 'the series we are preaching now', 'seedcast-sermon-library' ),
+				];
+			}
+		}
+
+		// 1c. Series the question names.
+		foreach ( self::series_in( $words ) as $match ) {
+			$terms[ 'series:' . $match['post']->ID ] = $match;
 		}
 
 		// 2. Topics from the church's own vocabulary.
@@ -137,7 +188,13 @@ class Retrieval {
 		$out = [];
 
 		foreach ( $terms as $key => $term ) {
-			$item = 'speaker' === $term['type'] ? self::speaker_item( $term ) : self::term_item( $term );
+			if ( 'speaker' === $term['type'] ) {
+				$item = self::speaker_item( $term );
+			} elseif ( 'series' === $term['type'] ) {
+				$item = self::series_item( $term );
+			} else {
+				$item = self::term_item( $term );
+			}
 
 			if ( $item ) {
 				$out[] = $item;
@@ -192,7 +249,11 @@ class Retrieval {
 	 * Passage terms named in the question: a book, and its chapter where the
 	 * question gives one and the library has a page for it.
 	 *
-	 * @return \WP_Term[]
+	 * Where the question names a chapter the library has no page for, the
+	 * book's term comes back with that chapter as 'narrow', so only sermons
+	 * in that chapter are taken from it.
+	 *
+	 * @return array<int, array{term:\WP_Term, narrow:string}>
 	 */
 	private static function passages_in( string $question ): array {
 		$out = [];
@@ -204,10 +265,15 @@ class Retrieval {
 				continue;
 			}
 
-			$term = null;
+			$term   = null;
+			$narrow = '';
 
 			if ( ! empty( $found[1] ) ) {
 				$term = get_term_by( 'name', $book . ' ' . (int) $found[1], 'scsl_scripture' );
+
+				if ( ! $term instanceof \WP_Term ) {
+					$narrow = $book . ' ' . (int) $found[1];
+				}
 			}
 
 			if ( ! $term instanceof \WP_Term ) {
@@ -215,7 +281,10 @@ class Retrieval {
 			}
 
 			if ( $term instanceof \WP_Term && $term->count > 0 ) {
-				$out[ $term->term_id ] = $term;
+				$out[ $term->term_id ] = [
+					'term'   => $term,
+					'narrow' => $narrow,
+				];
 			}
 
 			if ( count( $out ) >= 2 ) {
@@ -306,7 +375,7 @@ class Retrieval {
 	/**
 	 * Verbs, stemmed, that say nothing about what a question is about.
 	 */
-	private const GENERIC_WORDS = [ 'teach', 'taught', 'preach', 'said', 'talk', 'learn', 'mean', 'cam', 'come', 'went', 'go', 'get', 'he', 'she', 'they', 'them', 'him', 'her', 'did', 'done', 'mak', 'give', 'gav' ];
+	private const GENERIC_WORDS = [ 'right', 'teach', 'taught', 'preach', 'said', 'talk', 'learn', 'mean', 'cam', 'come', 'went', 'go', 'get', 'he', 'she', 'they', 'them', 'him', 'her', 'did', 'done', 'mak', 'give', 'gav' ];
 
 	/**
 	 * Speakers the question is about: everyone who preaches here when it asks
@@ -471,15 +540,166 @@ class Retrieval {
 	}
 
 	/**
+	 * Words, stemmed, that ask about what is newest.
+	 */
+	private const RECENT_WORDS = [ 'latest', 'recent', 'recently', 'newest', 'last', 'current', 'currently', 'now', 'lately', 'today', 'yesterday' ];
+
+	/**
+	 * The newest published, listed sermons.
+	 *
+	 * @return int[]
+	 */
+	private static function latest_sermons( int $count ): array {
+		$query = new \WP_Query( [
+			'post_type'      => 'scsl_sermon',
+			'post_status'    => 'publish',
+			'posts_per_page' => $count,
+			'fields'         => 'ids',
+			'no_found_rows'  => true,
+			'has_password'   => false,
+			'orderby'        => 'date',
+			'order'          => 'DESC',
+			'meta_query'     => self::listed_only(), // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+		] );
+
+		return array_map( 'intval', $query->posts );
+	}
+
+	/**
+	 * Series the question names: most of a series' title, or all of a short
+	 * one.
+	 *
+	 * @param string[] $words Stemmed words.
+	 * @return array<int, array{post:\WP_Post, type:string, score:float, reason:string}>
+	 */
+	private static function series_in( array $words ): array {
+		if ( ! $words || ! post_type_exists( 'scsl_series' ) ) {
+			return [];
+		}
+
+		$out = [];
+
+		foreach ( get_posts( [ 'post_type' => 'scsl_series', 'post_status' => 'publish', 'posts_per_page' => 200, 'has_password' => false ] ) as $series ) {
+			$title = array_values( array_diff( Questions::words( $series->post_title ), self::GENERIC_WORDS ) );
+			$hit   = count( array_intersect( $title, $words ) );
+
+			if ( ! $title || ! $hit || $hit * 2 < count( $title ) ) {
+				continue;
+			}
+
+			$out[] = [
+				'post'   => $series,
+				'type'   => 'series',
+				// Asked for as a series, the series is the answer, ahead of
+				// any one sermon in it.
+				'score'  => 7.0 + $hit + ( in_array( 'seri', $words, true ) ? 10 : 0 ),
+				/* translators: %s: series title. */
+				'reason' => sprintf( __( 'the series %s', 'seedcast-sermon-library' ), html_entity_decode( get_the_title( $series ), ENT_QUOTES, 'UTF-8' ) ),
+			];
+		}
+
+		usort(
+			$out,
+			static function ( array $a, array $b ): int {
+				return $b['score'] <=> $a['score'];
+			}
+		);
+
+		return array_slice( $out, 0, 2 );
+	}
+
+	/**
+	 * A series as material: what it is, how long it ran, and its sermons.
+	 */
+	private static function series_item( array $match ): ?array {
+		$series = $match['post'];
+
+		if ( ! $series instanceof \WP_Post ) {
+			return null;
+		}
+
+		$ids = get_posts( [
+			'post_type'      => 'scsl_sermon',
+			'post_status'    => 'publish',
+			'posts_per_page' => 200,
+			'fields'         => 'ids',
+			'has_password'   => false,
+			'orderby'        => 'date',
+			'order'          => 'DESC',
+			'meta_query'     => array_merge( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+				[ 'relation' => 'AND' ],
+				[ [ 'key' => '_scsl_series_id', 'value' => (string) $series->ID ] ],
+				[ self::listed_only() ]
+			),
+		] );
+
+		$lines = [];
+		$about = trim( (string) preg_replace( '/\s+/u', ' ', wp_strip_all_tags( '' !== trim( $series->post_excerpt ) ? $series->post_excerpt : $series->post_content ) ) );
+
+		if ( '' !== $about ) {
+			$lines[] = mb_substr( $about, 0, 500 );
+		}
+
+		if ( $ids ) {
+			$first = get_the_date( 'F j, Y', (int) end( $ids ) );
+			$last  = get_the_date( 'F j, Y', (int) $ids[0] );
+
+			/* translators: 1: number of sermons, 2: first date, 3: last date. */
+			$lines[] = sprintf( _n( '%1$d sermon, %2$s to %3$s.', '%1$d sermons, from %2$s to %3$s.', count( $ids ), 'seedcast-sermon-library' ), count( $ids ), $first, $last );
+
+			$titles = array_map(
+				static function ( $id ) {
+					return html_entity_decode( get_the_title( (int) $id ), ENT_QUOTES, 'UTF-8' ) . ' (' . get_the_date( 'M j, Y', (int) $id ) . ')';
+				},
+				array_slice( $ids, 0, 8 )
+			);
+
+			$lines[] = __( 'Newest first:', 'seedcast-sermon-library' ) . ' ' . implode( '; ', $titles );
+		}
+
+		$text = implode( "\n", $lines );
+
+		return [
+			'ref'      => 'series:' . $series->ID,
+			'type'     => 'series',
+			'title'    => html_entity_decode( get_the_title( $series ), ENT_QUOTES, 'UTF-8' ),
+			'url'      => (string) get_permalink( $series ),
+			'reason'   => $match['reason'],
+			'text'     => $text,
+			'modified' => md5( $text ),
+			'score'    => (float) $match['score'],
+		];
+	}
+
+	/**
+	 * Whether a sermon's own passages fall within a reference.
+	 */
+	private static function touches( int $sermon_id, string $reference ): bool {
+		$names = wp_get_object_terms( $sermon_id, 'scsl_scripture', [ 'fields' => 'names' ] );
+
+		if ( is_wp_error( $names ) ) {
+			return false;
+		}
+
+		foreach ( $names as $name ) {
+			if ( ScriptureParser::overlaps( (string) $name, $reference ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Sermons under a term, newest first.
 	 *
 	 * @return int[]
 	 */
-	private static function sermons_in( string $taxonomy, int $term_id ): array {
+	private static function sermons_in( string $taxonomy, int $term_id, int $limit = self::PER_TERM ): array {
 		$query = new \WP_Query( [
 			'post_type'      => 'scsl_sermon',
 			'post_status'    => 'publish',
-			'posts_per_page' => self::PER_TERM,
+			'posts_per_page' => $limit,
 			'fields'         => 'ids',
 			'no_found_rows'  => true,
 			'has_password'   => false,

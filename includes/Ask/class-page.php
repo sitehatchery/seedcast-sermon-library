@@ -636,6 +636,10 @@ class Page {
 				__( 'Writing an answer', 'seedcast-sermon-library' ),
 			],
 			'failed'   => __( 'Something went wrong asking that. Please try again in a moment.', 'seedcast-sermon-library' ),
+			// Logged-in staff only, so a REST request knows who they are and
+			// the per-visitor limit leaves them alone. A visitor's page, which
+			// may be cached, carries none.
+			'nonce'    => is_user_logged_in() ? wp_create_nonce( 'wp_rest' ) : '',
 		] );
 	}
 

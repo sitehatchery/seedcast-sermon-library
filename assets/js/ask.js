@@ -203,10 +203,16 @@
 			window.history.replaceState( null, '', url.toString() );
 		}
 
+		var headers = { 'Content-Type': 'application/json' };
+
+		if ( cfg.nonce ) {
+			headers[ 'X-WP-Nonce' ] = cfg.nonce;
+		}
+
 		window.fetch( cfg.endpoint, {
 			method: 'POST',
 			credentials: 'same-origin',
-			headers: { 'Content-Type': 'application/json' },
+			headers: headers,
 			body: JSON.stringify( { q: question, from: from ? from.value : '' } )
 		} )
 			.then( function ( response ) {
