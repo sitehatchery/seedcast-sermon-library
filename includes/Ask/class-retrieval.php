@@ -106,7 +106,12 @@ class Retrieval {
 			self::add( $sermons, $id, $hit['score'], sprintf( __( 'mentions %s', 'seedcast-sermon-library' ), implode( ', ', $hit['words'] ) ), 'words' );
 		}
 
-		// 5. The page it was asked from, when that is a sermon. "What does this
+		// 5. The people who preach here: asked about by role, or by name.
+		foreach ( self::speakers_in( $words ) as $speaker ) {
+			$terms[ 'speaker:' . $speaker['post']->ID ] = $speaker;
+		}
+
+		// 6. The page it was asked from, when that is a sermon. "What does this
 		// mean?" from a baptism sermon is a question about that sermon.
 		$from = is_array( $context['from'] ?? null ) ? $context['from'] : [];
 
@@ -128,7 +133,7 @@ class Retrieval {
 		$out = [];
 
 		foreach ( $terms as $key => $term ) {
-			$item = self::term_item( $term );
+			$item = 'speaker' === $term['type'] ? self::speaker_item( $term ) : self::term_item( $term );
 
 			if ( $item ) {
 				$out[] = $item;
@@ -285,6 +290,172 @@ class Retrieval {
 		);
 
 		return array_slice( $matches, 0, 3 );
+	}
+
+	/**
+	 * Words that ask who preaches here, stemmed the way questions are.
+	 */
+	private const ROLE_WORDS = [ 'pastor', 'elder', 'teacher', 'speaker', 'preacher', 'preach', 'leader', 'minister', 'staff', 'teach' ];
+
+	/**
+	 * Speakers the question is about: everyone who preaches here when it asks
+	 * by role ("who are your pastors"), or the ones it names.
+	 *
+	 * A speaker's own profile is where a church says who is a pastor and who
+	 * is an elder, so it is sent whole. Most sermons first, because the
+	 * person who has preached ninety times is the likeliest answer to "who is
+	 * your pastor".
+	 *
+	 * @param string[] $words Stemmed words.
+	 * @return array<int, array{post:\WP_Post, type:string, score:float, reason:string, sermons:int}>
+	 */
+	private static function speakers_in( array $words ): array {
+		if ( ! $words || ! post_type_exists( 'scsl_speaker' ) ) {
+			return [];
+		}
+
+		$by_role = (bool) array_intersect( $words, self::ROLE_WORDS );
+		$people  = get_posts( [
+			'post_type'      => 'scsl_speaker',
+			'post_status'    => 'publish',
+			'posts_per_page' => 50,
+			'has_password'   => false,
+		] );
+
+		$out = [];
+
+		foreach ( $people as $person ) {
+			// A name, not a role: "Guest Teachers" is not named by "teachers".
+			$name_words = array_filter(
+				Questions::words( $person->post_title ),
+				static function ( string $word ): bool {
+					return mb_strlen( $word ) >= 3 && ! in_array( $word, self::ROLE_WORDS, true );
+				}
+			);
+			$named      = (bool) array_intersect( $name_words, $words );
+
+			if ( ! $by_role && ! $named ) {
+				continue;
+			}
+
+			$sermons = self::sermon_count_for( (int) $person->ID );
+
+			// Somebody named on no sermon and with nothing written about them
+			// has nothing to say about them.
+			if ( ! $sermons && '' === trim( wp_strip_all_tags( $person->post_content ) ) ) {
+				continue;
+			}
+
+			$profile = Questions::words( $person->post_content . ' ' . get_post_meta( $person->ID, '_scsl_speaker_title', true ) );
+			$score   = $named ? 7.0 : 4.0;
+
+			// A profile that says "pastor" answers "who is your pastor" better
+			// than one that does not.
+			if ( $by_role && array_intersect( array_intersect( $words, self::ROLE_WORDS ), $profile ) ) {
+				$score += 2;
+			}
+
+			$score += min( 2.0, $sermons / 25 );
+
+			$out[] = [
+				'post'    => $person,
+				'type'    => 'speaker',
+				'score'   => $score,
+				'reason'  => $named ? __( 'named in the question', 'seedcast-sermon-library' ) : __( 'preaches here', 'seedcast-sermon-library' ),
+				'sermons' => $sermons,
+			];
+		}
+
+		// A question that names somebody is about them, even when it also
+		// says "preached".
+		$named_only = array_values( array_filter(
+			$out,
+			static function ( array $one ): bool {
+				return $one['score'] >= 7.0;
+			}
+		) );
+
+		if ( $named_only ) {
+			$out = $named_only;
+		}
+
+		usort(
+			$out,
+			static function ( array $a, array $b ): int {
+				return $b['score'] <=> $a['score'];
+			}
+		);
+
+		return array_slice( $out, 0, 6 );
+	}
+
+	private static function sermon_count_for( int $speaker_id ): int {
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		return (int) $wpdb->get_var( $wpdb->prepare(
+			"SELECT COUNT(*) FROM {$wpdb->postmeta} pm INNER JOIN {$wpdb->posts} p ON p.ID = pm.post_id
+			WHERE pm.meta_key = '_scsl_speaker_id' AND pm.meta_value = %s AND p.post_type = 'scsl_sermon' AND p.post_status = 'publish'",
+			(string) $speaker_id
+		) );
+	}
+
+	/**
+	 * A speaker as material: their profile, and what they have preached.
+	 */
+	private static function speaker_item( array $match ): ?array {
+		$person = $match['post'];
+		$lines  = [];
+
+		$role = trim( (string) get_post_meta( $person->ID, '_scsl_speaker_title', true ) );
+
+		if ( '' !== $role ) {
+			$lines[] = $role;
+		}
+
+		$profile = trim( (string) preg_replace( '/\s+/u', ' ', wp_strip_all_tags( $person->post_content ) ) );
+
+		if ( '' !== $profile ) {
+			$lines[] = $profile;
+		}
+
+		$recent = get_posts( [
+			'post_type'      => 'scsl_sermon',
+			'post_status'    => 'publish',
+			'posts_per_page' => 4,
+			'has_password'   => false,
+			'meta_query'     => array_merge( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+				[ 'relation' => 'AND' ],
+				[ [ 'key' => '_scsl_speaker_id', 'value' => (string) $person->ID ] ],
+				[ self::listed_only() ]
+			),
+		] );
+
+		if ( $match['sermons'] ) {
+			$titles = array_map(
+				static function ( \WP_Post $post ): string {
+					return html_entity_decode( get_the_title( $post ), ENT_QUOTES, 'UTF-8' ) . ' (' . get_the_date( 'F j, Y', $post ) . ')';
+				},
+				$recent
+			);
+
+			/* translators: %d: number of sermons. */
+			$lines[] = sprintf( _n( 'Has preached %d sermon here', 'Has preached %d sermons here', $match['sermons'], 'seedcast-sermon-library' ), $match['sermons'] )
+				. ( $titles ? ', most recently: ' . implode( '; ', $titles ) : '' );
+		}
+
+		$text = implode( "\n", $lines );
+
+		return [
+			'ref'      => 'speaker:' . $person->ID,
+			'type'     => 'speaker',
+			'title'    => html_entity_decode( get_the_title( $person ), ENT_QUOTES, 'UTF-8' ),
+			'url'      => (string) get_permalink( $person ),
+			'reason'   => $match['reason'],
+			'text'     => $text,
+			'modified' => (string) get_post_modified_time( 'U', true, $person ) . '|' . md5( $text ),
+			'score'    => (float) $match['score'],
+		];
 	}
 
 	/**

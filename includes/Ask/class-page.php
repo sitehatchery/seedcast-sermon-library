@@ -589,6 +589,7 @@ class Page {
 			'sermon'  => __( 'Sermon', 'seedcast-sermon-library' ),
 			'topic'   => __( 'Topic', 'seedcast-sermon-library' ),
 			'passage' => __( 'Scripture', 'seedcast-sermon-library' ),
+			'speaker' => __( 'Speaker', 'seedcast-sermon-library' ),
 			'church'  => __( 'About us', 'seedcast-sermon-library' ),
 		];
 
