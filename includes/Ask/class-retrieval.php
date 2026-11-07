@@ -52,7 +52,11 @@ class Retrieval {
 	public static function retrieve( $found, $question, $context = [] ): array {
 		$found    = is_array( $found ) ? $found : [];
 		$question = (string) $question;
-		$words    = Questions::words( $question );
+		$all      = Questions::words( $question );
+
+		// Verbs every question about a church uses. "What did he teach" is not
+		// about the topic False Teaching, nor asking who the teachers are.
+		$words = array_values( array_diff( $all, self::GENERIC_WORDS ) );
 
 		$sermons = [];
 		$terms   = [];
@@ -293,9 +297,16 @@ class Retrieval {
 	}
 
 	/**
-	 * Words that ask who preaches here, stemmed the way questions are.
+	 * Words that ask who preaches here, stemmed the way questions are. Nouns
+	 * only: "who are your teachers" asks about people, "what did he teach"
+	 * asks about a sermon.
 	 */
-	private const ROLE_WORDS = [ 'pastor', 'elder', 'teacher', 'speaker', 'preacher', 'preach', 'leader', 'minister', 'staff', 'teach' ];
+	private const ROLE_WORDS = [ 'pastor', 'elder', 'teacher', 'speaker', 'preacher', 'leader', 'minister', 'staff' ];
+
+	/**
+	 * Verbs, stemmed, that say nothing about what a question is about.
+	 */
+	private const GENERIC_WORDS = [ 'teach', 'taught', 'preach', 'said', 'talk', 'learn', 'mean', 'cam', 'come', 'went', 'go', 'get', 'he', 'she', 'they', 'them', 'him', 'her', 'did', 'done', 'mak', 'give', 'gav' ];
 
 	/**
 	 * Speakers the question is about: everyone who preaches here when it asks
@@ -363,6 +374,7 @@ class Retrieval {
 				'score'   => $score,
 				'reason'  => $named ? __( 'named in the question', 'seedcast-sermon-library' ) : __( 'preaches here', 'seedcast-sermon-library' ),
 				'sermons' => $sermons,
+				'named'   => $named,
 			];
 		}
 
@@ -371,7 +383,7 @@ class Retrieval {
 		$named_only = array_values( array_filter(
 			$out,
 			static function ( array $one ): bool {
-				return $one['score'] >= 7.0;
+				return $one['named'];
 			}
 		) );
 
@@ -572,6 +584,14 @@ class Retrieval {
 				'meta_query'     => self::listed_only(), // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
 			] );
 
+			/*
+			 * A word few sermons contain is the question's subject: a guest's
+			 * name, a book of the Bible, a series. Found in eight sermons it
+			 * describes nothing in particular; found in two it is what the
+			 * visitor came for, and in a title most of all.
+			 */
+			$rare = count( $query->posts ) <= 3;
+
 			foreach ( array_map( 'intval', $query->posts ) as $id ) {
 				if ( ! isset( $out[ $id ] ) ) {
 					$out[ $id ] = [ 'score' => 0.0, 'words' => [] ];
@@ -579,7 +599,12 @@ class Retrieval {
 
 				$title_hit = false !== stripos( (string) get_the_title( $id ), $word );
 
-				$out[ $id ]['score']  += $title_hit ? 2 : 1;
+				if ( $rare ) {
+					$out[ $id ]['score'] += $title_hit ? 8 : 4;
+				} else {
+					$out[ $id ]['score'] += $title_hit ? 2 : 1;
+				}
+
 				$out[ $id ]['words'][] = $word;
 			}
 		}
