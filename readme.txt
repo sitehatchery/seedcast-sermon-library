@@ -224,6 +224,7 @@ No. Sermons, series and speakers remain in the database.
 
 * Ask: a visitor asks a question in their own words and gets an answer drawn only from your sermons, their questions, your topic and passage pages and your church details, with links to where it came from. Needs Seedcast AI Engine with the assistant on for your site, invite-only for now. Without it nothing changes.
 * Place the ask box wherever you want it with [seedcast_ask], including a page builder header. A setting can also put it in place of your search box, and ordinary search results still appear under every answer.
+* The ask page reads as a conversation: suggested questions to start with, a moment of thinking while your library is read, the answer with its sources as cards, and follow-up questions asked in place without reloading. It still works with JavaScript off.
 * Answers are never pages of their own: one address, kept out of search engines and never cached.
 * A Questions screen lists what visitors asked, most asked and unanswered first. Add a question and its answer to a sermon or under your topics, ignore it for good, or block whoever asked.
 * Topic pages show the questions filed under them, under "Questions people have asked".

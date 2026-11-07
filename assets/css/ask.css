@@ -1,0 +1,448 @@
+/* ==========================================================================
+   The ask page: a conversation with the library.
+
+   Loaded on the ask page only. Colors come from the shared Seedcast tokens,
+   so it takes on whichever theme the church chose, with neutral fallbacks for
+   a site where core's stylesheet is missing.
+   ========================================================================== */
+
+.scsl-ask {
+	--ask-text:    var(--sc-color-text, #1a1a1a);
+	--ask-muted:   var(--sc-color-muted, #6b6b6b);
+	--ask-border:  var(--sc-color-border, #e4e1dc);
+	--ask-subtle:  var(--sc-color-bg-subtle, #f7f6f3);
+	--ask-bg:      var(--sc-color-bg, #ffffff);
+	--ask-accent:  var(--sc-color-accent, #b58a3a);
+	--ask-tint:    var(--sc-color-accent-light, #f4ecda);
+	--ask-ink:     var(--sc-color-primary, #111111);
+	--ask-link:    var(--sc-color-link, #6b4a12);
+	--ask-radius:  14px;
+
+	box-sizing: border-box;
+	width: 100%;
+	max-width: 46rem;
+	margin: clamp(2.5rem, 7vw, 5rem) auto clamp(2rem, 5vw, 3.5rem);
+	padding: 0 16px;
+	color: var(--ask-text);
+}
+
+.scsl-ask *,
+.scsl-ask *::before,
+.scsl-ask *::after {
+	box-sizing: inherit;
+}
+
+/* ── Opening ─────────────────────────────────────────────────────────── */
+
+.scsl-ask__intro {
+	text-align: center;
+	margin-bottom: 2.25rem;
+}
+
+.scsl-ask__badge {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 3rem;
+	height: 3rem;
+	margin-bottom: 1rem;
+	border-radius: 50%;
+	background: var(--ask-tint);
+	color: var(--ask-link);
+}
+
+.scsl-ask__badge svg {
+	width: 22px;
+	height: 22px;
+}
+
+.scsl-ask__heading {
+	margin: 0 0 .5rem;
+	font-size: clamp(1.75rem, 4vw, 2.4rem);
+	line-height: 1.15;
+}
+
+.scsl-ask__lede {
+	max-width: 34rem;
+	margin: 0 auto 1.5rem;
+	color: var(--ask-muted);
+	line-height: 1.55;
+}
+
+/* Once a conversation has started, the opening steps back. */
+.scsl-ask--started .scsl-ask__intro {
+	display: flex;
+	align-items: center;
+	gap: .75rem;
+	text-align: left;
+	margin-bottom: 1.75rem;
+	padding-bottom: 1.25rem;
+	border-bottom: 1px solid var(--ask-border);
+}
+
+.scsl-ask--started .scsl-ask__badge {
+	width: 2.25rem;
+	height: 2.25rem;
+	margin: 0;
+	flex: 0 0 auto;
+}
+
+.scsl-ask--started .scsl-ask__heading {
+	margin: 0;
+	font-size: 1.25rem;
+}
+
+.scsl-ask--started .scsl-ask__lede,
+.scsl-ask--started .scsl-ask__starters {
+	display: none;
+}
+
+/* ── Suggested questions ─────────────────────────────────────────────── */
+
+.scsl-ask__chips {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: .5rem;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.scsl-ask__chip {
+	display: inline-block;
+	padding: .5rem .9rem;
+	border: 1px solid var(--ask-border);
+	border-radius: 999px;
+	background: var(--ask-bg);
+	color: var(--ask-text);
+	font-size: .9rem;
+	line-height: 1.3;
+	text-decoration: none;
+	transition: border-color .15s ease, background-color .15s ease;
+}
+
+.scsl-ask__chip:hover,
+.scsl-ask__chip:focus-visible {
+	border-color: var(--ask-accent);
+	background: var(--ask-tint);
+	color: var(--ask-text);
+}
+
+.scsl-ask__next {
+	justify-content: flex-start;
+	margin-top: 1.1rem;
+}
+
+/* ── The conversation ────────────────────────────────────────────────── */
+
+.scsl-ask__thread {
+	display: flex;
+	flex-direction: column;
+	gap: 2rem;
+}
+
+.scsl-ask__turn {
+	/* Clear of a sticky site header when a new turn is scrolled to. */
+	scroll-margin-top: 7rem;
+	display: flex;
+	flex-direction: column;
+	gap: 1.1rem;
+}
+
+.scsl-ask__q {
+	align-self: flex-end;
+	max-width: 85%;
+	padding: .7rem 1rem;
+	border-radius: 18px 18px 4px 18px;
+	background: var(--ask-ink);
+	color: var(--ask-bg);
+	line-height: 1.45;
+}
+
+.scsl-ask__q p {
+	margin: 0;
+}
+
+.scsl-ask__a {
+	display: grid;
+	grid-template-columns: 2rem 1fr;
+	gap: .85rem;
+	align-items: start;
+}
+
+.scsl-ask__mark {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 2rem;
+	height: 2rem;
+	border-radius: 50%;
+	background: var(--ask-tint);
+	color: var(--ask-link);
+}
+
+.scsl-ask__body {
+	min-width: 0;
+}
+
+.scsl-ask__text {
+	font-size: 1.05rem;
+	line-height: 1.65;
+}
+
+.scsl-ask__text p {
+	margin: 0 0 .8em;
+}
+
+.scsl-ask__text p:last-child {
+	margin-bottom: 0;
+}
+
+.scsl-ask__label {
+	margin: 1.25rem 0 .6rem;
+	color: var(--ask-muted);
+	font-size: .75rem;
+	font-weight: 600;
+	letter-spacing: .06em;
+	text-transform: uppercase;
+}
+
+/* ── Where it came from ──────────────────────────────────────────────── */
+
+.scsl-ask__sources {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+	gap: .6rem;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.scsl-ask__source {
+	display: flex;
+	flex-direction: column;
+	gap: .2rem;
+	height: 100%;
+	padding: .75rem .9rem;
+	border: 1px solid var(--ask-border);
+	border-radius: var(--ask-radius);
+	background: var(--ask-bg);
+	color: var(--ask-text);
+	text-decoration: none;
+	transition: border-color .15s ease, transform .15s ease, box-shadow .15s ease;
+}
+
+.scsl-ask__source:hover,
+.scsl-ask__source:focus-visible {
+	border-color: var(--ask-accent);
+	box-shadow: 0 6px 18px rgba(0, 0, 0, .06);
+	transform: translateY(-1px);
+	color: var(--ask-text);
+}
+
+.scsl-ask__kind {
+	color: var(--ask-link);
+	font-size: .7rem;
+	font-weight: 600;
+	letter-spacing: .06em;
+	text-transform: uppercase;
+}
+
+.scsl-ask__title {
+	font-weight: 600;
+	line-height: 1.3;
+}
+
+.scsl-ask__why {
+	color: var(--ask-muted);
+	font-size: .85rem;
+	line-height: 1.35;
+}
+
+.scsl-ask__pages {
+	margin-top: 1rem;
+	font-size: .9rem;
+}
+
+.scsl-ask__pages summary {
+	color: var(--ask-muted);
+	cursor: pointer;
+}
+
+.scsl-ask__pages ul {
+	margin: .5rem 0 0;
+	padding-left: 1.1rem;
+}
+
+.scsl-ask__pages li {
+	margin: .25rem 0;
+}
+
+/* ── Thinking ────────────────────────────────────────────────────────── */
+
+.scsl-ask__thinking {
+	display: flex;
+	align-items: center;
+	gap: .6rem;
+	min-height: 2rem;
+	color: var(--ask-muted);
+}
+
+.scsl-ask__dots {
+	display: inline-flex;
+	gap: 4px;
+}
+
+.scsl-ask__dots i {
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: var(--ask-accent);
+	animation: scsl-ask-dot 1.2s infinite ease-in-out;
+}
+
+.scsl-ask__dots i:nth-child(2) { animation-delay: .15s; }
+.scsl-ask__dots i:nth-child(3) { animation-delay: .3s; }
+
+@keyframes scsl-ask-dot {
+	0%, 80%, 100% { opacity: .25; transform: translateY(0); }
+	40%           { opacity: 1;   transform: translateY(-3px); }
+}
+
+.scsl-ask__status {
+	transition: opacity .25s ease;
+}
+
+/* A new turn arrives rather than appears. */
+.scsl-ask__turn.is-new,
+.scsl-ask__a.is-new {
+	animation: scsl-ask-in .35s ease both;
+}
+
+@keyframes scsl-ask-in {
+	from { opacity: 0; transform: translateY(6px); }
+	to   { opacity: 1; transform: none; }
+}
+
+.scsl-ask__text .is-hidden {
+	opacity: 0;
+}
+
+.scsl-ask__text .is-shown {
+	opacity: 1;
+	transition: opacity .2s ease;
+}
+
+/* ── The box at the foot ─────────────────────────────────────────────── */
+
+.scsl-ask__composer {
+	position: sticky;
+	bottom: 16px;
+	z-index: 5;
+	display: flex;
+	align-items: flex-end;
+	gap: .5rem;
+	margin-top: 2rem;
+	padding: .45rem .45rem .45rem 1rem;
+	border: 1px solid var(--ask-border);
+	border-radius: 26px;
+	background: var(--ask-bg);
+	box-shadow: 0 8px 28px rgba(0, 0, 0, .08);
+}
+
+.scsl-ask__composer:focus-within {
+	border-color: var(--ask-accent);
+}
+
+/* Doubled class and element, because themes style every textarea and a
+   box three lines tall reads as a form rather than a conversation. */
+.scsl-ask .scsl-ask__composer textarea.scsl-ask__input {
+	flex: 1 1 auto;
+	height: 2.5rem;
+	width: auto;
+	min-width: 0;
+	min-height: 2.5rem;
+	max-height: 9rem;
+	margin: 0;
+	padding: .55rem 0;
+	border: 0;
+	background: transparent;
+	color: var(--ask-text);
+	font: inherit;
+	line-height: 1.4;
+	resize: none;
+	box-shadow: none;
+	outline: none;
+}
+
+.scsl-ask__input::placeholder {
+	color: var(--ask-muted);
+}
+
+.scsl-ask__send {
+	display: inline-flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: center;
+	width: 2.5rem;
+	height: 2.5rem;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	border-radius: 50%;
+	background: var(--ask-ink);
+	color: var(--ask-bg);
+	cursor: pointer;
+	transition: opacity .15s ease, transform .15s ease;
+}
+
+.scsl-ask__send:hover {
+	transform: scale(1.05);
+}
+
+.scsl-ask__send:disabled {
+	opacity: .35;
+	cursor: default;
+	transform: none;
+}
+
+.scsl-ask__fine {
+	margin: .9rem 0 0;
+	color: var(--ask-muted);
+	font-size: .8rem;
+	text-align: center;
+}
+
+/* ── Small screens ───────────────────────────────────────────────────── */
+
+@media (max-width: 600px) {
+	.scsl-ask__q {
+		max-width: 92%;
+	}
+
+	.scsl-ask__a {
+		grid-template-columns: 1fr;
+	}
+
+	.scsl-ask__mark {
+		display: none;
+	}
+
+	.scsl-ask__sources {
+		grid-template-columns: 1fr;
+	}
+
+	.scsl-ask__composer {
+		bottom: 10px;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.scsl-ask *,
+	.scsl-ask *::before,
+	.scsl-ask *::after {
+		animation: none !important;
+		transition: none !important;
+	}
+}

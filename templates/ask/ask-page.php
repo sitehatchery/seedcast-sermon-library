@@ -2,13 +2,12 @@
 /**
  * Template: the ask page.
  *
- * One address for every question, like a search results page. Shows the
- * answer, what it drew on, and the site's ordinary search for the same words.
- * Nothing on it is kept, and it is noindex. See Ask\Page.
+ * A conversation with the library. The first question arrives with the page
+ * and is answered here on the server, so everything works without JavaScript;
+ * assets/js/ask.js then asks the next ones in place. Every turn is printed by
+ * Ask\Page::render_turn(), here and through the REST route alike.
  *
- * The citations are the point of the page. They are how a visitor gets from a
- * question into the library, and they make an answer checkable rather than
- * authoritative, so they are shown whether the answer found something or not.
+ * Nothing on it is kept, and it is noindex. See Ask\Page.
  *
  * A theme can override this with seedcast/ask-page.php.
  *
@@ -19,127 +18,46 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use SeedcastSermonLibrary\Ask\Box;
 use SeedcastSermonLibrary\Ask\Page;
 
-$scsl_state    = Page::state();
-$scsl_question = $scsl_state['question'];
-$scsl_result   = $scsl_state['result'];
-$scsl_status   = is_array( $scsl_result ) ? (string) ( $scsl_result['status'] ?? '' ) : '';
-$scsl_cited    = is_array( $scsl_result ) ? (array) ( $scsl_result['cited'] ?? [] ) : [];
+$scsl_state  = Page::state();
+$scsl_church = class_exists( '\Seedcast\Core\Church' ) ? \Seedcast\Core\Church::name() : get_bloginfo( 'name' );
 
 get_header();
 ?>
 
-<main id="primary" class="site-main scsl-ask">
+<main id="primary" class="site-main scsl-ask<?php echo '' !== $scsl_state['question'] ? ' scsl-ask--started' : ''; ?>">
 
-	<h1 class="scsl-ask__title"><?php esc_html_e( 'Ask a question', 'seedcast-sermon-library' ); ?></h1>
-
-	<?php echo Box::form(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Box::form() escapes everything it prints. ?>
-
-	<?php if ( '' === $scsl_question ) : ?>
-
-		<p class="scsl-ask__note"><?php esc_html_e( 'Ask about anything we have taught or anything about us, in your own words. Answers come from our own sermons and pages, with links to where they came from.', 'seedcast-sermon-library' ); ?></p>
-
-	<?php elseif ( '' !== $scsl_state['message'] ) : ?>
-
-		<p class="scsl-ask__note"><?php echo esc_html( $scsl_state['message'] ); ?></p>
-
-	<?php elseif ( 'capped' === $scsl_status || 'unavailable' === $scsl_status ) : ?>
-
-		<p class="scsl-ask__note"><?php esc_html_e( 'We can\'t answer questions right now. The search results below may still help.', 'seedcast-sermon-library' ); ?></p>
-
-	<?php else : ?>
-
-		<div class="scsl-ask__answer">
-			<?php echo wp_kses_post( wpautop( esc_html( (string) ( $scsl_result['answer'] ?? '' ) ) ) ); ?>
-		</div>
-
-		<?php if ( $scsl_cited ) : ?>
-			<h2 class="scsl-ask__heading">
-				<?php
-				if ( 'answered' === $scsl_status ) {
-					esc_html_e( 'Where this came from', 'seedcast-sermon-library' );
-				} else {
-					esc_html_e( 'The nearest we have', 'seedcast-sermon-library' );
-				}
-				?>
-			</h2>
-			<ul class="scsl-ask__sources">
-				<?php foreach ( $scsl_cited as $scsl_source ) : ?>
-					<li>
-						<?php // nofollow: an answer page links into the library, and nothing should treat these links as votes. ?>
-						<a href="<?php echo esc_url( (string) ( $scsl_source['url'] ?? '' ) ); ?>" rel="nofollow"><?php echo esc_html( (string) ( $scsl_source['title'] ?? '' ) ); ?></a>
-						<?php if ( ! empty( $scsl_source['reason'] ) ) : ?>
-							<span class="scsl-ask__reason"><?php echo esc_html( ucfirst( (string) $scsl_source['reason'] ) ); ?></span>
-						<?php endif; ?>
-					</li>
-				<?php endforeach; ?>
-			</ul>
-		<?php endif; ?>
-
-		<p class="scsl-ask__note"><small><?php esc_html_e( 'This answer was written automatically from our own content. The links above are the best place to read more.', 'seedcast-sermon-library' ); ?></small></p>
-
-	<?php endif; ?>
-
-	<?php
-	/*
-	 * The site's ordinary search for the same words. This is what lets the
-	 * ask box stand where the theme's search did without anybody losing it.
-	 */
-	if ( '' !== $scsl_question ) :
-		$scsl_search = new WP_Query( [
-			's'              => $scsl_question,
-			'post_type'      => 'any',
-			'post_status'    => 'publish',
-			'posts_per_page' => 6,
-			'no_found_rows'  => true,
-			'has_password'   => false,
-		] );
-
-		// A long question rarely matches every word; its longest words might.
-		if ( ! $scsl_search->have_posts() ) {
-			$scsl_words = \SeedcastSermonLibrary\Ask\Questions::words( $scsl_question );
-			usort(
-				$scsl_words,
-				static function ( $a, $b ) {
-					return strlen( $b ) <=> strlen( $a );
-				}
-			);
-
-			if ( $scsl_words ) {
-				$scsl_search = new WP_Query( [
-					's'              => (string) $scsl_words[0],
-					'post_type'      => 'any',
-					'post_status'    => 'publish',
-					'posts_per_page' => 6,
-					'no_found_rows'  => true,
-					'has_password'   => false,
-				] );
-			}
-		}
-
-		if ( $scsl_search->have_posts() ) :
-			?>
-			<section class="scsl-ask__results">
-				<h2 class="scsl-ask__heading"><?php esc_html_e( 'Pages on this site', 'seedcast-sermon-library' ); ?></h2>
-				<ul class="scsl-ask__sources">
-					<?php
-					while ( $scsl_search->have_posts() ) :
-						$scsl_search->the_post();
-						?>
-						<li>
-							<a href="<?php the_permalink(); ?>" rel="nofollow"><?php the_title(); ?></a>
-							<span class="scsl-ask__reason"><?php echo esc_html( wp_trim_words( get_the_excerpt(), 24 ) ); ?></span>
-						</li>
-					<?php endwhile; ?>
-				</ul>
-			</section>
+	<header class="scsl-ask__intro">
+		<span class="scsl-ask__badge" aria-hidden="true"><?php echo Page::mark(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- a fixed SVG. ?></span>
+		<h1 class="scsl-ask__heading">
 			<?php
-			wp_reset_postdata();
-		endif;
-	endif;
-	?>
+			/* translators: %s: church name. */
+			echo esc_html( sprintf( __( 'Ask %s', 'seedcast-sermon-library' ), $scsl_church ) );
+			?>
+		</h1>
+		<p class="scsl-ask__lede"><?php esc_html_e( 'Ask about anything we have taught, or anything about us, in your own words. Answers come from our own sermons and pages, with links to where they came from.', 'seedcast-sermon-library' ); ?></p>
+		<?php echo Page::render_chips( Page::suggestions(), 'scsl-ask__starters' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- render_chips() escapes everything it prints. ?>
+	</header>
+
+	<div class="scsl-ask__thread" aria-live="polite">
+		<?php echo Page::render_turn( $scsl_state ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- render_turn() escapes everything it prints. ?>
+	</div>
+
+	<form class="scsl-ask__composer" method="get" action="<?php echo esc_url( Page::url() ); ?>">
+		<?php if ( '' === (string) get_option( 'permalink_structure' ) ) : ?>
+			<input type="hidden" name="<?php echo esc_attr( Page::QUERY_VAR ); ?>" value="1" />
+		<?php endif; ?>
+		<input type="hidden" name="from" value="<?php echo esc_attr( $scsl_state['from_raw'] ); ?>" />
+		<label class="screen-reader-text" for="scsl-ask-input"><?php esc_html_e( 'Your question', 'seedcast-sermon-library' ); ?></label>
+		<textarea id="scsl-ask-input" class="scsl-ask__input" name="q" rows="1" maxlength="<?php echo esc_attr( (string) Page::MAX_CHARS ); ?>" placeholder="<?php echo esc_attr( '' !== $scsl_state['question'] ? __( 'Ask something else', 'seedcast-sermon-library' ) : __( 'Ask us a question', 'seedcast-sermon-library' ) ); ?>" required></textarea>
+		<button type="submit" class="scsl-ask__send">
+			<span class="screen-reader-text"><?php esc_html_e( 'Ask', 'seedcast-sermon-library' ); ?></span>
+			<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path fill="currentColor" d="M3.4 20.4 21 12 3.4 3.6 3.4 10l12.6 2-12.6 2z"/></svg>
+		</button>
+	</form>
+
+	<p class="scsl-ask__fine"><?php esc_html_e( 'Answers are written automatically from our own content and can be wrong. The links are the best place to read more.', 'seedcast-sermon-library' ); ?></p>
 
 </main>
 

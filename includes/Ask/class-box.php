@@ -51,11 +51,19 @@ class Box {
 	}
 
 	public static function search_form( $form ) {
-		return self::takes_over() ? self::form() : $form;
+		if ( ! self::takes_over() ) {
+			return $form;
+		}
+
+		return Page::is_ask() ? '' : self::form();
 	}
 
 	public static function search_block( $content, $block ) {
-		return self::takes_over() ? self::form( [ 'class' => 'wp-block-search' ] ) : $content;
+		if ( ! self::takes_over() ) {
+			return $content;
+		}
+
+		return Page::is_ask() ? '' : self::form( [ 'class' => 'wp-block-search' ] );
 	}
 
 	public static function shortcode( $atts = [] ): string {
@@ -72,6 +80,13 @@ class Box {
 
 		if ( ! Page::available() ) {
 			return 'none' === $atts['fallback'] ? '' : get_search_form( [ 'echo' => false ] );
+		}
+
+		// The ask page has its own box at the foot of the conversation. A
+		// second one in the header, holding the same question, reads as a
+		// mistake.
+		if ( Page::is_ask() ) {
+			return '';
 		}
 
 		return self::form( [ 'placeholder' => (string) $atts['placeholder'] ] );
@@ -140,13 +155,6 @@ class Box {
 			'.scsl-ask-form{display:flex;gap:.4em;align-items:stretch;max-width:100%}'
 			. '.scsl-ask-form__input{flex:1 1 auto;min-width:0}'
 			. '.scsl-ask-form__submit{flex:0 0 auto;cursor:pointer}'
-			. '.scsl-ask{max-width:46rem;margin:2.5rem auto;padding:0 16px}'
-			. '.scsl-ask__answer{font-size:1.1em;line-height:1.6;margin:1.5rem 0}'
-			. '.scsl-ask__sources{list-style:none;padding:0;margin:0 0 2rem}'
-			. '.scsl-ask__sources li{padding:.6em 0;border-top:1px solid rgba(0,0,0,.1)}'
-			. '.scsl-ask__reason{display:block;font-size:.875em;opacity:.75}'
-			. '.scsl-ask__note{opacity:.8}'
-			. '.scsl-ask__results{margin-top:2.5rem}'
 		);
 	}
 }
