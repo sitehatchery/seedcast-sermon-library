@@ -20,7 +20,7 @@ if ( defined( 'SEEDCAST_CORE_VERSION' ) ) {
 	return;
 }
 
-define( 'SEEDCAST_CORE_VERSION', '1.29.0' );
+define( 'SEEDCAST_CORE_VERSION', '1.30.0' );
 define( 'SEEDCAST_CORE_DIR', __DIR__ . '/' );
 define( 'SEEDCAST_CORE_URL', plugin_dir_url( __FILE__ ) );
 
@@ -34,6 +34,7 @@ require_once SEEDCAST_CORE_DIR . 'class-blurb.php';
 require_once SEEDCAST_CORE_DIR . 'class-churchschema.php';
 require_once SEEDCAST_CORE_DIR . 'class-completeness.php';
 require_once SEEDCAST_CORE_DIR . 'class-counters.php';
+require_once SEEDCAST_CORE_DIR . 'class-words.php';
 require_once SEEDCAST_CORE_DIR . 'class-core.php';
 
 require_once SEEDCAST_CORE_DIR . 'Submissions/class-captcha.php';

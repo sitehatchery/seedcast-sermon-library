@@ -162,7 +162,7 @@ The plugin itself does not call any external service to work. These are the only
 * **Spam checking on submitted forms.** If you turn on Google reCAPTCHA, hCaptcha or Cloudflare Turnstile in Settings, each submitted form sends that provider the token their widget produced, along with your site's IP address, so the provider can confirm the sender is not a bot. Nothing is sent when no provider is configured, which is the default. Google: [terms](https://policies.google.com/terms), [privacy](https://policies.google.com/privacy). hCaptcha: [terms](https://www.hcaptcha.com/terms), [privacy](https://www.hcaptcha.com/privacy). Cloudflare: [terms](https://www.cloudflare.com/website-terms/), [privacy](https://www.cloudflare.com/privacypolicy/).
 * **Embedded video and audio.** A sermon given a YouTube or Vimeo address embeds that player, so a visitor's browser loads it from YouTube (through youtube-nocookie.com) or Vimeo when they open the sermon. No video is embedded unless you give a sermon one. YouTube: [terms](https://www.youtube.com/t/terms), [privacy](https://policies.google.com/privacy). Vimeo: [terms](https://vimeo.com/terms), [privacy](https://vimeo.com/privacy).
 * **Copying your audio back from Seedcast.** Churches whose sermon audio is hosted on media.seedcast.ai can copy those files into their own media library from Sermon Library > Reclaim Audio. Your site downloads its own files when you press the button; nothing is sent, and nothing happens unless you use that screen. [Terms](https://seedcast.ai/terms/), [privacy](https://seedcast.ai/privacy/).
-* **Questions visitors ask, when the assistant is on.** Only where Seedcast AI Engine is installed and the assistant is switched on for your site. A visitor's question, the title of the page they asked from, and the parts of your published sermons and pages found for it are sent through the engine to api.seedcast.ai to be answered. Nothing identifying the visitor is sent, and the questions themselves are kept on your site. [Terms](https://seedcast.ai/terms/), [privacy](https://seedcast.ai/privacy/).
+* **Questions visitors ask, when the AI Engine's assistant is on.** The parts of your published sermons found for a question are passed to Seedcast AI Engine, which sends them to api.seedcast.ai to be answered. Nothing is sent where the engine is not installed or the assistant is off. [Terms](https://seedcast.ai/terms/), [privacy](https://seedcast.ai/privacy/).
 * **Links out to a Bible.** The "Read it" links beside a passage open Bible.com or BibleGateway in a new tab. These are ordinary links: your site sends them nothing, and nothing loads until a visitor clicks.
 
 Sermon Library AI, the optional paid add-on, is a separate plugin with its own readme, and it is the only part that sends your sermon recordings anywhere.
@@ -222,14 +222,9 @@ No. Sermons, series and speakers remain in the database.
 
 = 2.76.0 =
 
-* Ask: a visitor asks a question in their own words and gets an answer drawn only from your own content (sermons and their questions, speakers, series, topic and passage pages, your church details, and your site's own pages and articles, your statement of faith among them), with links to where it came from. Needs Seedcast AI Engine with the assistant on for your site, invite-only for now. Without it nothing changes.
-* Place the ask box wherever you want it with [seedcast_ask], including a page builder header. A setting can also put it in place of your search box, and ordinary search results still appear under every answer.
-* The ask page reads as a conversation: suggested questions to start with, a moment of thinking while your library is read, the answer with its sources as cards, and follow-up questions asked in place without reloading. It still works with JavaScript off.
-* Answers are never pages of their own: one address, kept out of search engines and never cached.
-* A Questions screen lists what visitors asked, most asked and unanswered first. Add a question and its answer to a sermon or under your topics, ignore it for good, or block whoever asked.
+* Ready for Ask, the AI Engine's assistant: visitors' questions are answered from your sermons and the questions they answer, your speakers, series, topics and passages, with links to each. The assistant itself, its box, page and AI Assistant screen, comes with Seedcast AI Engine.
+* An answer written on the AI Assistant screen can be published onto a sermon's questions, where it counts toward completeness, or under your topics.
 * Topic pages show the questions filed under them, under "Questions people have asked".
-* Questions stay on your site for ninety days unless you act on them. Visitors are recorded as a changing hash, never an address.
-* Visitors are limited to a few questions a minute, and your site stops itself at a daily limit you set.
 * A Topic Coverage screen shows how much of your library carries topics, and can file every unfiled sermon in one run with Seedcast AI Engine.
 * Sermon views are counted. They never were: the counter never reached the page. Topic and passage pages are counted too, a cached page still counts, and crawlers do not.
 * A service bulletin's opening paragraph is written from its sermon, as the emphasis of the morning, where Seedcast AI Engine is connected.
@@ -244,4 +239,4 @@ Complete historical changelog: see `changelog.txt`.
 
 = 2.76.0 =
 
-Visitors can ask your library a question, for churches in the Ask beta, and sermon views are counted at last.
+Your library answers the AI Engine's Ask assistant, topic pages carry the questions people asked, and sermon views are counted at last.

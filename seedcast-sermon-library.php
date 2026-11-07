@@ -31,7 +31,7 @@ define( 'SCSL_PLUGIN_BASENAME',  plugin_basename( __FILE__ ) );
  * features. They match today; they diverge as soon as another Seedcast plugin
  * ships a newer core and this one has not caught up.
  */
-define( 'SCSL_CORE_VERSION',     '1.29.0' );
+define( 'SCSL_CORE_VERSION',     '1.30.0' );
 define( 'SCSL_CORE_MIN_VERSION', '1.17.1' );
 
 /*
@@ -103,16 +103,13 @@ final class SermonLibrary {
 		( new Frontend\LlmsIndex() )->init();
 		( new Frontend\ViewCounter() )->init();
 
-		// The public assistant. Each part costs nothing until the engine says
-		// this site is entitled: the box and the page check before doing
-		// anything, and retrieval only runs when the engine asks.
-		Ask\Questions::init();
+		// What this plugin gives the AI Engine's assistant: its sermons, topics,
+		// passages, speakers and series to answer from, questions on topic
+		// pages, and a place to publish an answer. The assistant itself is the
+		// engine's; all of this costs nothing where the engine is not running.
 		Ask\Retrieval::init();
-		Ask\SitePages::init();
-		Ask\Page::init();
-		Ask\Box::init();
+		Ask\Bridge::init();
 		Ask\TopicFaq::init();
-		( new Admin\QuestionsScreen() )->init();
 		( new Admin\TopicCoverage() )->init();
 		( new Frontend\ImageFallback() )->init();
 		( new Frontend\PodcastFeed() )->init();

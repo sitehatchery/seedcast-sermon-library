@@ -4,6 +4,7 @@ namespace SeedcastSermonLibrary\Ask;
 use SeedcastSermonLibrary\Frontend\Faq;
 use SeedcastSermonLibrary\Frontend\Unlisted;
 use SeedcastSermonLibrary\Scripture\ScriptureParser;
+use Seedcast\Core\Words;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -52,7 +53,7 @@ class Retrieval {
 	public static function retrieve( $found, $question, $context = [] ): array {
 		$found    = is_array( $found ) ? $found : [];
 		$question = (string) $question;
-		$all      = Questions::words( $question );
+		$all      = Words::of( $question );
 
 		// Verbs every question about a church uses. "What did he teach" is not
 		// about the topic False Teaching, nor asking who the teachers are.
@@ -321,8 +322,8 @@ class Retrieval {
 		$matches = [];
 
 		foreach ( $terms as $term ) {
-			$name_words = Questions::words( $term->name );
-			$desc_words = Questions::words( (string) $term->description );
+			$name_words = Words::of( $term->name );
+			$desc_words = Words::of( (string) $term->description );
 
 			if ( ! $name_words ) {
 				continue;
@@ -407,7 +408,7 @@ class Retrieval {
 		foreach ( $people as $person ) {
 			// A name, not a role: "Guest Teachers" is not named by "teachers".
 			$name_words = array_filter(
-				Questions::words( $person->post_title ),
+				Words::of( $person->post_title ),
 				static function ( string $word ): bool {
 					return mb_strlen( $word ) >= 3 && ! in_array( $word, self::ROLE_WORDS, true );
 				}
@@ -426,7 +427,7 @@ class Retrieval {
 				continue;
 			}
 
-			$profile = Questions::words( $person->post_content . ' ' . get_post_meta( $person->ID, '_scsl_speaker_title', true ) );
+			$profile = Words::of( $person->post_content . ' ' . get_post_meta( $person->ID, '_scsl_speaker_title', true ) );
 			$score   = $named ? 7.0 : 4.0;
 
 			// A profile that says "pastor" answers "who is your pastor" better
@@ -580,7 +581,7 @@ class Retrieval {
 		$out = [];
 
 		foreach ( get_posts( [ 'post_type' => 'scsl_series', 'post_status' => 'publish', 'posts_per_page' => 200, 'has_password' => false ] ) as $series ) {
-			$title = array_values( array_diff( Questions::words( $series->post_title ), self::GENERIC_WORDS ) );
+			$title = array_values( array_diff( Words::of( $series->post_title ), self::GENERIC_WORDS ) );
 			$hit   = count( array_intersect( $title, $words ) );
 
 			if ( ! $title || ! $hit || $hit * 2 < count( $title ) ) {
@@ -760,7 +761,7 @@ class Retrieval {
 			$best = null;
 
 			foreach ( Faq::get( $id ) as $pair ) {
-				$overlap = count( array_intersect( Questions::words( $pair['question'] ), $words ) );
+				$overlap = count( array_intersect( Words::of( $pair['question'] ), $words ) );
 
 				if ( $overlap >= 2 && ( ! $best || $overlap > $best['score'] ) ) {
 					$best = [
